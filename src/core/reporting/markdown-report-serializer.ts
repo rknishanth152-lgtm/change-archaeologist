@@ -204,6 +204,7 @@ export function serializeReportToMarkdown(report: AnalysisReport): string {
   if (report.correlations.length === 0) {
     corrSec += `*No change-to-test correlations observed or computed.*\n`;
   } else {
+    corrSec += `> [!NOTE]\n> **Correlation Status Semantics:** Correlation status reflects syntactic proximity prioritization (e.g. \`STRONG\` indicates a direct call to the target function within the changed test block; \`WEAK\` indicates a file-level import or identifier reference; \`NONE\` indicates no companion test changes). Correlation statuses are prioritization indicators for review, **not** runtime test coverage proofs or causal verifications.\n\n`;
     corrSec += `| Correlation ID | Status | Structural Change | Related Test Changes | Rationale |\n`;
     corrSec += `| :--- | :--- | :--- | :--- | :--- |\n`;
     for (const c of report.correlations) {

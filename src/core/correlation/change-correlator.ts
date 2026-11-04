@@ -425,7 +425,11 @@ export class ChangeCorrelator {
           const isModified = astChange.changeType === "ASSERTION_MODIFIED_OR_REWRITTEN";
           const isAdded = astChange.changeType === "ASSERTION_ADDED";
 
-          // Determine syntactic closeness
+          // Determine syntactic proximity (calibration semantics):
+          // - STRONG: Direct syntactic call (callsTargetFunctionInBlock) in the changed test block.
+          //   Prioritization signal indicating high syntactic proximity; does NOT prove runtime execution.
+          // - WEAK: File-level import or identifier reference without an immediate direct call in block.
+          // - NONE: No companion test changes observed.
           const hasDirectCall = astChange.callsTargetFunctionInBlock;
           const mentionsOrImports = tc.importsTargetFile || tc.mentionsTargetFunction;
 
