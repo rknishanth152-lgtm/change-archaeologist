@@ -8,6 +8,7 @@
  * - Maps low-level OS errors to structured GitError objects.
  */
 
+import { Buffer } from "node:buffer";
 import { execFile } from "node:child_process";
 import { GitError, type GitErrorCode } from "./errors.js";
 
@@ -135,6 +136,21 @@ export class GitRunner {
                 `Git execution failed (exit ${exitCode}): ${stderrStr.trim() || error.message}`,
                 "GIT_EXEC_ERROR",
                 { exitCode, stderr: stderrStr.trim(), args }
+              )
+            );
+          }
+
+          // Cross-platform buffer limit enforcement:
+          // Node's child_process on Linux may not emit ERR_CHILD_PROCESS_STDIO_MAXBUFFER
+          // if the process finishes and closes stdio before chunk buffer inspection fires.
+          const stdoutBytes = Buffer.byteLength(stdoutStr, "utf8");
+          const stderrBytes = Buffer.byteLength(stderrStr, "utf8");
+          if (stdoutBytes > maxBuffer || stderrBytes > maxBuffer) {
+            return reject(
+              new GitError(
+                `Git output exceeded buffer limit of ${maxBuffer} bytes`,
+                "GIT_OUTPUT_LIMIT_EXCEEDED",
+                { maxBuffer, stdoutBytes, stderrBytes }
               )
             );
           }
