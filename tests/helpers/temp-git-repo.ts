@@ -26,7 +26,7 @@ export class TempGitRepo {
     return repo;
   }
 
-  private runGit(args: string[]): string {
+  runGit(args: string[]): string {
     return execFileSync("git", args, {
       cwd: this.dir,
       shell: false,

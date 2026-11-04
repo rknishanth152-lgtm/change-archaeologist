@@ -644,4 +644,56 @@ export function calculateTax(broken { syntax error!
     const gitErr = caughtError as GitError;
     expect(gitErr.code).toBe("INVALID_REVISION");
   });
+
+  // --------------------------------------------------------------------------
+  // 15. Regression test: Guard exit modified (RULE_GUARD_MODIFIED)
+  // --------------------------------------------------------------------------
+  it("15. detects a guard exit modified (RULE_GUARD_MODIFIED) and synthesizes a valid finding and evidence", async () => {
+    const baseSource = `export function validateScore(score: number): boolean {
+  if (score < 0) {
+    return false;
+  }
+  return score >= 50;
+}
+`;
+    const headSource = `export function validateScore(score: number): boolean {
+  if (score < 0) {
+    return true;
+  }
+  return score >= 50;
+}
+`;
+
+    const baseSha = repo.commitFile("src/score.ts", baseSource, "Commit A: return false on negative");
+    const headSha = repo.commitFile("src/score.ts", headSource, "Commit B: return true on negative");
+
+    const request: AnalysisRequest = {
+      repoPath: repo.dir,
+      targetFilePath: "src/score.ts",
+      targetFunctionName: "validateScore",
+      baseRevisionInput: "HEAD~1",
+      headRevisionInput: "HEAD",
+    };
+
+    const report = await compareHistoricalFunction(request);
+
+    assertValidAnalysisReport(report);
+    expect(report.status).toBe("COMPLETED_WITH_FINDINGS");
+    expect(report.baseCommit.sha).toBe(baseSha);
+    expect(report.headCommit.sha).toBe(headSha);
+    expect(report.findings).toHaveLength(1);
+
+    const finding = report.findings[0];
+    expect(finding.inferred[0].ruleId).toBe("RULE_GUARD_MODIFIED");
+    expect(finding.observed[0].statement).toContain("guard exit");
+    expect(finding.unknown[0].statement).toBeDefined();
+
+    expect(report.structuralChanges).toHaveLength(1);
+    expect(report.structuralChanges[0].changeType).toBe("MODIFIED");
+    expect(report.structuralChanges[0].ruleId).toBe("RULE_GUARD_MODIFIED");
+    expect(report.structuralChanges[0].beforeSpan).not.toBeNull();
+    expect(report.structuralChanges[0].afterSpan).not.toBeNull();
+    expect(report.structuralChanges[0].beforeSnippet).toContain("return false;");
+    expect(report.structuralChanges[0].afterSnippet).toContain("return true;");
+  });
 });

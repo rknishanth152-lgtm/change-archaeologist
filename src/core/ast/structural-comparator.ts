@@ -196,6 +196,69 @@ export class StructuralComparator {
             beforeSnippet: bGuard.rawText,
             afterSnippet: hGuard.rawText,
           });
+
+          const evBaseId = nextEvId();
+          evidence.push({
+            id: evBaseId,
+            kind: "SOURCE_BEFORE",
+            commitRole: "BASE",
+            commitSha: baseSha,
+            posixFilePath: baseFilePath,
+            span: bGuard.span,
+            codeSnippet: bGuard.rawText,
+            description: `Guard exit at BASE lines ${bGuard.span.startLine}-${bGuard.span.endLine}`,
+          });
+
+          const evHeadId = nextEvId();
+          evidence.push({
+            id: evHeadId,
+            kind: "SOURCE_AFTER",
+            commitRole: "HEAD",
+            commitSha: headSha,
+            posixFilePath: headFilePath,
+            span: hGuard.span,
+            codeSnippet: hGuard.rawText,
+            description: `Guard exit at HEAD lines ${hGuard.span.startLine}-${hGuard.span.endLine}`,
+          });
+
+          const obsId = nextObsId();
+          const obs: Observation = {
+            id: obsId,
+            category: "OBSERVED",
+            statement: `Under condition "${bGuard.normalizedCondition}", guard exit "${bGuard.exitText}" at BASE lines ${bGuard.span.startLine}-${bGuard.span.endLine} was replaced with "${hGuard.exitText}" at HEAD lines ${hGuard.span.startLine}-${hGuard.span.endLine}.`,
+            evidenceIds: [evBaseId, evHeadId],
+            span: bGuard.span,
+            snippet: bGuard.rawText,
+          };
+
+          const infId = nextInfId();
+          const inf: InferenceStatement = {
+            id: infId,
+            category: "INFERRED",
+            statement: `Guard clause exit was modified from "${bGuard.exitText}" to "${hGuard.exitText}" while preserving condition "${bGuard.normalizedCondition}".`,
+            ruleId: "RULE_GUARD_MODIFIED",
+            supportingObservationIds: [obsId],
+          };
+
+          const unkId = nextUnkId();
+          const unk: UnknownStatement = {
+            id: unkId,
+            category: "UNKNOWN",
+            statement: `Static analysis cannot evaluate whether downstream callers expect the previous guard exit value or behavior.`,
+            reasonCategory: "EXTERNAL_CALLER_BEHAVIOR",
+          };
+
+          findings.push({
+            id: nextFndId(),
+            title: `Guard exit modified under condition (${bGuard.normalizedCondition})`,
+            category: "GUARD_CLAUSE",
+            attentionLevel: "MODERATE_ATTENTION",
+            structuralChangeIds: [changeId],
+            correlationId: null,
+            observed: [obs],
+            inferred: [inf],
+            unknown: [unk],
+          });
         }
         continue;
       }
