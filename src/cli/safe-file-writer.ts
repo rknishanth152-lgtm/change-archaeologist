@@ -37,9 +37,9 @@ export function safeWriteReportFile(options: SafeWriteOptions): SafeWriteResult 
       ? path.normalize(outputPath)
       : path.resolve(cwd, outputPath);
 
-    // 1. Guard against writing into internal .git directory
-    const normalizedSegments = path.normalize(resolvedPath).split(path.sep);
-    if (normalizedSegments.includes(".git")) {
+    // 1. Guard against writing into internal .git directory (case-insensitive, cross-platform)
+    const normalizedSegments = path.normalize(resolvedPath).split(/[\\/]/);
+    if (normalizedSegments.some((s) => s.toLowerCase() === ".git")) {
       return {
         success: false,
         error: `Output destination '${resolvedPath}' resolves inside a '.git' directory, which is prohibited for repository integrity.`,
