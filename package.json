@@ -1,0 +1,23 @@
+{
+  "name": "change-archaeologist",
+  "version": "0.1.0",
+  "description": "Local-first JavaScript and TypeScript Git-history analysis tool",
+  "type": "module",
+  "bin": {
+    "change-archaeologist": "./bin/change-archaeologist.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --outDir dist"
+  },
+  "dependencies": {
+    "ts-morph": "^24.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
+
