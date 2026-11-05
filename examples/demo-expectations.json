@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "Predefined expectations for Change Archaeologist deterministic demonstration scenarios.",
+  "scenarios": [
+    {
+      "id": "A",
+      "title": "Guard Clause Removal",
+      "description": "An early validation guard clause throwing an Error in BASE is structurally removed in HEAD.",
+      "targetFilePath": "src/auth.ts",
+      "targetFunctionName": "processPayment",
+      "companionTestFiles": [],
+      "baseRevision": "base",
+      "headRevision": "head",
+      "expectedExitCode": 0,
+      "expectedReportStatus": "COMPLETED_WITH_FINDINGS",
+      "expectedStructuralRules": ["RULE_GUARD_REMOVED"],
+      "expectedCategories": ["GUARD_CLAUSE"],
+      "minStructuralChanges": 1,
+      "maxStructuralChanges": 1,
+      "forbiddenClaims": [
+        "proves a regression",
+        "regression introduced",
+        "bug introduced",
+        "proven breaking change",
+        "coverage decreased"
+      ]
+    },
+    {
+      "id": "B",
+      "title": "Conditional Expression Modification",
+      "description": "A logical operator in a conditional guard mutates from logical AND (&&) to logical OR (||).",
+      "targetFilePath": "src/access.ts",
+      "targetFunctionName": "authorizeUser",
+      "companionTestFiles": [],
+      "baseRevision": "base",
+      "headRevision": "head",
+      "expectedExitCode": 0,
+      "expectedReportStatus": "COMPLETED_WITH_FINDINGS",
+      "expectedStructuralRules": ["RULE_CONDITIONAL_MODIFIED"],
+      "expectedCategories": ["CONDITIONAL_EXPRESSION"],
+      "minStructuralChanges": 1,
+      "maxStructuralChanges": 1,
+      "forbiddenClaims": [
+        "security vulnerability introduced",
+        "runtime failure proven",
+        "broken authorization",
+        "test failed"
+      ]
+    },
+    {
+      "id": "C",
+      "title": "Throw-to-Return Conversion",
+      "description": "An exceptional error exit (throw) is replaced by a graceful fallback return value.",
+      "targetFilePath": "src/config.ts",
+      "targetFunctionName": "loadConfig",
+      "companionTestFiles": [],
+      "baseRevision": "base",
+      "headRevision": "head",
+      "expectedExitCode": 0,
+      "expectedReportStatus": "COMPLETED_WITH_FINDINGS",
+      "expectedStructuralRules": ["RULE_THROW_TO_RETURN_CONVERSION"],
+      "expectedCategories": ["GUARD_CLAUSE"],
+      "minStructuralChanges": 1,
+      "maxStructuralChanges": 1,
+      "forbiddenClaims": [
+        "behavioral regression",
+        "guaranteed runtime success",
+        "caller broken"
+      ]
+    },
+    {
+      "id": "D",
+      "title": "Companion Test Change Detection",
+      "description": "Companion test changes in an isolated test file are detected with line numbers, titles, and AST assertion diffs.",
+      "targetFilePath": "src/order.ts",
+      "targetFunctionName": "calculateDiscount",
+      "companionTestFiles": ["tests/order.test.ts"],
+      "baseRevision": "base",
+      "headRevision": "head",
+      "expectedExitCode": 0,
+      "expectedReportStatus": "COMPLETED_WITH_FINDINGS",
+      "expectedTestStatus": "COMPLETED_WITH_CHANGES",
+      "minTestChanges": 1,
+      "forbiddenClaims": [
+        "test passes at runtime",
+        "test fails at runtime",
+        "coverage verified",
+        "regression proven"
+      ]
+    },
+    {
+      "id": "E",
+      "title": "Conservative Change-to-Test Correlation",
+      "description": "A production calculation change and a companion assertion change in the same commit are correlated without claiming runtime causality.",
+      "targetFilePath": "src/order.ts",
+      "targetFunctionName": "calculateDiscount",
+      "companionTestFiles": ["tests/order.test.ts"],
+      "baseRevision": "base",
+      "headRevision": "head",
+      "expectedExitCode": 0,
+      "expectedReportStatus": "COMPLETED_WITH_FINDINGS",
+      "expectedStructuralRules": ["RULE_RETURN_MODIFIED"],
+      "expectedCorrelationStatus": "STRONG",
+      "expectedCorrelationClassification": "POTENTIALLY_RELATED_ASSERTION_MODIFIED",
+      "minCorrelations": 1,
+      "forbiddenClaims": [
+        "proves coverage",
+        "proves verification",
+        "causally linked",
+        "test confirms change"
+      ]
+    },
+    {
+      "id": "F",
+      "title": "Unknown or Incomplete Evidence (Missing Function)",
+      "description": "A target function present in BASE but deleted in HEAD produces an explicit incomplete report preserving epistemic boundaries.",
+      "targetFilePath": "src/legacy.ts",
+      "targetFunctionName": "deprecatedHelper",
+      "companionTestFiles": [],
+      "baseRevision": "base",
+      "headRevision": "head",
+      "expectedExitCode": 1,
+      "expectedReportStatus": "INCOMPLETE_FUNCTION_MISSING",
+      "expectedStructuralRules": [],
+      "minStructuralChanges": 0,
+      "maxStructuralChanges": 0,
+      "forbiddenClaims": [
+        "unchanged function",
+        "identical AST",
+        "runtime error"
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,418 @@
+/**
+ * Change Archaeologist — Graph Accessible Linear View Component
+ *
+ * Full semantic HTML alternative for keyboard navigation, screen readers,
+ * and narrow screen viewports. Exposes the exact same entities, relationships,
+ * and evidence anchors as the visual graph canvas.
+ */
+
+import React from "react";
+import {
+  FileCode2,
+  FileCheck,
+  Tag,
+  Network,
+  Info,
+  Layers,
+} from "lucide-react";
+import {
+  GlyphMark,
+  GlyphGuardClause,
+  GlyphConditional,
+  GlyphThrowStmt,
+  GlyphReturnStmt,
+  GlyphDeltaAdded,
+  GlyphDeltaModified,
+  GlyphDeltaRemoved,
+  GlyphCorrStrong,
+  GlyphCorrWeak,
+  GlyphCorrUncertain,
+  GlyphCorrNone,
+  GlyphEvidencePin,
+} from "../icons/ArchaeologistGlyphs.js";
+import type {
+  CorrelationGraphModel,
+  CorrelationGraphNode,
+  CorrelationGraphEdge,
+} from "../../types/index.js";
+import { formatSpanCoordinates } from "../../utils/source-location.js";
+import { Badge } from "../ui/Badge.js";
+
+interface GraphAccessibleViewProps {
+  readonly model: CorrelationGraphModel;
+  readonly selectedNodeId: string | null;
+  readonly selectedEdgeId: string | null;
+  readonly searchQuery?: string;
+  readonly onSelectNode: (node: CorrelationGraphNode) => void;
+  readonly onSelectEdge: (edge: CorrelationGraphEdge) => void;
+  readonly onSelectEvidence?: (evidenceId: string) => void;
+}
+
+// Category glyph helper for structural change cards
+function getCategoryGlyph(category?: string) {
+  const cat = (category ?? "").toUpperCase();
+  if (cat.includes("GUARD")) return <GlyphGuardClause size={13} className="text-status-modified shrink-0" />;
+  if (cat.includes("CONDITIONAL")) return <GlyphConditional size={13} className="text-status-modified shrink-0" />;
+  if (cat.includes("THROW")) return <GlyphThrowStmt size={13} className="text-status-modified shrink-0" />;
+  if (cat.includes("RETURN")) return <GlyphReturnStmt size={13} className="text-status-modified shrink-0" />;
+  return <Layers size={13} className="text-status-modified shrink-0" />;
+}
+
+// Delta badge helper
+function renderChangeBadge(changeType?: string) {
+  if (!changeType) return null;
+  const upper = changeType.toUpperCase();
+  if (upper === "ADDED" || upper === "ADD") {
+    return (
+      <Badge variant="verdigris" className="text-[9px] px-1.5 py-0 font-semibold inline-flex items-center gap-1">
+        <GlyphDeltaAdded size={10} className="shrink-0" />
+        <span>[+] ADD</span>
+      </Badge>
+    );
+  }
+  if (upper === "MODIFIED" || upper === "MOD") {
+    return (
+      <Badge variant="terracotta" className="text-[9px] px-1.5 py-0 font-semibold inline-flex items-center gap-1">
+        <GlyphDeltaModified size={10} className="shrink-0" />
+        <span>[Δ] MOD</span>
+      </Badge>
+    );
+  }
+  if (upper === "REMOVED" || upper === "DELETED" || upper === "REM") {
+    return (
+      <Badge variant="amber" className="text-[9px] px-1.5 py-0 font-semibold inline-flex items-center gap-1">
+        <GlyphDeltaRemoved size={10} className="shrink-0" />
+        <span>[-] REM</span>
+      </Badge>
+    );
+  }
+  return <Badge variant="outline" className="text-[9px] px-1.5 py-0">{changeType}</Badge>;
+}
+
+export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
+  model,
+  selectedNodeId,
+  selectedEdgeId,
+  searchQuery = "",
+  onSelectNode,
+  onSelectEdge,
+  onSelectEvidence,
+}) => {
+  const query = searchQuery.trim().toLowerCase();
+
+  const productionNodes = model.nodes.filter(
+    (n) => n.data.category === "PRODUCTION_FUNCTION" || n.data.category === "STRUCTURAL_CHANGE"
+  ).filter((n) => {
+    if (!query) return true;
+    return (
+      n.data.title.toLowerCase().includes(query) ||
+      n.data.subtitle.toLowerCase().includes(query) ||
+      n.data.filePath.toLowerCase().includes(query)
+    );
+  });
+
+  const testNodes = model.nodes.filter(
+    (n) =>
+      n.data.category === "TEST_FILE" ||
+      n.data.category === "TEST_CHANGE" ||
+      n.data.category === "TEST_DECLARATION"
+  ).filter((n) => {
+    if (!query) return true;
+    return (
+      n.data.title.toLowerCase().includes(query) ||
+      n.data.subtitle.toLowerCase().includes(query) ||
+      n.data.filePath.toLowerCase().includes(query)
+    );
+  });
+
+  const correlationEdges = model.edges.filter(
+    (e) => e.data.category === "CORRELATED_WITH"
+  ).filter((e) => {
+    if (!query) return true;
+    return (
+      e.data.sourceEntityId.toLowerCase().includes(query) ||
+      e.data.targetEntityId.toLowerCase().includes(query) ||
+      (e.data.label && e.data.label.toLowerCase().includes(query)) ||
+      (e.data.rationale && e.data.rationale.toLowerCase().includes(query))
+    );
+  });
+
+  return (
+    <div
+      role="region"
+      aria-label="Accessible Linear Graph Table View"
+      className="p-4 space-y-6 max-w-5xl mx-auto font-mono text-xs text-text-primary"
+    >
+      {/* Epistemic Humility Banner */}
+      <div className="rounded-md border border-hairline bg-panel p-3 flex items-center space-x-2.5 text-text-muted">
+        <Info size={14} className="text-status-uncertain shrink-0" />
+        <span>
+          <strong className="text-text-secondary font-semibold">Accessible Linear Representation:</strong>{" "}
+          Presents all graph nodes, containment relationships, and analytical correlations in a keyboard-navigable linear format.
+        </span>
+      </div>
+
+      {/* 1. Production Entities */}
+      <div className="space-y-2">
+        <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
+          <GlyphMark size={14} className="text-text-accent" />
+          <span>1. Production Function & Structural Mutations ({productionNodes.length})</span>
+        </div>
+
+        <div role="list" aria-label="Production nodes" className="space-y-2">
+          {productionNodes.map((node) => {
+            const isSelected = selectedNodeId === node.id;
+            const spanStr = node.data.span ? formatSpanCoordinates(node.data.span) : null;
+
+            return (
+              <div
+                key={node.id}
+                role="listitem"
+                tabIndex={0}
+                onClick={() => onSelectNode(node)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelectNode(node);
+                  }
+                }}
+                className={`p-3 rounded-md border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                  isSelected
+                    ? "bg-surface-elevated border-text-accent shadow-xs"
+                    : "bg-panel border-hairline hover:border-border-interactive"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    {node.data.category === "PRODUCTION_FUNCTION" ? (
+                      <GlyphMark size={13} className="text-text-accent" />
+                    ) : (
+                      getCategoryGlyph(node.data.subtitle)
+                    )}
+                    <span className="font-semibold text-text-primary">{node.data.title}</span>
+                    <span className="text-[10px] text-text-muted uppercase px-1.5 py-0.2 rounded-xs bg-ground border border-hairline">
+                      {node.data.category}
+                    </span>
+                    {renderChangeBadge(node.data.changeType)}
+                  </div>
+                  {spanStr && <span className="text-[10px] text-text-muted">{spanStr}</span>}
+                </div>
+
+                <div className="text-[11px] text-text-secondary mt-1">{node.data.subtitle}</div>
+                <div className="text-[10px] text-text-muted mt-0.5">{node.data.filePath}</div>
+
+                {node.data.evidenceIds.length > 0 && (
+                  <div className="mt-2 pt-1.5 border-t border-hairline flex items-center space-x-1.5">
+                    <span className="text-[10px] text-text-muted inline-flex items-center gap-1">
+                      <GlyphEvidencePin size={10} className="text-text-accent" />
+                      <span>Evidence:</span>
+                    </span>
+                    {node.data.evidenceIds.map((evId) => (
+                      <button
+                        key={evId}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onSelectEvidence) onSelectEvidence(evId);
+                          onSelectNode(node);
+                        }}
+                        className="px-1.5 py-0.2 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-[10px] cursor-pointer"
+                        title="Inspect evidence in Monaco diff"
+                      >
+                        {evId}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Test Entities */}
+      <div className="space-y-2">
+        <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
+          <FileCheck size={14} className="text-status-strong" />
+          <span>2. Companion Test Files & Changes ({testNodes.length})</span>
+        </div>
+
+        {testNodes.length === 0 ? (
+          <div className="p-4 rounded-md border border-hairline bg-panel text-text-muted text-xs">
+            No companion test files or test assertion changes recorded in this report.
+          </div>
+        ) : (
+          <div role="list" aria-label="Test nodes" className="space-y-2">
+            {testNodes.map((node) => {
+              const isSelected = selectedNodeId === node.id;
+              const spanStr = node.data.span ? formatSpanCoordinates(node.data.span) : null;
+
+              return (
+                <div
+                  key={node.id}
+                  role="listitem"
+                  tabIndex={0}
+                  onClick={() => onSelectNode(node)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelectNode(node);
+                    }
+                  }}
+                  className={`p-3 rounded-md border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                    isSelected
+                      ? "bg-surface-elevated border-status-strong shadow-xs"
+                      : "bg-panel border-hairline hover:border-border-interactive"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {node.data.category === "TEST_FILE" ? (
+                        <FileCode2 size={13} className="text-status-strong" />
+                      ) : node.data.category === "TEST_CHANGE" ? (
+                        <FileCheck size={13} className="text-status-strong" />
+                      ) : (
+                        <Tag size={13} className="text-status-weak" />
+                      )}
+                      <span className="font-semibold text-text-primary">{node.data.title}</span>
+                      <span className="text-[10px] text-text-muted uppercase px-1.5 py-0.2 rounded-xs bg-ground border border-hairline">
+                        {node.data.category}
+                      </span>
+                      {renderChangeBadge(node.data.changeType)}
+                    </div>
+                    {spanStr && <span className="text-[10px] text-text-muted">{spanStr}</span>}
+                  </div>
+
+                  <div className="text-[11px] text-text-secondary mt-1">{node.data.subtitle}</div>
+                  <div className="text-[10px] text-text-muted mt-0.5">{node.data.filePath}</div>
+
+                  {node.data.evidenceIds.length > 0 && (
+                    <div className="mt-2 pt-1.5 border-t border-hairline flex items-center space-x-1.5">
+                      <span className="text-[10px] text-text-muted inline-flex items-center gap-1">
+                        <GlyphEvidencePin size={10} className="text-text-accent" />
+                        <span>Evidence:</span>
+                      </span>
+                      {node.data.evidenceIds.map((evId) => (
+                        <button
+                          key={evId}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onSelectEvidence) onSelectEvidence(evId);
+                            onSelectNode(node);
+                          }}
+                          className="px-1.5 py-0.2 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-[10px] cursor-pointer"
+                          title="Inspect evidence in Monaco diff"
+                        >
+                          {evId}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 3. Correlation Links */}
+      <div className="space-y-2">
+        <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
+          <Network size={14} className="text-text-accent" />
+          <span>3. Analytical Correlation Links ({correlationEdges.length})</span>
+        </div>
+
+        {correlationEdges.length === 0 ? (
+          <div className="p-4 rounded-md border border-hairline bg-panel text-text-muted text-xs">
+            No cross-side correlation edges established between production mutations and companion tests.
+          </div>
+        ) : (
+          <div role="list" aria-label="Correlation edges" className="space-y-2">
+            {correlationEdges.map((edge) => {
+              const isSelected = selectedEdgeId === edge.id;
+
+              return (
+                <div
+                  key={edge.id}
+                  role="listitem"
+                  tabIndex={0}
+                  onClick={() => onSelectEdge(edge)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelectEdge(edge);
+                    }
+                  }}
+                  className={`p-3 rounded-md border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                    isSelected
+                      ? "bg-surface-elevated border-text-accent shadow-xs"
+                      : "bg-panel border-hairline hover:border-border-interactive"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-semibold text-text-primary">
+                        {edge.data.sourceEntityId} → {edge.data.targetEntityId}
+                      </span>
+                      <span
+                        className={`px-1.5 py-0.2 rounded-xs text-[10px] font-semibold border inline-flex items-center gap-1 ${
+                          edge.data.status === "STRONG"
+                            ? "text-status-strong bg-status-strong-bg border-status-strong-border"
+                            : edge.data.status === "WEAK"
+                            ? "text-status-weak bg-status-weak-bg border-status-weak-border"
+                            : edge.data.status === "UNCERTAIN"
+                            ? "text-status-uncertain bg-status-uncertain-bg border-status-uncertain-border"
+                            : "text-text-muted bg-surface-ground border-border-hairline"
+                        }`}
+                      >
+                        {edge.data.status === "STRONG" && <GlyphCorrStrong size={11} />}
+                        {edge.data.status === "WEAK" && <GlyphCorrWeak size={11} />}
+                        {edge.data.status === "UNCERTAIN" && <GlyphCorrUncertain size={11} />}
+                        {edge.data.status === "NONE" && <GlyphCorrNone size={11} />}
+                        <span>{edge.data.status} CORRELATION</span>
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-text-muted uppercase">
+                      [{edge.data.classification ?? "ANALYTICAL_LINK"}]
+                    </span>
+                  </div>
+
+                  {edge.data.rationale && (
+                    <div className="text-[11px] text-text-secondary mt-1.5 leading-relaxed">
+                      {edge.data.rationale}
+                    </div>
+                  )}
+
+                  {edge.data.evidenceIds.length > 0 && (
+                    <div className="mt-2 pt-1.5 border-t border-hairline flex items-center space-x-1.5">
+                      <span className="text-[10px] text-text-muted inline-flex items-center gap-1">
+                        <GlyphEvidencePin size={10} className="text-text-accent" />
+                        <span>Evidence:</span>
+                      </span>
+                      {edge.data.evidenceIds.map((evId) => (
+                        <button
+                          key={evId}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onSelectEvidence) onSelectEvidence(evId);
+                            onSelectEdge(edge);
+                          }}
+                          className="px-1.5 py-0.2 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-[10px] cursor-pointer"
+                          title="Inspect evidence in Monaco diff"
+                        >
+                          {evId}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

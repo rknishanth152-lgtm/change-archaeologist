@@ -32,3 +32,8 @@ Thumbs.db
 *.tmp
 *.tmp.*
 reports/
+examples/demo-repository/
+.agents/
+
+examples/output/
+scratch/

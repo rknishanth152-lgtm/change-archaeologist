@@ -7,7 +7,25 @@ The tool strictly separates:
 - **`INFERRED`**: Rule-based interpretations and hypotheses supported by observed facts.
 - **`UNKNOWN`**: Explicit epistemic boundaries acknowledging what static analysis cannot prove.
 
-> **Project Status:** Core static-analysis engine, domain schemas, historical AST comparison, test-change analysis, conservative correlation, reporting, and CLI are fully implemented and verified with automated test suites (139 passing tests). Web viewer and UI components remain out of scope for the current MVP.
+> **Project Status:** Core static-analysis engine, domain schemas, historical AST comparison, test-change analysis, conservative correlation, reporting, CLI, security hardening, and end-to-end demonstration environment are fully implemented and verified with automated test suites (186 passing tests across 13 suites). Web viewer and graphical UI components remain out of scope for the current engine.
+
+---
+
+## Quick Start: One-Command Demonstration
+
+To experience Change Archaeologist immediately on a deterministic, realistic Git history without configuring target repositories:
+
+```bash
+npm run demo
+```
+
+This command:
+1. Programmatically builds a synthetic Git repository in `examples/demo-repository/` with fixed commits.
+2. Executes Change Archaeologist across 6 core scenarios (guard removal, operator mutation, throw-to-return conversion, companion test changes, conservative correlation, and missing functions).
+3. Verifies outputs against predefined expectations in `examples/demo-expectations.json`.
+4. Writes sample Markdown (`.md`) and JSON (`.json`) reports into `examples/output/`.
+
+See [Docs/demo-guide.md](Docs/demo-guide.md) for full scenario walkthroughs and inspection details.
 
 ---
 
