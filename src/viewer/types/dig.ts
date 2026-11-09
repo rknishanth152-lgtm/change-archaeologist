@@ -107,8 +107,15 @@ export interface DigModel {
   /** Correlation records that are not tied to a change drawn here. */
   readonly unanchoredLinkCount: number;
   readonly hiddenLineCount: number;
+  /** Set when only one section of a large report is drawn. */
+  readonly section: { readonly start: number; readonly end: number; readonly total: number } | null;
   readonly isIncomplete: boolean;
   readonly verdict: string;
+}
+
+export interface DigOverviewTick {
+  readonly faultId: string;
+  readonly tone: CorrelationStatus | "UNLINKED";
 }
 
 export type DigFocus =

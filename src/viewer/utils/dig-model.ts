@@ -19,6 +19,7 @@ import type {
   DigFocus,
   DigLine,
   DigModel,
+  DigOverviewTick,
   DigRow,
   DigShaft,
   DigShaftEnd,
@@ -31,6 +32,8 @@ import { buildVerdict } from "./verdict.js";
 /** Functions at or below this many lines are always drawn in full. */
 const COMPRESS_OVER_LINES = 24;
 const CONTEXT_LINES = 2;
+/** Reports with more changes than this are read one section at a time. */
+export const DIG_SECTION_SIZE = 8;
 /** Hiding fewer lines than this saves no room once a gap row is drawn. */
 const MIN_GAP_LINES = 3;
 
@@ -45,7 +48,8 @@ function buildColumn(
   shortSha: string,
   fn: AnalysisReport["baseFunction"],
   ranges: readonly ChangedRange[],
-  expandAll: boolean
+  expandAll: boolean,
+  contextLines: number
 ): DigColumn {
   const source = extractFunctionSource(fn);
   if (!source.isAvailable) {
@@ -68,8 +72,8 @@ function buildColumn(
   const keep = (index: number): boolean => {
     if (expandAll || lines.length <= COMPRESS_OVER_LINES) return true;
     if (index === 0 || index === lines.length - 1) return true;
-    const from = Math.max(0, index - CONTEXT_LINES);
-    const to = Math.min(lines.length - 1, index + CONTEXT_LINES);
+    const from = Math.max(0, index - contextLines);
+    const to = Math.min(lines.length - 1, index + contextLines);
     return lines.slice(from, to + 1).some((line) => line.changeType !== null);
   };
 
@@ -220,12 +224,50 @@ function buildTestFiles(report: AnalysisReport, shafts: readonly DigShaft[]): Di
   return Array.from(byPath, ([path, cards]) => ({ path, cards }));
 }
 
+/** In a section, the test layer shows only what that section's shafts reach. */
+function onlyReachedTests(files: readonly DigTestFile[], shafts: readonly DigShaft[]): DigTestFile[] {
+  const reachedTests = new Set(shafts.flatMap((shaft) => shaft.testChangeId ?? []));
+  const reachedFiles = new Set(shafts.filter((shaft) => shaft.end === "FILE").flatMap((shaft) => shaft.testFilePath ?? []));
+  return files
+    .map((file) => ({ path: file.path, cards: file.cards.filter((card) => reachedTests.has(card.id)) }))
+    .filter((file) => file.cards.length > 0 || reachedFiles.has(file.path));
+}
+
+/** One tick per change, toned by the strongest link recorded for it. */
+export function buildDigOverview(report: AnalysisReport): DigOverviewTick[] {
+  const rank = ["STRONG", "WEAK", "UNCERTAIN", "NONE"] as const;
+  const items = report.correlationItems ?? [];
+  return report.structuralChanges.map((change) => {
+    const statuses = items.filter((item) => item.structuralChangeId === change.id).map((item) => item.status);
+    return { faultId: change.id, tone: rank.find((status) => statuses.includes(status)) ?? "UNLINKED" };
+  });
+}
+
+/** The section holding the focused item, so a selection made elsewhere stays visible. */
+export function sectionIndexForFocus(report: AnalysisReport, focus: DigFocus | null): number {
+  if (!focus || report.structuralChanges.length <= DIG_SECTION_SIZE) return 0;
+  const items = report.correlationItems ?? [];
+  const changeId =
+    focus.kind === "fault"
+      ? focus.id
+      : focus.kind === "shaft"
+      ? items.find((item) => item.id === focus.id)?.structuralChangeId
+      : items.find((item) => item.testChangeId === focus.id && item.structuralChangeId)?.structuralChangeId;
+  const index = report.structuralChanges.findIndex((change) => change.id === changeId);
+  return index < 0 ? 0 : Math.floor(index / DIG_SECTION_SIZE);
+}
+
 export function buildDigModel(
   report: AnalysisReport,
-  options: { readonly expandAll?: boolean } = {}
+  options: { readonly expandAll?: boolean; readonly sectionIndex?: number } = {}
 ): DigModel {
   const expandAll = options.expandAll ?? false;
-  const changes = report.structuralChanges;
+  const total = report.structuralChanges.length;
+  const isSectioned = total > DIG_SECTION_SIZE;
+  const sectionStart = isSectioned ? (options.sectionIndex ?? 0) * DIG_SECTION_SIZE : 0;
+  const sectionEnd = isSectioned ? Math.min(total, sectionStart + DIG_SECTION_SIZE) : total;
+  const changes = report.structuralChanges.slice(sectionStart, sectionEnd);
+  const contextLines = isSectioned ? 1 : CONTEXT_LINES;
 
   const toRange = (
     span: StructuralChange["beforeSpan"],
@@ -234,8 +276,8 @@ export function buildDigModel(
 
   const baseRanges = changes.flatMap((c) => toRange(c.beforeSpan, c.changeType) ?? []);
   const headRanges = changes.flatMap((c) => toRange(c.afterSpan, c.changeType) ?? []);
-  const base = buildColumn("BASE", report.baseCommit.shortSha, report.baseFunction, baseRanges, expandAll);
-  const head = buildColumn("HEAD", report.headCommit.shortSha, report.headFunction, headRanges, expandAll);
+  const base = buildColumn("BASE", report.baseCommit.shortSha, report.baseFunction, baseRanges, expandAll, contextLines);
+  const head = buildColumn("HEAD", report.headCommit.shortSha, report.headFunction, headRanges, expandAll, contextLines);
 
   const faults: DigFault[] = changes.map((change) => ({
     id: change.id,
@@ -269,10 +311,13 @@ export function buildDigModel(
     faults,
     shafts,
     unprobedFaultIds: faults.filter((f) => !probed.has(f.id)).map((f) => f.id),
-    testFiles: buildTestFiles(report, shafts),
+    testFiles: isSectioned ? onlyReachedTests(buildTestFiles(report, shafts), shafts) : buildTestFiles(report, shafts),
     unanchoredLinkCount:
-      items.length > 0 ? items.filter((i) => !hasChangeId(i.structuralChangeId, faultById)).length : 0,
+      items.length > 0
+        ? items.filter((i) => !i.structuralChangeId || !report.structuralChanges.some((c) => c.id === i.structuralChangeId)).length
+        : 0,
     hiddenLineCount: Math.max(countHidden(base), countHidden(head)),
+    section: isSectioned ? { start: sectionStart, end: sectionEnd, total } : null,
     isIncomplete: report.status.startsWith("INCOMPLETE") || base.state !== "PRESENT" || head.state !== "PRESENT",
     verdict: buildVerdict(report),
   };

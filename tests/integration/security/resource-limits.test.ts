@@ -111,20 +111,15 @@ describe("Resource Limits & Hardening Integration", () => {
   it("enforces git runner timeout limits with GIT_TIMEOUT", async () => {
     repo.commitFile("src/test.ts", "export function hello() { return 'world'; }", "Add test file");
 
-    // Runner with an unachievable 1ms timeout
-    const immediateTimeoutRunner = new GitRunner({ defaultTimeoutMs: 1 });
+    // git hash-object --stdin waits for stdin, which the runner never closes, so
+    // this command cannot finish before the timeout, however fast the machine is.
+    const timeoutRunner = new GitRunner({ defaultTimeoutMs: 100 });
 
-    await expect(
-      immediateTimeoutRunner.exec(repo.dir, ["log", "-n", "1"])
-    ).rejects.toThrowError(GitError);
-
-    try {
-      await immediateTimeoutRunner.exec(repo.dir, ["log", "-n", "1"]);
-    } catch (err: unknown) {
-      expect(err).toBeInstanceOf(GitError);
-      expect((err as GitError).code).toBe("GIT_TIMEOUT");
-      expect((err as GitError).message).toContain("timed out");
-    }
+    await expect(timeoutRunner.exec(repo.dir, ["hash-object", "--stdin"])).rejects.toMatchObject({
+      name: "GitError",
+      code: "GIT_TIMEOUT",
+      message: expect.stringContaining("timed out"),
+    });
   });
 
   // 4. Malformed source handling

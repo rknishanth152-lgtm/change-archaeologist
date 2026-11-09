@@ -146,7 +146,7 @@ describe("layoutDig", () => {
     }
   });
 
-  it("widens the canvas rather than crushing many test cards", () => {
+  it("stacks many test cards rather than crushing them or widening the canvas", () => {
     const manyTests = {
       ...CROWDED_REPORT,
       testChanges: Array.from({ length: 12 }, (_, i) => ({
@@ -157,7 +157,9 @@ describe("layoutDig", () => {
     };
     const layout = layoutDig(buildDigModel(manyTests), 900);
     expect(layout.files[0].cards[0].width).toBeGreaterThanOrEqual(210);
-    expect(layout.width).toBeGreaterThan(900);
+    expect(layout.width).toBe(900);
+    const tops = layout.files.flatMap((file) => file.cards.map((card) => card.y));
+    expect(new Set(tops).size).toBe(tops.length);
   });
 
   it("truncates with an ellipsis only when needed", () => {

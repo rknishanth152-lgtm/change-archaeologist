@@ -11,11 +11,12 @@ import { Search, X } from "lucide-react";
 import type { AnalysisReport, CorrelationStatus } from "../types/index.js";
 import type { DigFocus } from "../types/dig.js";
 import { buildCorrelationGraphModel } from "../utils/graph-model.js";
-import { buildDigModel, relatedToFocus } from "../utils/dig-model.js";
+import { buildDigModel, buildDigOverview, DIG_SECTION_SIZE, relatedToFocus, sectionIndexForFocus } from "../utils/dig-model.js";
 import { layoutDig } from "../utils/dig-layout.js";
 import { DigCanvas } from "./dig/DigCanvas.js";
 import { DigDetail } from "./dig/DigDetail.js";
 import { DigLegend } from "./dig/DigLegend.js";
+import { DigOverview } from "./dig/DigOverview.js";
 import { GraphAccessibleView } from "./dig/GraphAccessibleView.js";
 import { ViewHeader } from "./ui/Headings.js";
 import { GlyphDig } from "./icons/HeadingGlyphs.js";
@@ -54,12 +55,14 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
   const [focus, setFocus] = useState<DigFocus | null>(initialFocus);
   const [statusFilter, setStatusFilter] = useState<CorrelationStatus | null>(null);
   const [showAllLines, setShowAllLines] = useState(false);
+  const [sectionIndex, setSectionIndex] = useState(() => sectionIndexForFocus(report, initialFocus));
   const [hint, setHint] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [availableWidth, setAvailableWidth] = useState(0);
   const stageRef = useRef<HTMLDivElement>(null);
 
-  const digModel = useMemo(() => buildDigModel(report, { expandAll: showAllLines }), [report, showAllLines]);
+  const digModel = useMemo(() => buildDigModel(report, { expandAll: showAllLines, sectionIndex }), [report, showAllLines, sectionIndex]);
+  const overview = useMemo(() => buildDigOverview(report), [report]);
   const layout = useMemo(() => layoutDig(digModel, availableWidth), [digModel, availableWidth]);
   const lit = useMemo(() => relatedToFocus(digModel, focus), [digModel, focus]);
   const accessibleModel = useMemo(() => buildCorrelationGraphModel(report), [report]);
@@ -77,6 +80,7 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
     if (previousReport.current === report) return;
     previousReport.current = report;
     setFocus(null);
+    setSectionIndex(0);
     setStatusFilter(null);
     setShowAllLines(false);
     setHint(null);
@@ -233,6 +237,19 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
               onHint={setHint}
             />
           </div>
+
+          {digModel.section && (
+            <DigOverview
+              ticks={overview}
+              pageSize={DIG_SECTION_SIZE}
+              page={sectionIndex}
+              onPageChange={(next) => {
+                setSectionIndex(next);
+                setFocus(null);
+                setHint(null);
+              }}
+            />
+          )}
 
           <div className="px-4 py-3">
           <DigLegend

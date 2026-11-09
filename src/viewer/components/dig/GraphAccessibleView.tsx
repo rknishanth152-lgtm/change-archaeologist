@@ -6,7 +6,7 @@
  * and evidence anchors as the visual graph canvas.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import {
   FileCode2,
   FileCheck,
@@ -50,6 +50,9 @@ interface GraphAccessibleViewProps {
   readonly onSelectUnattached?: (item: CorrelationItem) => void;
   readonly onSelectEvidence?: (evidenceId: string) => void;
 }
+
+/** Long lists open with this many rows, so a large report stays quick to scan. */
+const LIST_PREVIEW = 12;
 
 // Category glyph helper for structural change cards
 function getCategoryGlyph(category?: string) {
@@ -103,6 +106,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
   onSelectEvidence,
 }) => {
   const query = searchQuery.trim().toLowerCase();
+  const [expandedLists, setExpandedLists] = useState<ReadonlySet<string>>(new Set());
 
   const productionNodes = model.nodes.filter(
     (n) => n.data.category === "PRODUCTION_FUNCTION" || n.data.category === "STRUCTURAL_CHANGE"
@@ -148,6 +152,27 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
     );
   });
 
+  // A selected row stays visible even when it falls past the preview.
+  const preview = <T,>(list: string, items: readonly T[], isSelected: (item: T) => boolean): readonly T[] =>
+    query || expandedLists.has(list) || items.length <= LIST_PREVIEW
+      ? items
+      : [...items.slice(0, LIST_PREVIEW), ...items.slice(LIST_PREVIEW).filter(isSelected)];
+
+  const visibleProduction = preview("code", productionNodes, (node) => node.id === selectedNodeId);
+  const visibleTests = preview("tests", testNodes, (node) => node.id === selectedNodeId);
+  const visibleEdges = preview("links", correlationEdges, (edge) => edge.id === selectedEdgeId);
+
+  const showAllButton = (list: string, shown: number, total: number, noun: string) =>
+    shown < total && (
+      <button
+        type="button"
+        onClick={() => setExpandedLists(new Set([...expandedLists, list]))}
+        className="min-h-8 px-2 text-sm text-text-primary underline underline-offset-2 cursor-pointer rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+      >
+        Show all {total} {noun}
+      </button>
+    );
+
   return (
     <div
       role="region"
@@ -170,7 +195,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
         </div>
 
         <div role="list" aria-label="Production nodes" className="space-y-2">
-          {productionNodes.map((node) => {
+          {visibleProduction.map((node) => {
             const isSelected = selectedNodeId === node.id;
             const spanStr = node.data.span ? formatSpanCoordinates(node.data.span) : null;
 
@@ -235,6 +260,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
             );
           })}
         </div>
+        {showAllButton("code", visibleProduction.length, productionNodes.length, "code items")}
       </div>
 
       {/* 2. Test Entities */}
@@ -250,7 +276,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
           </div>
         ) : (
           <div role="list" aria-label="Test nodes" className="space-y-2">
-            {testNodes.map((node) => {
+            {visibleTests.map((node) => {
               const isSelected = selectedNodeId === node.id;
               const spanStr = node.data.span ? formatSpanCoordinates(node.data.span) : null;
 
@@ -318,6 +344,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
             })}
           </div>
         )}
+        {showAllButton("tests", visibleTests.length, testNodes.length, "test items")}
       </div>
 
       {/* 3. Correlation Links */}
@@ -333,7 +360,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
           </div>
         ) : (
           <div role="list" aria-label="Correlation edges" className="space-y-2">
-            {correlationEdges.map((edge) => {
+            {visibleEdges.map((edge) => {
               const isSelected = selectedEdgeId === edge.id;
 
               return (
@@ -441,6 +468,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
             ))}
           </div>
         )}
+        {showAllButton("links", visibleEdges.length, correlationEdges.length, "links")}
       </div>
     </div>
   );

@@ -20,6 +20,9 @@ const CARD_MIN_WIDTH = 210;
 const CARD_GAP = 12;
 const FILE_GAP = 22;
 const UNKNOWN_HEIGHT = 62;
+const RAIL_STEP = 12;
+const STACK_GAP = 6;
+const STACK_FILE_GAP = 10;
 export const MONO_CHAR_WIDTH = 7.25;
 
 export interface LaidOutRow {
@@ -159,6 +162,21 @@ function shaftPath(x: number, y: number, driftY: number, toX: number, toY: numbe
   ].join("");
 }
 
+/** Down the channel, across to a rail on the left, down the rail, then into the card. */
+function railPath(x: number, y: number, driftY: number, trunkX: number, entryY: number, entryX: number): string {
+  const radius = 8;
+  return [
+    `M${x} ${y}`,
+    `V${driftY - radius}`,
+    `Q${x} ${driftY} ${x - radius} ${driftY}`,
+    `H${trunkX + radius}`,
+    `Q${trunkX} ${driftY} ${trunkX} ${driftY + radius}`,
+    `V${entryY - radius}`,
+    `Q${trunkX} ${entryY} ${trunkX + radius} ${entryY}`,
+    `H${entryX}`,
+  ].join("");
+}
+
 export function layoutDig(model: DigModel, availableWidth: number): DigLayout {
   const codeWidth = Math.max(DIG_MIN_WIDTH, Math.floor(availableWidth) || 980);
   const columnWidth = (codeWidth - MARGIN * 2 - CHANNEL) / 2;
@@ -200,12 +218,33 @@ export function layoutDig(model: DigModel, availableWidth: number): DigLayout {
   const cardTotal = model.testFiles.reduce((sum, file) => sum + Math.max(1, file.cards.length), 0);
   const fileTotal = model.testFiles.length;
   const spaceForGaps = (cardTotal - fileTotal) * CARD_GAP + Math.max(0, fileTotal - 1) * FILE_GAP;
-  const fitted = cardTotal > 0 ? (codeWidth - MARGIN * 2 - spaceForGaps) / cardTotal : 0;
-  const cardWidth = Math.max(CARD_MIN_WIDTH, Math.min(fitted, 460));
+  const contentWidth = codeWidth - MARGIN * 2;
+  // When cards can't share a row at a readable width they stack, and shafts reach them along a rail.
+  const isStacked = cardTotal * CARD_MIN_WIDTH + spaceForGaps > contentWidth;
+
+  const railCount = model.shafts.filter((shaft) => shaft.end !== "OPEN").length;
+  const railStep = Math.min(RAIL_STEP, (contentWidth * 0.3) / Math.max(1, railCount));
+  const railWidth = isStacked ? railCount * railStep + 16 : 0;
+  const fitted = cardTotal > 0 ? (contentWidth - spaceForGaps) / cardTotal : 0;
+  const cardWidth = isStacked ? contentWidth - railWidth : Math.max(CARD_MIN_WIDTH, Math.min(fitted, 460));
   const cardsY = testTop + BAND_HEIGHT + 6;
 
-  let cursorX = MARGIN;
+  let cursorX = MARGIN + railWidth;
+  let cursorY = testTop;
   const files: LaidOutFile[] = model.testFiles.map((file) => {
+    if (isStacked) {
+      const bandY = cursorY;
+      const cards = file.cards.map((card, index) => ({
+        card,
+        x: cursorX,
+        y: bandY + BAND_HEIGHT + 6 + index * (CARD_HEIGHT + STACK_GAP),
+        width: cardWidth,
+        height: CARD_HEIGHT,
+        maxChars: Math.floor((cardWidth - 20) / MONO_CHAR_WIDTH),
+      }));
+      cursorY = bandY + BAND_HEIGHT + 6 + cards.length * (CARD_HEIGHT + STACK_GAP) + STACK_FILE_GAP;
+      return { path: file.path, x: cursorX, y: bandY, width: cardWidth, height: BAND_HEIGHT - 2, maxChars: Math.max(8, Math.floor((cardWidth - 20) / MONO_CHAR_WIDTH)), cards };
+    }
     const count = Math.max(1, file.cards.length);
     const width = count * cardWidth + (count - 1) * CARD_GAP;
     const cards = file.cards.map((card, index) => ({
@@ -229,10 +268,8 @@ export function layoutDig(model: DigModel, availableWidth: number): DigLayout {
     return laidOut;
   });
 
-  const cardCenters = new Map(
-    files.flatMap((file) => file.cards.map((c) => [c.card.id, c.x + c.width / 2] as const))
-  );
-  const fileCenters = new Map(files.map((file) => [file.path, file.x + file.width / 2]));
+  const cardGeometry = new Map(files.flatMap((file) => file.cards.map((c) => [c.card.id, c] as const)));
+  const fileGeometry = new Map(files.map((file) => [file.path, file]));
 
   // Several shafts can land on one target, so they sit side by side, centred on it.
   const targetKey = (shaft: DigShaft) => `${shaft.end}:${shaft.testChangeId ?? shaft.testFilePath ?? shaft.faultId}`;
@@ -245,7 +282,19 @@ export function layoutDig(model: DigModel, availableWidth: number): DigLayout {
   model.shafts.forEach((s) => totalPerFault.set(s.faultId, (totalPerFault.get(s.faultId) ?? 0) + 1));
   const seenPerFault = new Map<string, number>();
 
-  const shafts: LaidOutShaft[] = model.shafts.flatMap((shaft, lane) => {
+  // Stacked, the deepest target takes the outermost rail, so rails nest and never cross.
+  const entryDepth = (shaft: DigShaft): number => {
+    if (shaft.end === "ASSERTION" && shaft.testChangeId) return cardGeometry.get(shaft.testChangeId)?.y ?? -1;
+    if (shaft.end === "FILE" && shaft.testFilePath) return fileGeometry.get(shaft.testFilePath)?.y ?? -1;
+    return -1;
+  };
+  const railOrder = model.shafts
+    .map((shaft, index) => ({ shaft, index, depth: entryDepth(shaft) }))
+    .sort((a, b) => b.depth - a.depth || b.index - a.index);
+  const laneOf = new Map(railOrder.map((entry, order) => [entry.shaft.id, order]));
+
+  const shafts: LaidOutShaft[] = model.shafts.flatMap((shaft, index) => {
+    const lane = isStacked ? (laneOf.get(shaft.id) ?? index) : index;
     const fault = faultGeometry.get(shaft.faultId);
     if (!fault) return [];
 
@@ -259,20 +308,39 @@ export function layoutDig(model: DigModel, availableWidth: number): DigLayout {
     const key = targetKey(shaft);
     const seen = seenPerTarget.get(key) ?? 0;
     seenPerTarget.set(key, seen + 1);
-    const spread = (seen - ((totalPerTarget.get(key) ?? 1) - 1) / 2) * 14;
+    const centredOffset = seen - ((totalPerTarget.get(key) ?? 1) - 1) / 2;
+    const driftY = datumY + 12 + lane * LANE_GAP;
+
+    const card = shaft.end === "ASSERTION" && shaft.testChangeId ? cardGeometry.get(shaft.testChangeId) : undefined;
+    const file = shaft.end === "FILE" && shaft.testFilePath ? fileGeometry.get(shaft.testFilePath) : undefined;
+
+    if (isStacked && (card || file)) {
+      const trunkX = MARGIN + 6 + lane * railStep;
+      const entryX = card ? card.x : (file as LaidOutFile).x;
+      const entryY = card ? card.y + card.height / 2 + centredOffset * 10 : (file as LaidOutFile).y + (file as LaidOutFile).height / 2;
+      return [
+        {
+          shaft,
+          path: railPath(start.shaftX, start.shaftY, driftY, trunkX, entryY, entryX),
+          endX: entryX,
+          endY: entryY,
+          labelX: (trunkX + start.shaftX) / 2,
+          labelY: driftY,
+        },
+      ];
+    }
 
     let endX = start.shaftX;
     let endY = openEndY;
-    if (shaft.end === "ASSERTION" && shaft.testChangeId) {
-      endX = cardCenters.get(shaft.testChangeId) ?? endX;
+    if (card) {
+      endX = card.x + card.width / 2;
       endY = cardsY;
-    } else if (shaft.end === "FILE" && shaft.testFilePath) {
-      endX = fileCenters.get(shaft.testFilePath) ?? endX;
+    } else if (file) {
+      endX = file.x + file.width / 2;
       endY = testTop;
     }
-    endX += spread;
+    endX += centredOffset * 14;
 
-    const driftY = datumY + 12 + lane * LANE_GAP;
     const longDrift = Math.abs(endX - start.shaftX) > 90;
     return [
       {
@@ -292,11 +360,11 @@ export function layoutDig(model: DigModel, availableWidth: number): DigLayout {
   });
 
   const testEmptyHeight = 50;
-  const testBottom = files.length > 0 ? cardsY + CARD_HEIGHT : testTop + testEmptyHeight;
+  const testBottom = isStacked ? cursorY - STACK_FILE_GAP : files.length > 0 ? cardsY + CARD_HEIGHT : testTop + testEmptyHeight;
   const unknownTop = testBottom + 30;
 
   return {
-    width: Math.max(codeWidth, cursorX - FILE_GAP + MARGIN),
+    width: isStacked ? codeWidth : Math.max(codeWidth, cursorX - FILE_GAP + MARGIN),
     height: unknownTop + UNKNOWN_HEIGHT + 6,
     codeHeight: rowCount * ROW_HEIGHT,
     codeTop: CODE_TOP,
