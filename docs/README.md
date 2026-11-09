@@ -10,4 +10,3 @@
 | [Validation report](reports/validation-report.md) | Results from the validation corpus |
 | [Independent validation](reports/independent-validation-report.md) | A second, separate review |
 | [Security and cross-platform](reports/security-and-cross-platform-report.md) | Hardening and platform checks |
-| [Archive](archive/llm-handoff/) | Earlier design handoff notes. They describe a previous UI. |
