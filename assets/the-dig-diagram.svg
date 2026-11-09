@@ -1,119 +1,93 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 330" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
   <defs>
-    <!-- Background Gradients -->
+    <!-- Background Gradient -->
     <linearGradient id="digBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0C1214" />
-      <stop offset="50%" stop-color="#121A1D" />
-      <stop offset="100%" stop-color="#162326" />
+      <stop offset="0%" stop-color="#0A0F11" />
+      <stop offset="50%" stop-color="#101719" />
+      <stop offset="100%" stop-color="#141E21" />
     </linearGradient>
 
-    <linearGradient id="rockGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#182427" />
-      <stop offset="100%" stop-color="#131B1E" />
+    <!-- Code Block Background -->
+    <linearGradient id="codeBlockBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#121A1D" />
+      <stop offset="100%" stop-color="#0E1517" />
     </linearGradient>
 
-    <linearGradient id="faultGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#F58D84" />
-      <stop offset="50%" stop-color="#6FE3D1" />
-      <stop offset="100%" stop-color="#5CCFBE" />
+    <!-- Fault Channel Fill Gradient -->
+    <linearGradient id="faultShearGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F58D84" stop-opacity="0.25" />
+      <stop offset="50%" stop-color="#F58D84" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#4EBEAD" stop-opacity="0.2" />
     </linearGradient>
 
-    <linearGradient id="shaftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#5CCFBE" />
-      <stop offset="100%" stop-color="#86DDCF" />
+    <!-- Shaft Conduits -->
+    <linearGradient id="shaftStrongGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4EBEAD" />
+      <stop offset="100%" stop-color="#72EBD9" />
     </linearGradient>
 
     <!-- Bedrock Hatch Pattern -->
-    <pattern id="digBedrockHatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+    <pattern id="bedrockHatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
       <line x1="0" y1="0" x2="0" y2="10" stroke="#253538" stroke-width="1.2" stroke-opacity="0.6" />
     </pattern>
 
     <!-- Subtle Cartographic Grid Pattern -->
     <pattern id="digGrid" width="24" height="24" patternUnits="userSpaceOnUse">
-      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#1B272A" stroke-width="0.6" stroke-opacity="0.5" />
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#162225" stroke-width="0.5" stroke-opacity="0.6" />
     </pattern>
 
-    <!-- Glow Filter -->
-    <filter id="shaftGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="4" result="blur" />
-      <feMerge>
-        <feMergeNode in="blur" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
-
-    <filter id="pulseGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="6" result="b1" />
-      <feGaussianBlur stdDeviation="2" result="b2" />
+    <!-- Soft Glow Filter -->
+    <filter id="verdigrisGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="b1" />
       <feMerge>
         <feMergeNode in="b1" />
-        <feMergeNode in="b2" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
 
     <style>
-      /* 1. Fault Line Seismic Travel */
-      .anim-fault-seismic {
-        stroke-dasharray: 20 80;
-        animation: faultSeismic 3.2s linear infinite;
-      }
-      @keyframes faultSeismic {
-        from { stroke-dashoffset: 100; }
-        to { stroke-dashoffset: 0; }
-      }
-
-      /* 2. Shaft Laser Drill Energy Flow */
-      .anim-shaft-drill {
-        stroke-dasharray: 12 18;
-        animation: shaftFlow 2.4s linear infinite;
+      /* 1. Calm, Elegant Data Signal Traveling Down Shaft 1 */
+      .anim-shaft-signal {
+        stroke-dasharray: 12 120;
+        animation: shaftFlow 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
       }
       @keyframes shaftFlow {
-        from { stroke-dashoffset: 30; }
-        to { stroke-dashoffset: 0; }
+        0% { stroke-dashoffset: 132; opacity: 0.2; }
+        20% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { stroke-dashoffset: 0; opacity: 0.2; }
       }
 
-      /* 3. Excavation Horizon Scanline Sweep */
-      .anim-excavation-sweep {
-        animation: digScanner 6s ease-in-out infinite alternate;
+      /* 2. Soft Breathing on the Geological Fault Boundary */
+      .anim-fault-pulse {
+        animation: faultBreathe 3.6s ease-in-out infinite alternate;
       }
-      @keyframes digScanner {
-        0% { transform: translateY(75px); opacity: 0.2; }
-        50% { opacity: 0.85; filter: drop-shadow(0 0 4px #5CCFBE); }
-        100% { transform: translateY(270px); opacity: 0.2; }
-      }
-
-      /* 4. Pulse on Fault Anchor Node */
-      .anim-fault-node {
-        animation: faultNodePulse 2s ease-in-out infinite alternate;
-      }
-      @keyframes faultNodePulse {
-        0% { transform: scale(0.9); opacity: 0.7; }
-        100% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 6px #F58D84); }
+      @keyframes faultBreathe {
+        0% { stroke-opacity: 0.5; fill-opacity: 0.12; }
+        100% { stroke-opacity: 0.9; fill-opacity: 0.22; }
       }
 
-      /* 5. Pulse on Assertion Target Node */
-      .anim-assertion-node {
-        animation: assertNodePulse 2.4s ease-in-out infinite alternate;
+      /* 3. Status Indicator Subtle Pulse */
+      .anim-beacon-strong {
+        animation: beaconStrong 2.6s ease-in-out infinite;
       }
-      @keyframes assertNodePulse {
-        0% { transform: scale(0.9); opacity: 0.7; }
-        100% { transform: scale(1.25); opacity: 1; filter: drop-shadow(0 0 6px #72EBD9); }
+      @keyframes beaconStrong {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; filter: drop-shadow(0 0 4px #4EBEAD); }
       }
 
-      /* 6. Bedrock Static Boundary Beacon */
-      .anim-bedrock-beacon {
-        animation: bedrockPulse 4s ease-in-out infinite;
+      /* 4. Bedrock Boundary Gentle Pulse */
+      .anim-bedrock-rule {
+        animation: bedrockPulse 4s ease-in-out infinite alternate;
       }
       @keyframes bedrockPulse {
-        0%, 100% { opacity: 0.5; }
-        50% { opacity: 0.95; stroke: #F59E0B; }
+        0% { stroke-opacity: 0.5; }
+        100% { stroke-opacity: 0.9; }
       }
 
-      /* Reduced motion support */
+      /* Accessibility Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
-        *, .anim-fault-seismic, .anim-shaft-drill, .anim-excavation-sweep,
-        .anim-fault-node, .anim-assertion-node, .anim-bedrock-beacon {
+        .anim-shaft-signal, .anim-fault-pulse, .anim-beacon-strong, .anim-bedrock-rule {
           animation: none !important;
         }
       }
@@ -121,170 +95,211 @@
   </defs>
 
   <!-- Container Box -->
-  <rect width="900" height="330" rx="14" fill="url(#digBg)" stroke="#26363A" stroke-width="1.5" />
-  <rect width="900" height="330" rx="14" fill="url(#digGrid)" />
+  <rect width="900" height="440" rx="12" fill="url(#digBg)" />
+  <rect width="900" height="440" rx="12" fill="url(#digGrid)" />
+  <rect width="898" height="438" x="1" y="1" rx="11" fill="none" stroke="#253539" stroke-width="1" stroke-opacity="0.6" />
 
-  <!-- Top Instrument Header Bar -->
-  <g transform="translate(0, 0)">
-    <rect width="900" height="42" rx="14" fill="#0E1618" stroke="#1F2C2F" stroke-width="1" />
-    <circle cx="28" cy="21" r="5" fill="#5CCFBE" filter="url(#shaftGlow)" />
-    <text x="44" y="25" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" font-weight="700" fill="#E2E8F0" letter-spacing="1">
+  <!-- ==================== HEADER BAR ==================== -->
+  <g transform="translate(24, 26)">
+    <circle cx="6" cy="6" r="3.5" fill="#4EBEAD" />
+    <text x="18" y="10" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#E2E8F0" letter-spacing="1.2">
       THE DIG — EXCAVATION CROSS-SECTION
     </text>
 
     <!-- Context Meta Pill -->
-    <g transform="translate(420, 10)">
-      <rect width="456" height="22" rx="4" fill="#141E21" stroke="#253538" stroke-width="1" />
-      <text x="12" y="15" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#7E9491">
-        TARGET: <tspan fill="#5CCFBE" font-weight="700">calculateDiscount()</tspan> in src/order.ts
+    <g transform="translate(430, -3)">
+      <rect width="422" height="20" rx="4" fill="#111B1E" stroke="#1D2A2E" stroke-width="0.8" />
+      <text x="12" y="13.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#7E9491">
+        TARGET: <tspan fill="#86DDCF" font-weight="700">calculateDiscount()</tspan> in src/order.ts
       </text>
-      <text x="310" y="15" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#94A3B8">
-        REV: <tspan fill="#E2E8F0">9a8bf4e</tspan> → <tspan fill="#5CCFBE">a8265d8</tspan>
+      <text x="286" y="13.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#94A3B8">
+        REV: <tspan fill="#E2E8F0">9a8bf4e</tspan> → <tspan fill="#86DDCF">a8265d8</tspan>
       </text>
     </g>
   </g>
 
-  <!-- Moving Excavation Laser Scanner Horizon -->
-  <line x1="20" y1="0" x2="880" y2="0" stroke="#72EBD9" stroke-width="1" class="anim-excavation-sweep" />
+  <line x1="24" y1="42" x2="876" y2="42" stroke="#1E2C30" stroke-width="0.8" />
+
+  <!-- ==================== CODE STRATA (TOP HALF) ==================== -->
 
   <!-- COLUMN 1: BASE Strata (Left) -->
-  <g transform="translate(30, 60)">
-    <rect width="230" height="205" rx="8" fill="url(#rockGrad1)" stroke="#27373A" stroke-width="1" />
-    <!-- Header -->
-    <rect width="230" height="26" rx="8" fill="#131B1E" />
-    <text x="14" y="17" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#94A3B8" letter-spacing="1">
-      LAYER I : BASE (9a8bf4e)
+  <g transform="translate(24, 54)">
+    <rect width="340" height="156" rx="8" fill="url(#codeBlockBg)" stroke="#223236" stroke-width="1" />
+    <!-- Column Title -->
+    <rect width="340" height="24" rx="8" fill="#131D20" />
+    <rect x="0" y="16" width="340" height="8" fill="#131D20" />
+    <text x="14" y="16" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="9" font-weight="700" fill="#94A3B8" letter-spacing="0.8">
+      YOUR CODE, BEFORE • BASE (9a8bf4e)
     </text>
-    
-    <!-- Code Lines / Strata -->
-    <g font-family="ui-monospace, SFMono-Regular, monospace" font-size="9" fill="#64748B" transform="translate(12, 45)">
+
+    <!-- Code Lines -->
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#64748B" transform="translate(14, 40)">
       <text x="0" y="0"><tspan fill="#475569">L10</tspan>  const baseRate = 0.05;</text>
       <text x="0" y="16"><tspan fill="#475569">L11</tspan>  if (!customer) return 0;</text>
-      <text x="0" y="32"><tspan fill="#475569">L12</tspan>  // VIP discount checks</text>
+      <text x="0" y="32"><tspan fill="#475569">L12</tspan>  // VIP discount validation</text>
       
-      <!-- Fault Line AST Mutation: Safety Check Removed -->
-      <g transform="translate(-4, 44)">
-        <rect x="0" y="0" width="214" height="34" rx="4" fill="#2E1719" stroke="#A02019" stroke-width="1" stroke-opacity="0.8" />
-        <text x="6" y="14" fill="#F87171"><tspan fill="#EF4444">-</tspan> L14 if (!customer.isVerified) {</text>
-        <text x="6" y="27" fill="#F87171"><tspan fill="#EF4444">-</tspan> L15   throw new AuthError();</text>
+      <!-- Removed Lines Highlight -->
+      <g transform="translate(-6, 44)">
+        <rect x="0" y="0" width="324" height="28" rx="3" fill="#2E1719" stroke="#5C2227" stroke-width="0.8" />
+        <text x="6" y="12" fill="#FCA5A5"><tspan fill="#EF4444">-</tspan> L14 if (!customer.isVerified) {</text>
+        <text x="6" y="23" fill="#FCA5A5"><tspan fill="#EF4444">-</tspan> L15   throw new AuthError();</text>
       </g>
 
-      <text x="0" y="98"><tspan fill="#475569">L16</tspan>  return total * baseRate;</text>
-      <text x="0" y="114"><tspan fill="#475569">L17</tspan> }</text>
-      <text x="0" y="132" fill="#4B6065">... [18 lines compressed] ...</text>
+      <text x="0" y="86"><tspan fill="#475569">L16</tspan>  return total * baseRate;</text>
+      <text x="0" y="100"><tspan fill="#475569">L17</tspan> }</text>
     </g>
   </g>
 
-  <!-- COLUMN 2: HEAD Strata (Center-Left) -->
-  <g transform="translate(290, 60)">
-    <rect width="230" height="205" rx="8" fill="url(#rockGrad1)" stroke="#27373A" stroke-width="1" />
-    <!-- Header -->
-    <rect width="230" height="26" rx="8" fill="#131B1E" />
-    <text x="14" y="17" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#5CCFBE" letter-spacing="1">
-      LAYER II : HEAD (a8265d8)
+  <!-- COLUMN 2: HEAD Strata (Right) -->
+  <g transform="translate(536, 54)">
+    <rect width="340" height="156" rx="8" fill="url(#codeBlockBg)" stroke="#223236" stroke-width="1" />
+    <!-- Column Title -->
+    <rect width="340" height="24" rx="8" fill="#131D20" />
+    <rect x="0" y="16" width="340" height="8" fill="#131D20" />
+    <text x="14" y="16" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="9" font-weight="700" fill="#86DDCF" letter-spacing="0.8">
+      YOUR CODE, AFTER • HEAD (a8265d8)
     </text>
 
-    <!-- Code Lines / Strata -->
-    <g font-family="ui-monospace, SFMono-Regular, monospace" font-size="9" fill="#64748B" transform="translate(12, 45)">
+    <!-- Code Lines -->
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#64748B" transform="translate(14, 40)">
       <text x="0" y="0"><tspan fill="#475569">L10</tspan>  const baseRate = 0.05;</text>
       <text x="0" y="16"><tspan fill="#475569">L11</tspan>  if (!customer) return 0;</text>
-      <text x="0" y="32"><tspan fill="#475569">L12</tspan>  // VIP discount checks</text>
-
-      <!-- Pinched Fault Destination -->
-      <g transform="translate(-4, 44)">
-        <rect x="0" y="0" width="214" height="22" rx="4" fill="#1A272A" stroke="#255550" stroke-width="1" stroke-dasharray="3 3" />
-        <text x="6" y="15" fill="#5CCFBE">[GUARD CLAUSE REMOVED IN HEAD]</text>
+      <text x="0" y="32"><tspan fill="#475569">L12</tspan>  // VIP discount validation</text>
+      
+      <!-- Pinch Marker (Where lines were removed) -->
+      <g transform="translate(-6, 44)">
+        <rect x="0" y="0" width="324" height="18" rx="3" fill="#102022" stroke="#1D4341" stroke-width="0.8" stroke-dasharray="3 3" />
+        <text x="8" y="12" fill="#5CCFBE" font-size="7.5">[GUARD CLAUSE DROPPED IN HEAD]</text>
       </g>
 
-      <text x="0" y="86"><tspan fill="#475569">L14</tspan>  return total * baseRate;</text>
-      <text x="0" y="102"><tspan fill="#475569">L15</tspan> }</text>
-      <text x="0" y="120" fill="#4B6065">... [18 lines compressed] ...</text>
+      <text x="0" y="76"><tspan fill="#475569">L14</tspan>  return total * baseRate;</text>
+      <text x="0" y="90"><tspan fill="#475569">L15</tspan> }</text>
+      <text x="0" y="104" fill="#4B6065">... [18 lines unchanged] ...</text>
     </g>
   </g>
 
-  <!-- SEISMIC FAULT CONNECTOR (Between BASE & HEAD) -->
+  <!-- ==================== CENTRAL FAULT CHANNEL ==================== -->
+  <!-- Fault Polygon connecting lines 14-15 of BASE to line 14 of HEAD -->
   <g>
-    <!-- Background track -->
-    <path d="M 256 166 C 272 166, 276 153, 290 153" fill="none" stroke="#2E3C40" stroke-width="2" stroke-dasharray="3 3" />
-    <!-- Active Animated Seismic Pulse -->
-    <path d="M 256 166 C 272 166, 276 153, 290 153" fill="none" stroke="url(#faultGrad)" stroke-width="2.5" class="anim-fault-seismic" filter="url(#shaftGlow)" />
-    <!-- Fault Node Marker -->
-    <circle cx="256" cy="166" r="4.5" fill="#F87171" class="anim-fault-node" />
-    <circle cx="290" cy="153" r="4" fill="#5CCFBE" />
+    <!-- Polygon spanning from Left Column x=364 to Right Column x=536 -->
+    <polygon points="364,142 536,146 536,156 364,170" fill="url(#faultShearGrad)" stroke="#F58D84" stroke-width="1.2" class="anim-fault-pulse" />
+    
+    <!-- Fault Anchor in Center of Channel -->
+    <circle cx="450" cy="154" r="3.5" fill="#F87171" />
+    
+    <!-- Fault Pill Label (Floats cleanly in central channel) -->
+    <g transform="translate(390, 106)">
+      <rect width="120" height="20" rx="4" fill="#181315" stroke="#4A1E24" stroke-width="0.8" />
+      <circle cx="9" cy="10" r="2.5" fill="#F87171" />
+      <text x="18" y="13.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" font-weight="700" fill="#FCA5A5">
+        FAULT: REMOVED
+      </text>
+    </g>
   </g>
 
-  <!-- COLUMN 3: COMPANION TEST CORRELATIONS (Right) -->
-  <g transform="translate(580, 60)">
-    <rect width="290" height="205" rx="8" fill="url(#rockGrad1)" stroke="#27373A" stroke-width="1" />
-    <!-- Header -->
-    <rect width="290" height="26" rx="8" fill="#131B1E" />
-    <text x="14" y="17" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#E2E8F0" letter-spacing="1">
-      TEST SHAFT : tests/order.test.ts
+  <!-- ==================== DATUM RULE DIVIDER ==================== -->
+  <g transform="translate(24, 226)">
+    <line x1="0" y1="0" x2="852" y2="0" stroke="#1E2C30" stroke-width="0.8" />
+    <rect x="0" y="-8" width="220" height="16" rx="3" fill="#0C1416" />
+    <text x="6" y="4" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" font-weight="700" fill="#64748B" letter-spacing="1">
+      TESTS TOUCHED IN THIS RANGE
+    </text>
+  </g>
+
+  <!-- ==================== DRILLED SHAFTS (CONDUITS) ==================== -->
+  <!-- Shaft 1 (STRONG): Originates at Central Fault (450, 154) and curves smoothly down to Test Card 1 (250, 260) -->
+  <g>
+    <!-- Background Guide Track -->
+    <path d="M 450 154 C 450 200, 250 210, 250 256" fill="none" stroke="#1B3835" stroke-width="2.5" />
+    <!-- Active Conduit -->
+    <path d="M 450 154 C 450 200, 250 210, 250 256" fill="none" stroke="url(#shaftStrongGrad)" stroke-width="2" />
+    <!-- Traveling Data Pulse Bead -->
+    <path d="M 450 154 C 450 200, 250 210, 250 256" fill="none" stroke="#C2FBF3" stroke-width="3" class="anim-shaft-signal" />
+
+    <!-- Shaft Status Badge (Positioned in open channel whitespace) -->
+    <g transform="translate(305, 196)">
+      <rect width="94" height="18" rx="4" fill="#0E2421" stroke="#1B594F" stroke-width="0.8" />
+      <circle cx="8" cy="9" r="2.5" fill="#4EBEAD" class="anim-beacon-strong" />
+      <text x="16" y="12.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" font-weight="700" fill="#86DDCF">
+        STRONG SHAFT
+      </text>
+    </g>
+  </g>
+
+  <!-- Shaft 2 (NONE): Originates at Central Fault (450, 154) and curves down to Card 2, ending above bedrock -->
+  <g>
+    <path d="M 450 154 C 450 200, 650 210, 650 256" fill="none" stroke="#3D2912" stroke-width="1.8" stroke-dasharray="4 4" />
+    <g transform="translate(500, 196)">
+      <rect width="90" height="18" rx="4" fill="#1E170C" stroke="#483313" stroke-width="0.8" />
+      <circle cx="8" cy="9" r="2.5" fill="#F59E0B" />
+      <text x="16" y="12.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" font-weight="700" fill="#FBBF24">
+        NONE SHAFT
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== TEST CARDS (BOTTOM HALF) ==================== -->
+
+  <!-- Card 1: Strong Correlation Companion Test -->
+  <g transform="translate(80, 256)">
+    <rect width="340" height="100" rx="8" fill="#0E1B1D" stroke="#1D4D47" stroke-width="1.2" />
+    <!-- Card Header -->
+    <rect width="340" height="24" rx="8" fill="#132628" />
+    <rect x="0" y="16" width="340" height="8" fill="#132628" />
+    <circle cx="12" cy="12" r="3" fill="#4EBEAD" class="anim-beacon-strong" />
+    <text x="22" y="15.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" font-weight="700" fill="#E2E8F0">
+      tests/order.test.ts • describe(&apos;calculateDiscount&apos;)
     </text>
 
-    <!-- Test Assertions Strata -->
-    <g transform="translate(14, 42)">
-      <!-- Assertion Block 1: STRONG CORRELATION -->
-      <g transform="translate(0, 0)">
-        <rect width="262" height="48" rx="6" fill="#102523" stroke="#1B6359" stroke-width="1" />
-        <circle cx="14" cy="14" r="3.5" fill="#5CCFBE" />
-        <text x="24" y="17" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9" font-weight="700" fill="#6FE3D1">
-          SHAFT #1 : STRONG CORRELATION
-        </text>
-        <text x="14" y="34" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#94A3B8">
-          L42: expect(calculateDiscount(c)).toBe(0)
-        </text>
-      </g>
-
-      <!-- Assertion Block 2: UNMODIFIED / NONE CORRELATION -->
-      <g transform="translate(0, 58)">
-        <rect width="262" height="48" rx="6" fill="#1A181C" stroke="#483438" stroke-width="1" />
-        <circle cx="14" cy="14" r="3.5" fill="#F59E0B" />
-        <text x="24" y="17" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9" font-weight="700" fill="#FBBF24">
-          SHAFT #2 : NONE (UNMODIFIED TEST)
-        </text>
-        <text x="14" y="34" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#94A3B8">
-          L58: expect(authCheck).toHaveBeenCalled()
-        </text>
-      </g>
-
-      <!-- Open Ground / Uncorrelated Note -->
-      <text x="6" y="132" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#4D6267">
-        [PROBE: 0 companion test mutations observed]
+    <!-- Card Assertions -->
+    <g transform="translate(12, 36)" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8">
+      <rect x="0" y="0" width="316" height="34" rx="3" fill="#131F21" stroke="#1F363A" stroke-width="0.7" />
+      <text x="8" y="14" fill="#F87171">− L42: expect(calculateDiscount(c)).toBe(0)</text>
+      <text x="8" y="27" fill="#4EBEAD">+ L42: expect(calculateDiscount(c)).toBe(10)</text>
+      
+      <text x="2" y="48" fill="#86DDCF" font-weight="600">
+        CORRELATION: STRONG <tspan fill="#64748B" font-weight="400">(Direct syntactic reference to modified guard)</tspan>
       </text>
     </g>
   </g>
 
-  <!-- DRILLED CORRELATION SHAFTS (Connecting Fault to Tests) -->
-  <g>
-    <!-- Shaft 1: Strong Correlation (Fault to Test 1) -->
-    <path d="M 290 153 C 400 130, 480 115, 580 115" fill="none" stroke="#255550" stroke-width="2" stroke-dasharray="4 4" />
-    <path d="M 290 153 C 400 130, 480 115, 580 115" fill="none" stroke="url(#shaftGrad)" stroke-width="2.5" class="anim-shaft-drill" filter="url(#shaftGlow)" />
-    <circle cx="580" cy="115" r="4.5" fill="#72EBD9" class="anim-assertion-node" />
+  <!-- Card 2: Unmodified Test / Hazard Check -->
+  <g transform="translate(480, 256)">
+    <rect width="340" height="100" rx="8" fill="#15151A" stroke="#3D3222" stroke-width="1.2" />
+    <rect width="340" height="24" rx="8" fill="#201C14" />
+    <rect x="0" y="16" width="340" height="8" fill="#201C14" />
+    <circle cx="12" cy="12" r="3" fill="#F59E0B" />
+    <text x="22" y="15.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" font-weight="700" fill="#E2E8F0">
+      tests/auth.test.ts • describe(&apos;authCheck&apos;)
+    </text>
 
-    <!-- Shaft Tag Pill -->
-    <g transform="translate(385, 118)">
-      <rect width="90" height="18" rx="4" fill="#0C2E2A" stroke="#165C53" stroke-width="1" />
-      <text x="45" y="12.5" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#72EBD9">
-        STRONG LINK
+    <g transform="translate(12, 36)" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8">
+      <rect x="0" y="0" width="316" height="34" rx="3" fill="#181717" stroke="#2B271E" stroke-width="0.7" />
+      <text x="8" y="14" fill="#94A3B8">  L58: expect(authCheck).toHaveBeenCalled()</text>
+      <text x="8" y="27" fill="#64748B">[0 assertion mutations observed in companion test]</text>
+      
+      <text x="2" y="48" fill="#F59E0B" font-weight="600">
+        CORRELATION: NONE <tspan fill="#64748B" font-weight="400">(Test file touched but assertion left unchanged)</tspan>
       </text>
     </g>
-
-    <!-- Shaft 2: None Correlation (Drilled into open ground) -->
-    <path d="M 290 153 C 380 175, 460 215, 550 215" fill="none" stroke="#483236" stroke-width="1.8" stroke-dasharray="3 4" opacity="0.65" />
-    <circle cx="550" cy="215" r="3.5" fill="#F87171" opacity="0.8" />
   </g>
 
-  <!-- BEDROCK STRATUM: WHAT STATIC ANALYSIS CANNOT SEE (Bottom) -->
-  <g transform="translate(0, 276)">
-    <rect width="900" height="54" rx="0" fill="url(#digBedrockHatch)" />
-    <line x1="0" y1="0" x2="900" y2="0" stroke="#F59E0B" stroke-width="1.5" class="anim-bedrock-beacon" stroke-dasharray="6 3" />
+  <!-- ==================== BEDROCK STRATUM (BOTTOM FOUNDATION) ==================== -->
+  <g transform="translate(0, 380)">
+    <!-- Hatching Background -->
+    <rect width="900" height="60" fill="url(#bedrockHatch)" />
+    <!-- Boundary Amber Dotted Line -->
+    <line x1="0" y1="0" x2="900" y2="0" stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="6 4" class="anim-bedrock-rule" />
     
-    <!-- Bedrock Warning Label -->
-    <g transform="translate(30, 16)">
-      <rect width="840" height="24" rx="4" fill="#131719" stroke="#2B3639" stroke-width="1" />
-      <text x="420" y="16" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#BAC6C2" letter-spacing="1">
+    <!-- Bedrock Warning Label Badge -->
+    <g transform="translate(24, 16)">
+      <rect width="852" height="26" rx="4" fill="#101518" stroke="#253539" stroke-width="0.8" />
+      <circle cx="14" cy="13" r="3" fill="#F59E0B" />
+      <text x="26" y="16.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#BAC6C2" letter-spacing="0.8">
         BEDROCK: <tspan fill="#F59E0B" font-weight="700">WHAT STATIC ANALYSIS CANNOT SEE</tspan> — RUNTIME TEST PASSAGE, COVERAGE &amp; DEFECT CAUSATION
+      </text>
+      <text x="836" y="16.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" fill="#4B6065" text-anchor="end">
+        SHAFTS NEVER ENTER BEDROCK
       </text>
     </g>
   </g>

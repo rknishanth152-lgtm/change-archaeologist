@@ -30,55 +30,30 @@
     </linearGradient>
 
     <style>
-      /* Radar Sweep Line Animation across the 6 Scenarios */
-      .anim-radar-sweep {
-        animation: radarSweep 6s linear infinite;
-      }
-      @keyframes radarSweep {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(900px); }
+      /* Staggered Telemetry LED Soft Glows (Calm, understated) */
+      .anim-led-coral { animation: ledPulse 3s ease-in-out infinite alternate; }
+      .anim-led-amber { animation: ledPulse 2.8s ease-in-out infinite alternate 0.4s; }
+      .anim-led-teal  { animation: ledPulse 3.4s ease-in-out infinite alternate 0.8s; }
+      .anim-led-green { animation: ledPulse 3.2s ease-in-out infinite alternate 1.2s; }
+      .anim-led-blue  { animation: ledPulse 3.6s ease-in-out infinite alternate 1.6s; }
+
+      @keyframes ledPulse {
+        0% { opacity: 0.6; }
+        100% { opacity: 1; }
       }
 
-      /* Staggered Telemetry LED Pulses */
-      .anim-led-coral { animation: ledPulseCoral 2s ease-in-out infinite; }
-      .anim-led-amber { animation: ledPulseAmber 1.8s ease-in-out infinite; }
-      .anim-led-teal  { animation: ledPulseTeal 2.6s ease-in-out infinite; }
-      .anim-led-green { animation: ledPulseGreen 2.4s ease-in-out infinite; }
-      .anim-led-blue  { animation: ledPulseBlue 3s ease-in-out infinite; }
-
-      @keyframes ledPulseCoral {
-        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #F58D84); }
-        50% { opacity: 1; filter: drop-shadow(0 0 5px #F58D84); }
-      }
-      @keyframes ledPulseAmber {
-        0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 1px #F59E0B); }
-        50% { opacity: 1; filter: drop-shadow(0 0 6px #F59E0B); }
-      }
-      @keyframes ledPulseTeal {
-        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #5CCFBE); }
-        50% { opacity: 1; filter: drop-shadow(0 0 5px #5CCFBE); }
-      }
-      @keyframes ledPulseGreen {
-        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #34D399); }
-        50% { opacity: 1; filter: drop-shadow(0 0 6px #34D399); }
-      }
-      @keyframes ledPulseBlue {
-        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #38BDF8); }
-        50% { opacity: 1; filter: drop-shadow(0 0 5px #38BDF8); }
-      }
-
-      /* Hazard Border Pulse for Scenario E */
+      /* Hazard Border Subtle Pulse for Scenario E */
       .anim-hazard-card {
-        animation: hazardGlow 2.4s ease-in-out infinite;
+        animation: hazardGlow 3s ease-in-out infinite alternate;
       }
       @keyframes hazardGlow {
-        0%, 100% { stroke-opacity: 0.5; }
-        50% { stroke-opacity: 1; }
+        0% { stroke-opacity: 0.6; }
+        100% { stroke-opacity: 1; }
       }
 
       /* Accessibility Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
-        .anim-radar-sweep, .anim-led-coral, .anim-led-amber, .anim-led-teal, .anim-led-green, .anim-led-blue, .anim-hazard-card {
+        .anim-led-coral, .anim-led-amber, .anim-led-teal, .anim-led-green, .anim-led-blue, .anim-hazard-card {
           animation: none !important;
         }
       }
@@ -90,13 +65,7 @@
   <rect width="900" height="320" rx="12" fill="url(#matGrid)" />
   <rect width="898" height="318" x="1" y="1" rx="11" fill="none" stroke="#253539" stroke-width="1" stroke-opacity="0.6" />
 
-  <!-- Radar Scanning Beam (subtle sweep) -->
-  <g clip-path="url(#matClip)" opacity="0.6">
-    <clipPath id="matClip">
-      <rect width="898" height="318" x="1" y="1" rx="11" />
-    </clipPath>
-    <rect x="-80" y="0" width="80" height="320" fill="url(#sweepGrad)" class="anim-radar-sweep" />
-  </g>
+
 
   <!-- Header Strip -->
   <g transform="translate(24, 26)">

@@ -30,49 +30,31 @@
     </filter>
 
     <style>
-      /* 1. Bridge Data Transmission Stream */
+      /* 1. Calm, Slow Data Packet Conduits */
       .anim-flow-1 {
-        stroke-dasharray: 10 20;
-        animation: flowPacket 2.6s linear infinite;
+        stroke-dasharray: 8 24;
+        animation: flowPacket 3.5s linear infinite;
       }
       .anim-flow-2 {
-        stroke-dasharray: 10 20;
-        animation: flowPacket 3.2s linear infinite;
+        stroke-dasharray: 8 24;
+        animation: flowPacket 4.2s linear infinite;
       }
       @keyframes flowPacket {
-        from { stroke-dashoffset: 30; }
+        from { stroke-dashoffset: 32; }
         to { stroke-dashoffset: 0; }
       }
 
-      /* 2. Radar Pulses on Column Headers */
-      .anim-obs-ping { animation: radarObs 2.2s ease-in-out infinite; }
-      .anim-inf-ping { animation: radarInf 2.8s ease-in-out infinite; }
-      .anim-unk-ping { animation: radarUnk 3.4s ease-in-out infinite; }
-      @keyframes radarObs {
-        0%, 100% { opacity: 0.6; transform: scale(0.95); }
-        50% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 4px #38BDF8); }
-      }
-      @keyframes radarInf {
-        0%, 100% { opacity: 0.6; transform: scale(0.95); }
-        50% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 5px #5CCFBE); }
-      }
-      @keyframes radarUnk {
-        0%, 100% { opacity: 0.6; transform: scale(0.95); }
-        50% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 5px #F59E0B); }
-      }
-
-      /* 3. Bridge Chasm Particle Scan */
-      .anim-bridge-scanline {
-        animation: bridgeScan 4.5s ease-in-out infinite alternate;
-      }
-      @keyframes bridgeScan {
-        0% { transform: translateX(260px); opacity: 0.2; }
-        50% { opacity: 0.8; }
-        100% { transform: translateX(640px); opacity: 0.2; }
+      /* 2. Soft, Calm Beacon Glows (No scale jitter) */
+      .anim-obs-ping { animation: softBeacon 3s ease-in-out infinite alternate; }
+      .anim-inf-ping { animation: softBeacon 3.5s ease-in-out infinite alternate 0.5s; }
+      .anim-unk-ping { animation: softBeacon 4s ease-in-out infinite alternate 1s; }
+      @keyframes softBeacon {
+        0% { opacity: 0.5; }
+        100% { opacity: 1; }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        *, .anim-flow-1, .anim-flow-2, .anim-obs-ping, .anim-inf-ping, .anim-unk-ping, .anim-bridge-scanline {
+        *, .anim-flow-1, .anim-flow-2, .anim-obs-ping, .anim-inf-ping, .anim-unk-ping {
           animation: none !important;
         }
       }

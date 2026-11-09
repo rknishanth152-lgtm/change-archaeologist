@@ -49,21 +49,21 @@
     </filter>
 
     <style>
-      /* Flowing Data Stream along Conduits */
+      /* Flowing Data Stream along Conduits (Calm, graceful transmission) */
       .anim-bus-packet {
-        stroke-dasharray: 8 16;
-        animation: busFlow 2s linear infinite;
+        stroke-dasharray: 8 20;
+        animation: busFlow 3.4s linear infinite;
       }
       .anim-bus-packet-slow {
-        stroke-dasharray: 8 16;
-        animation: busFlow 2.6s linear infinite;
+        stroke-dasharray: 8 20;
+        animation: busFlow 4.2s linear infinite;
       }
       .anim-bus-packet-fast {
-        stroke-dasharray: 6 12;
-        animation: busFlow 1.6s linear infinite;
+        stroke-dasharray: 6 16;
+        animation: busFlow 2.8s linear infinite;
       }
       @keyframes busFlow {
-        from { stroke-dashoffset: 24; }
+        from { stroke-dashoffset: 28; }
         to { stroke-dashoffset: 0; }
       }
 
