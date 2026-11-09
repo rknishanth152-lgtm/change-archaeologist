@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 280" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E1315" />
+      <stop offset="50%" stop-color="#141C1E" />
+      <stop offset="100%" stop-color="#182326" />
+    </linearGradient>
+
+    <!-- Verdigris Accent Gradient -->
+    <linearGradient id="verdigrisGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4EBEAD" />
+      <stop offset="60%" stop-color="#6FE3D1" />
+      <stop offset="100%" stop-color="#A2EFE3" />
+    </linearGradient>
+
+    <!-- Rock Strata Layers Gradient -->
+    <linearGradient id="strataGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#182225" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#1F2C30" stop-opacity="0.4" />
+    </linearGradient>
+
+    <linearGradient id="strataGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#131B1D" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#1B2629" stop-opacity="0.6" />
+    </linearGradient>
+
+    <!-- Pill Background Gradient -->
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0B3833" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#0E4842" stop-opacity="0.6" />
+    </linearGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="verdigrisGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Subtle Grid Pattern -->
+    <pattern id="archGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1F2A2D" stroke-width="0.75" stroke-opacity="0.6" />
+      <circle cx="0" cy="0" r="1" fill="#2E3F44" />
+    </pattern>
+
+    <!-- Geological Hatch Pattern (Bedrock / Never Dug) -->
+    <pattern id="bedrockHatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="12" stroke="#253539" stroke-width="1.2" stroke-opacity="0.45" />
+    </pattern>
+  </defs>
+
+  <!-- Outer Rounded Container with Border -->
+  <rect width="900" height="280" rx="16" fill="url(#bgGrad)" stroke="#28373B" stroke-width="1.5" />
+
+  <!-- Background Stratigraphy Grid -->
+  <rect width="900" height="280" rx="16" fill="url(#archGrid)" opacity="0.85" />
+
+  <!-- Geological Strata Waves (Subtle Archeological Layers) -->
+  <path d="M 0 160 Q 220 185 450 165 T 900 175 L 900 280 L 0 280 Z" fill="url(#strataGrad1)" />
+  <path d="M 0 215 Q 260 235 520 210 T 900 225 L 900 280 L 0 280 Z" fill="url(#strataGrad2)" />
+  <path d="M 0 248 L 900 248 L 900 280 L 0 280 Z" fill="url(#bedrockHatch)" />
+
+  <!-- Archeological Fault Line (Cutting diagonally through layers on left) -->
+  <path d="M 190 20 L 155 120 L 175 190 L 140 270" fill="none" stroke="#2E4247" stroke-width="3" stroke-dasharray="6 4" opacity="0.6" />
+  <path d="M 155 120 L 175 190" fill="none" stroke="#5CCFBE" stroke-width="2" filter="url(#verdigrisGlow)" opacity="0.8" />
+
+  <!-- Excavation Depth Markers on Left Margin -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#4B6065" letter-spacing="1">
+    <text x="32" y="55">DEPTH 0.0m [SURFACE]</text>
+    <line x1="24" y1="52" x2="28" y2="52" stroke="#4B6065" stroke-width="1" />
+    <text x="32" y="115">LAYER I [BASE: 9a8bf4e]</text>
+    <line x1="24" y1="112" x2="28" y2="112" stroke="#4B6065" stroke-width="1" />
+    <text x="32" y="175">LAYER II [HEAD: a8265d8]</text>
+    <line x1="24" y1="172" x2="28" y2="172" stroke="#5CCFBE" stroke-width="1" opacity="0.7" />
+    <text x="32" y="240">BEDROCK [STATIC LIMIT]</text>
+    <line x1="24" y1="237" x2="28" y2="237" stroke="#4B6065" stroke-width="1" />
+  </g>
+
+  <!-- Left Glyph Emblem: Excavation Reticle & Stratigraphic Core -->
+  <g transform="translate(145, 128)">
+    <!-- Outer Survey Rings -->
+    <circle cx="0" cy="0" r="46" fill="none" stroke="#223337" stroke-width="1" stroke-dasharray="3 3" />
+    <circle cx="0" cy="0" r="36" fill="#121B1D" stroke="#2D4348" stroke-width="1.5" />
+
+    <!-- Crosshair Target Needles -->
+    <line x1="-50" y1="0" x2="-40" y2="0" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
+    <line x1="40" y1="0" x2="50" y2="0" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
+    <line x1="0" y1="-50" x2="0" y2="-40" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
+    <line x1="0" y1="40" x2="0" y2="50" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
+
+    <!-- Stratum Hexagon Glyph with Borehole Needle -->
+    <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#182427" stroke="#416167" stroke-width="1.5" />
+    
+    <!-- Fault Mutation Slice -->
+    <path d="M -12 -5 L 12 -5 L 16 6 L -8 6 Z" fill="#0C453F" stroke="#5CCFBE" stroke-width="1.2" />
+
+    <!-- Borehole Center Core -->
+    <circle cx="0" cy="0" r="4" fill="#6FE3D1" filter="url(#verdigrisGlow)" />
+  </g>
+
+  <!-- Main Content Block -->
+  <g transform="translate(232, 0)">
+    <!-- Badge / Category Pill -->
+    <g transform="translate(0, 42)">
+      <rect width="338" height="24" rx="5" fill="url(#badgeGrad)" stroke="#17635A" stroke-width="1" />
+      <circle cx="12" cy="12" r="3.5" fill="#6FE3D1" filter="url(#verdigrisGlow)" />
+      <text x="24" y="15.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="9.5" font-weight="700" fill="#75E5D5" letter-spacing="1.5">
+        FORENSIC AST STRATIGRAPHY &amp; CORRELATION
+      </text>
+    </g>
+
+    <!-- Title: CHANGE ARCHAEOLOGIST -->
+    <g transform="translate(0, 114)">
+      <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="42" letter-spacing="2">
+        <tspan fill="#EDF3F0">CHANGE </tspan>
+        <tspan fill="url(#verdigrisGrad)" filter="url(#verdigrisGlow)">ARCHAEOLOGIST</tspan>
+      </text>
+    </g>
+
+    <!-- Subtitle / Mission Statement -->
+    <text x="0" y="148" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#B1C2BE" letter-spacing="0.2">
+      Excavates structural code changes across Git history and correlates companion tests.
+    </text>
+
+    <!-- Epistemic Ground Truth Strip -->
+    <g transform="translate(0, 184)">
+      <!-- Card: OBSERVED -->
+      <g transform="translate(0, 0)">
+        <rect width="180" height="30" rx="6" fill="#131B1E" stroke="#253538" stroke-width="1" />
+        <circle cx="14" cy="15" r="4" fill="#38BDF8" />
+        <text x="26" y="19" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#E2E8F0" letter-spacing="0.5">OBSERVED</text>
+        <text x="96" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#7E9491">AST Spans</text>
+      </g>
+
+      <!-- Card: INFERRED -->
+      <g transform="translate(192, 0)">
+        <rect width="180" height="30" rx="6" fill="#131B1E" stroke="#253538" stroke-width="1" />
+        <circle cx="14" cy="15" r="4" fill="#5CCFBE" />
+        <text x="26" y="19" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#E2E8F0" letter-spacing="0.5">INFERRED</text>
+        <text x="92" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#7E9491">Correlations</text>
+      </g>
+
+      <!-- Card: UNKNOWN -->
+      <g transform="translate(384, 0)">
+        <rect width="180" height="30" rx="6" fill="#131B1E" stroke="#253538" stroke-width="1" />
+        <circle cx="14" cy="15" r="4" fill="#F59E0B" />
+        <text x="26" y="19" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#E2E8F0" letter-spacing="0.5">UNKNOWN</text>
+        <text x="94" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#7E9491">Boundaries</text>
+      </g>
+    </g>
+
+    <!-- Technical Trust Markers at Base -->
+    <g transform="translate(0, 246)" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10" fill="#68817D" letter-spacing="0.5">
+      <text x="0" y="0">
+        <tspan fill="#5CCFBE">✓</tspan> 100% Local-First
+        <tspan dx="16" fill="#5CCFBE">✓</tspan> Deterministic AST
+        <tspan dx="16" fill="#5CCFBE">✓</tspan> Subprocess Sandboxed
+        <tspan dx="16" fill="#5CCFBE">✓</tspan> Zero Telemetry
+      </text>
+    </g>
+  </g>
+
+  <!-- Right Decorative Stratum Probe -->
+  <g transform="translate(850, 40)" opacity="0.7">
+    <line x1="0" y1="0" x2="0" y2="180" stroke="#223337" stroke-width="1" stroke-dasharray="2 3" />
+    <circle cx="0" cy="30" r="3" fill="#2E4449" />
+    <circle cx="0" cy="90" r="3" fill="#5CCFBE" />
+    <circle cx="0" cy="150" r="3" fill="#2E4449" />
+  </g>
+</svg>
