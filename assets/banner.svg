@@ -2,135 +2,334 @@
   <defs>
     <!-- Background Gradient -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0E1315" />
-      <stop offset="50%" stop-color="#141C1E" />
-      <stop offset="100%" stop-color="#182326" />
+      <stop offset="0%" stop-color="#0B1012" />
+      <stop offset="50%" stop-color="#12191B" />
+      <stop offset="100%" stop-color="#162225" />
     </linearGradient>
 
-    <!-- Verdigris Accent Gradient -->
+    <!-- Base Verdigris Accent Gradient -->
     <linearGradient id="verdigrisGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#4EBEAD" />
-      <stop offset="60%" stop-color="#6FE3D1" />
-      <stop offset="100%" stop-color="#A2EFE3" />
+      <stop offset="50%" stop-color="#72EBD9" />
+      <stop offset="100%" stop-color="#9EF5E8" />
     </linearGradient>
 
-    <!-- Rock Strata Layers Gradient -->
+    <!-- Shimmering Text Gradient (Animated Light Sweep) -->
+    <linearGradient id="shimmerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4EBEAD">
+        <animate attributeName="stop-color" values="#4EBEAD;#72EBD9;#C2FBF3;#4EBEAD" dur="4s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="35%" stop-color="#72EBD9">
+        <animate attributeName="stop-color" values="#72EBD9;#C2FBF3;#72EBD9;#4EBEAD;#72EBD9" dur="4s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="70%" stop-color="#A8F6EC">
+        <animate attributeName="stop-color" values="#A8F6EC;#4EBEAD;#C2FBF3;#A8F6EC" dur="4s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" stop-color="#4EBEAD">
+        <animate attributeName="stop-color" values="#4EBEAD;#72EBD9;#4EBEAD" dur="4s" repeatCount="indefinite" />
+      </stop>
+    </linearGradient>
+
+    <!-- Radar Scanline Gradient -->
+    <linearGradient id="scanBeamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5CCFBE" stop-opacity="0" />
+      <stop offset="85%" stop-color="#5CCFBE" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#86DDCF" stop-opacity="0.85" />
+    </linearGradient>
+
+    <!-- Rock Strata Layers Gradients -->
     <linearGradient id="strataGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#182225" stop-opacity="0.9" />
-      <stop offset="100%" stop-color="#1F2C30" stop-opacity="0.4" />
+      <stop offset="0%" stop-color="#162023" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#1C292D" stop-opacity="0.45" />
     </linearGradient>
 
     <linearGradient id="strataGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#131B1D" stop-opacity="0.95" />
-      <stop offset="100%" stop-color="#1B2629" stop-opacity="0.6" />
+      <stop offset="0%" stop-color="#101719" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#162225" stop-opacity="0.6" />
     </linearGradient>
 
     <!-- Pill Background Gradient -->
     <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0B3833" stop-opacity="0.9" />
-      <stop offset="100%" stop-color="#0E4842" stop-opacity="0.6" />
+      <stop offset="0%" stop-color="#093833" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#0D4B44" stop-opacity="0.5" />
     </linearGradient>
 
     <!-- Soft Glow Filter -->
-    <filter id="verdigrisGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="6" result="blur" />
+    <filter id="verdigrisGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
       <feMerge>
         <feMergeNode in="blur" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
 
-    <!-- Subtle Grid Pattern -->
+    <filter id="intenseGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur1" />
+      <feGaussianBlur stdDeviation="3" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur1" />
+        <feMergeNode in="blur2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Archeological Cartography Grid Pattern -->
     <pattern id="archGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1F2A2D" stroke-width="0.75" stroke-opacity="0.6" />
-      <circle cx="0" cy="0" r="1" fill="#2E3F44" />
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1D282B" stroke-width="0.7" stroke-opacity="0.6" />
+      <circle cx="0" cy="0" r="1" fill="#28393D" />
     </pattern>
 
-    <!-- Geological Hatch Pattern (Bedrock / Never Dug) -->
+    <!-- Bedrock Hatching Pattern (Never Dug) -->
     <pattern id="bedrockHatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-      <line x1="0" y1="0" x2="0" y2="12" stroke="#253539" stroke-width="1.2" stroke-opacity="0.45" />
+      <line x1="0" y1="0" x2="0" y2="12" stroke="#233236" stroke-width="1.2" stroke-opacity="0.5" />
     </pattern>
+
+    <!-- EMBEDDED GPU-ACCELERATED CSS ANIMATIONS -->
+    <style>
+      /* 1. Survey Theodolite Ring Rotation (Around Reticle Center: 145px, 128px) */
+      .anim-survey-outer {
+        transform-origin: 145px 128px;
+        animation: spinClockwise 26s linear infinite;
+      }
+      .anim-survey-inner {
+        transform-origin: 145px 128px;
+        animation: spinCounter 18s linear infinite;
+      }
+      @keyframes spinClockwise {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      @keyframes spinCounter {
+        from { transform: rotate(360deg); }
+        to { transform: rotate(0deg); }
+      }
+
+      /* 2. Sonar Borehole Ping Wavefronts */
+      .anim-sonar-wave1 {
+        transform-origin: 145px 128px;
+        animation: sonarExpand 3.2s cubic-bezier(0.1, 0.7, 0.3, 1) infinite;
+      }
+      .anim-sonar-wave2 {
+        transform-origin: 145px 128px;
+        animation: sonarExpand 3.2s cubic-bezier(0.1, 0.7, 0.3, 1) infinite 1.6s;
+      }
+      @keyframes sonarExpand {
+        0% { r: 6px; opacity: 0.85; stroke-width: 2px; }
+        50% { opacity: 0.45; }
+        100% { r: 48px; opacity: 0; stroke-width: 0.5px; }
+      }
+
+      /* 3. Center Emitter Core Pulse */
+      .anim-core-pulse {
+        animation: coreBreathing 2.4s ease-in-out infinite alternate;
+      }
+      @keyframes coreBreathing {
+        0% { transform: scale(0.9); opacity: 0.75; }
+        100% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 6px #72EBD9); }
+      }
+
+      /* 4. Fault-Line Active Signal Propagation */
+      .anim-fault-pulse {
+        stroke-dasharray: 45 180;
+        animation: faultTravel 3.6s ease-in-out infinite;
+      }
+      @keyframes faultTravel {
+        0% { stroke-dashoffset: 225; opacity: 0.2; }
+        35% { opacity: 1; }
+        70% { opacity: 0.9; }
+        100% { stroke-dashoffset: -45; opacity: 0.2; }
+      }
+
+      /* 5. Subsurface Radar Scanline Beam */
+      .anim-radar-scan {
+        animation: scanlineSweep 5.4s cubic-bezier(0.35, 0.05, 0.2, 0.95) infinite;
+      }
+      @keyframes scanlineSweep {
+        0% { transform: translateY(18px); opacity: 0; }
+        10% { opacity: 0.85; }
+        85% { opacity: 0.85; }
+        98% { transform: translateY(246px); opacity: 0.15; }
+        100% { transform: translateY(248px); opacity: 0; }
+      }
+
+      /* 6. Epistemic LED Status Indicators */
+      .anim-led-observed {
+        animation: ledPulseBlue 2.2s ease-in-out infinite;
+      }
+      .anim-led-inferred {
+        animation: ledPulseVerdigris 2.8s ease-in-out infinite;
+      }
+      .anim-led-unknown {
+        animation: ledPulseAmber 3.4s ease-in-out infinite;
+      }
+      @keyframes ledPulseBlue {
+        0%, 100% { opacity: 0.65; transform: scale(0.95); }
+        50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 4px #38BDF8); }
+      }
+      @keyframes ledPulseVerdigris {
+        0%, 100% { opacity: 0.7; transform: scale(0.95); }
+        50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 5px #72EBD9); }
+      }
+      @keyframes ledPulseAmber {
+        0%, 100% { opacity: 0.65; transform: scale(0.95); }
+        50% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 5px #F59E0B); }
+      }
+
+      /* 7. Reticle Hexagon Subtle Breathing */
+      .anim-hex-float {
+        transform-origin: 145px 128px;
+        animation: hexMotion 4.8s ease-in-out infinite alternate;
+      }
+      @keyframes hexMotion {
+        0% { transform: rotate(0deg) scale(0.98); }
+        100% { transform: rotate(3deg) scale(1.02); }
+      }
+
+      /* 8. Badge Glow Dot */
+      .anim-badge-dot {
+        animation: badgePulse 2s ease-in-out infinite alternate;
+      }
+      @keyframes badgePulse {
+        0% { opacity: 0.6; transform: scale(0.9); }
+        100% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 4px #72EBD9); }
+      }
+
+      /* 9. Telemetry Column Nodes */
+      .anim-telemetry-1 { animation: telemetryFlash 2.4s infinite 0.2s; }
+      .anim-telemetry-2 { animation: telemetryFlash 2.4s infinite 1.0s; }
+      .anim-telemetry-3 { animation: telemetryFlash 2.4s infinite 1.8s; }
+      @keyframes telemetryFlash {
+        0%, 100% { opacity: 0.3; fill: #2E4449; }
+        50% { opacity: 1; fill: #6FE3D1; filter: drop-shadow(0 0 4px #72EBD9); }
+      }
+
+      /* 10. Stratigraphic Wave Drift */
+      .anim-strata-drift {
+        animation: strataDrift 14s ease-in-out infinite alternate;
+      }
+      @keyframes strataDrift {
+        0% { transform: translateY(0px); }
+        100% { transform: translateY(3px); }
+      }
+
+      /* Respect Accessibility Settings */
+      @media (prefers-reduced-motion: reduce) {
+        *, .anim-survey-outer, .anim-survey-inner, .anim-sonar-wave1, .anim-sonar-wave2,
+        .anim-core-pulse, .anim-fault-pulse, .anim-radar-scan, .anim-led-observed,
+        .anim-led-inferred, .anim-led-unknown, .anim-hex-float, .anim-badge-dot,
+        .anim-telemetry-1, .anim-telemetry-2, .anim-telemetry-3, .anim-strata-drift {
+          animation: none !important;
+        }
+      }
+    </style>
   </defs>
 
-  <!-- Outer Rounded Container with Border -->
-  <rect width="900" height="280" rx="16" fill="url(#bgGrad)" stroke="#28373B" stroke-width="1.5" />
+  <!-- Base Dark Mineral Plate -->
+  <rect width="900" height="280" rx="16" fill="url(#bgGrad)" stroke="#26363A" stroke-width="1.5" />
 
-  <!-- Background Stratigraphy Grid -->
-  <rect width="900" height="280" rx="16" fill="url(#archGrid)" opacity="0.85" />
+  <!-- Background Stratigraphy Coordinate Grid -->
+  <rect width="900" height="280" rx="16" fill="url(#archGrid)" opacity="0.9" />
 
-  <!-- Geological Strata Waves (Subtle Archeological Layers) -->
-  <path d="M 0 160 Q 220 185 450 165 T 900 175 L 900 280 L 0 280 Z" fill="url(#strataGrad1)" />
-  <path d="M 0 215 Q 260 235 520 210 T 900 225 L 900 280 L 0 280 Z" fill="url(#strataGrad2)" />
+  <!-- Geological Strata Waves (The Subsurface Layers) -->
+  <g class="anim-strata-drift">
+    <path d="M 0 160 Q 220 185 450 165 T 900 175 L 900 280 L 0 280 Z" fill="url(#strataGrad1)" />
+    <path d="M 0 215 Q 260 235 520 210 T 900 225 L 900 280 L 0 280 Z" fill="url(#strataGrad2)" />
+  </g>
   <path d="M 0 248 L 900 248 L 900 280 L 0 280 Z" fill="url(#bedrockHatch)" />
 
-  <!-- Archeological Fault Line (Cutting diagonally through layers on left) -->
-  <path d="M 190 20 L 155 120 L 175 190 L 140 270" fill="none" stroke="#2E4247" stroke-width="3" stroke-dasharray="6 4" opacity="0.6" />
-  <path d="M 155 120 L 175 190" fill="none" stroke="#5CCFBE" stroke-width="2" filter="url(#verdigrisGlow)" opacity="0.8" />
+  <!-- Geological Bedrock Limit Line -->
+  <line x1="0" y1="248" x2="900" y2="248" stroke="#374D52" stroke-width="1" stroke-dasharray="4 3" opacity="0.8" />
 
-  <!-- Excavation Depth Markers on Left Margin -->
-  <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#4B6065" letter-spacing="1">
+  <!-- Subsurface Archaeological Radar Scanning Beam -->
+  <g class="anim-radar-scan">
+    <rect x="0" y="0" width="900" height="22" fill="url(#scanBeamGrad)" />
+    <line x1="0" y1="22" x2="900" y2="22" stroke="#72EBD9" stroke-width="1.2" opacity="0.9" filter="url(#verdigrisGlow)" />
+  </g>
+
+  <!-- Static Fault Line Base Track (Left Geological Section) -->
+  <path d="M 190 20 L 155 120 L 175 190 L 140 270" fill="none" stroke="#25373B" stroke-width="3" stroke-dasharray="6 4" opacity="0.7" />
+
+  <!-- Active Animated Seismic Pulse Traveling Down Fault Line -->
+  <path d="M 190 20 L 155 120 L 175 190 L 140 270" fill="none" stroke="#6FE3D1" stroke-width="2.5" class="anim-fault-pulse" filter="url(#intenseGlow)" />
+
+  <!-- Excavation Depth Coordinates (Left Border) -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#4D6267" letter-spacing="1">
     <text x="32" y="55">DEPTH 0.0m [SURFACE]</text>
-    <line x1="24" y1="52" x2="28" y2="52" stroke="#4B6065" stroke-width="1" />
+    <line x1="24" y1="52" x2="28" y2="52" stroke="#4D6267" stroke-width="1" />
     <text x="32" y="115">LAYER I [BASE: 9a8bf4e]</text>
-    <line x1="24" y1="112" x2="28" y2="112" stroke="#4B6065" stroke-width="1" />
+    <line x1="24" y1="112" x2="28" y2="112" stroke="#4D6267" stroke-width="1" />
     <text x="32" y="175">LAYER II [HEAD: a8265d8]</text>
-    <line x1="24" y1="172" x2="28" y2="172" stroke="#5CCFBE" stroke-width="1" opacity="0.7" />
+    <line x1="24" y1="172" x2="28" y2="172" stroke="#5CCFBE" stroke-width="1" opacity="0.75" />
     <text x="32" y="240">BEDROCK [STATIC LIMIT]</text>
-    <line x1="24" y1="237" x2="28" y2="237" stroke="#4B6065" stroke-width="1" />
+    <line x1="24" y1="237" x2="28" y2="237" stroke="#4D6267" stroke-width="1" />
   </g>
 
-  <!-- Left Glyph Emblem: Excavation Reticle & Stratigraphic Core -->
-  <g transform="translate(145, 128)">
-    <!-- Outer Survey Rings -->
-    <circle cx="0" cy="0" r="46" fill="none" stroke="#223337" stroke-width="1" stroke-dasharray="3 3" />
-    <circle cx="0" cy="0" r="36" fill="#121B1D" stroke="#2D4348" stroke-width="1.5" />
+  <!-- Left Emblem: The Forensic Optical Survey Reticle (Center at 145, 128) -->
+  <g>
+    <!-- Sonar Concentric Ripple Waves -->
+    <circle cx="145" cy="128" r="6" fill="none" stroke="#6FE3D1" class="anim-sonar-wave1" filter="url(#verdigrisGlow)" />
+    <circle cx="145" cy="128" r="6" fill="none" stroke="#6FE3D1" class="anim-sonar-wave2" filter="url(#verdigrisGlow)" />
 
-    <!-- Crosshair Target Needles -->
-    <line x1="-50" y1="0" x2="-40" y2="0" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
-    <line x1="40" y1="0" x2="50" y2="0" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
-    <line x1="0" y1="-50" x2="0" y2="-40" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
-    <line x1="0" y1="40" x2="0" y2="50" stroke="#5CCFBE" stroke-width="1.5" opacity="0.8" />
+    <!-- Outer Rotating Survey Ring with Azimuth Graduations -->
+    <g class="anim-survey-outer">
+      <circle cx="145" cy="128" r="48" fill="none" stroke="#22353A" stroke-width="1" stroke-dasharray="4 6" />
+      <circle cx="145" cy="128" r="42" fill="none" stroke="#2E4449" stroke-width="1" stroke-dasharray="1 8" />
+    </g>
 
-    <!-- Stratum Hexagon Glyph with Borehole Needle -->
-    <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#182427" stroke="#416167" stroke-width="1.5" />
-    
-    <!-- Fault Mutation Slice -->
-    <path d="M -12 -5 L 12 -5 L 16 6 L -8 6 Z" fill="#0C453F" stroke="#5CCFBE" stroke-width="1.2" />
+    <!-- Inner Counter-Rotating Reticle Ring -->
+    <g class="anim-survey-inner">
+      <circle cx="145" cy="128" r="34" fill="#111A1C" stroke="#334B50" stroke-width="1.5" stroke-dasharray="8 4" />
+    </g>
 
-    <!-- Borehole Center Core -->
-    <circle cx="0" cy="0" r="4" fill="#6FE3D1" filter="url(#verdigrisGlow)" />
+    <!-- Fixed Theodolite Crosshairs -->
+    <line x1="95" y1="128" x2="108" y2="128" stroke="#5CCFBE" stroke-width="1.5" opacity="0.85" />
+    <line x1="182" y1="128" x2="195" y2="128" stroke="#5CCFBE" stroke-width="1.5" opacity="0.85" />
+    <line x1="145" y1="78" x2="145" y2="91" stroke="#5CCFBE" stroke-width="1.5" opacity="0.85" />
+    <line x1="145" y1="165" x2="145" y2="178" stroke="#5CCFBE" stroke-width="1.5" opacity="0.85" />
+
+    <!-- Breathing Geological Hexagon & Fault Core -->
+    <g class="anim-hex-float">
+      <!-- Hexagon Stratum Crystal -->
+      <polygon points="145,106 164,117 164,139 145,150 126,139 126,117" fill="#162326" stroke="#48686F" stroke-width="1.5" />
+      
+      <!-- Fault Mutation Wedge -->
+      <path d="M 133 123 L 157 123 L 161 134 L 137 134 Z" fill="#0E453F" stroke="#5CCFBE" stroke-width="1.2" />
+
+      <!-- Center Emitter Core -->
+      <circle cx="145" cy="128" r="4.5" fill="#72EBD9" class="anim-core-pulse" filter="url(#intenseGlow)" />
+    </g>
   </g>
 
-  <!-- Main Content Block -->
+  <!-- Main Information Block -->
   <g transform="translate(232, 0)">
-    <!-- Badge / Category Pill -->
+    <!-- Pill Badge: FORENSIC AST STRATIGRAPHY & CORRELATION -->
     <g transform="translate(0, 42)">
       <rect width="338" height="24" rx="5" fill="url(#badgeGrad)" stroke="#17635A" stroke-width="1" />
-      <circle cx="12" cy="12" r="3.5" fill="#6FE3D1" filter="url(#verdigrisGlow)" />
+      <circle cx="12" cy="12" r="3.5" fill="#6FE3D1" class="anim-badge-dot" />
       <text x="24" y="15.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="9.5" font-weight="700" fill="#75E5D5" letter-spacing="1.5">
         FORENSIC AST STRATIGRAPHY &amp; CORRELATION
       </text>
     </g>
 
-    <!-- Title: CHANGE ARCHAEOLOGIST -->
+    <!-- Main Title: CHANGE ARCHAEOLOGIST with Iridescent Shimmer -->
     <g transform="translate(0, 114)">
       <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="42" letter-spacing="2">
         <tspan fill="#EDF3F0">CHANGE </tspan>
-        <tspan fill="url(#verdigrisGrad)" filter="url(#verdigrisGlow)">ARCHAEOLOGIST</tspan>
+        <tspan fill="url(#shimmerGrad)" filter="url(#verdigrisGlow)">ARCHAEOLOGIST</tspan>
       </text>
     </g>
 
-    <!-- Subtitle / Mission Statement -->
+    <!-- Subtitle -->
     <text x="0" y="148" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#B1C2BE" letter-spacing="0.2">
       Excavates structural code changes across Git history and correlates companion tests.
     </text>
 
-    <!-- Epistemic Ground Truth Strip -->
+    <!-- Epistemic Ground Truth Strip with Pulsing Sensor LEDs -->
     <g transform="translate(0, 184)">
       <!-- Card: OBSERVED -->
       <g transform="translate(0, 0)">
         <rect width="180" height="30" rx="6" fill="#131B1E" stroke="#253538" stroke-width="1" />
-        <circle cx="14" cy="15" r="4" fill="#38BDF8" />
+        <circle cx="14" cy="15" r="4" fill="#38BDF8" class="anim-led-observed" />
         <text x="26" y="19" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#E2E8F0" letter-spacing="0.5">OBSERVED</text>
         <text x="96" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#7E9491">AST Spans</text>
       </g>
@@ -138,7 +337,7 @@
       <!-- Card: INFERRED -->
       <g transform="translate(192, 0)">
         <rect width="180" height="30" rx="6" fill="#131B1E" stroke="#253538" stroke-width="1" />
-        <circle cx="14" cy="15" r="4" fill="#5CCFBE" />
+        <circle cx="14" cy="15" r="4" fill="#5CCFBE" class="anim-led-inferred" />
         <text x="26" y="19" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#E2E8F0" letter-spacing="0.5">INFERRED</text>
         <text x="92" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#7E9491">Correlations</text>
       </g>
@@ -146,7 +345,7 @@
       <!-- Card: UNKNOWN -->
       <g transform="translate(384, 0)">
         <rect width="180" height="30" rx="6" fill="#131B1E" stroke="#253538" stroke-width="1" />
-        <circle cx="14" cy="15" r="4" fill="#F59E0B" />
+        <circle cx="14" cy="15" r="4" fill="#F59E0B" class="anim-led-unknown" />
         <text x="26" y="19" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#E2E8F0" letter-spacing="0.5">UNKNOWN</text>
         <text x="94" y="19" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#7E9491">Boundaries</text>
       </g>
@@ -163,11 +362,11 @@
     </g>
   </g>
 
-  <!-- Right Decorative Stratum Probe -->
-  <g transform="translate(850, 40)" opacity="0.7">
-    <line x1="0" y1="0" x2="0" y2="180" stroke="#223337" stroke-width="1" stroke-dasharray="2 3" />
-    <circle cx="0" cy="30" r="3" fill="#2E4449" />
-    <circle cx="0" cy="90" r="3" fill="#5CCFBE" />
-    <circle cx="0" cy="150" r="3" fill="#2E4449" />
+  <!-- Right Decorative Telemetry Column with Blinking Node Sensors -->
+  <g transform="translate(850, 40)" opacity="0.85">
+    <line x1="0" y1="0" x2="0" y2="180" stroke="#22353A" stroke-width="1" stroke-dasharray="2 3" />
+    <circle cx="0" cy="30" r="3.5" class="anim-telemetry-1" />
+    <circle cx="0" cy="90" r="3.5" class="anim-telemetry-2" />
+    <circle cx="0" cy="150" r="3.5" class="anim-telemetry-3" />
   </g>
 </svg>
