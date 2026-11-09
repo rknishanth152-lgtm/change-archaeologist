@@ -31,7 +31,7 @@ Thumbs.db
 # Temporary & Local Output
 *.tmp
 *.tmp.*
-reports/
+/reports/
 examples/demo-repository/
 .agents/
 .claude/
