@@ -68,7 +68,7 @@
   <!-- Title / Ledger Header -->
   <g transform="translate(30, 26)">
     <text font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" font-weight="700" fill="#E2E8F0" letter-spacing="1.5">
-      THE EPISTEMIC BRIDGE — THREE-TIER TRUTH SEGREGATION
+      THREE KINDS OF STATEMENT
     </text>
     <text x="600" y="0" text-anchor="end" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9" fill="#5CCFBE">
       PRINCIPLE: SHOW EVIDENCE • LABEL INFERENCE • ADMIT UNKNOWN
@@ -131,10 +131,10 @@
     <!-- Items -->
     <g font-family="ui-monospace, SFMono-Regular, monospace" font-size="9" fill="#BAC6C2" transform="translate(14, 52)">
       <text x="0" y="0"><tspan fill="#5CCFBE">◆</tspan> Syntactic Proximity Heuristics</text>
-      <text x="0" y="20"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#6FE3D1" font-weight="700">STRONG</tspan> : Variable / Guard Bound</text>
-      <text x="0" y="40"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#BAC6C2" font-weight="700">WEAK</tspan> : Temporal Co-occurrence</text>
-      <text x="0" y="60"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#FBBF24" font-weight="700">UNCERTAIN</tspan> : Ambiguous Title</text>
-      <text x="0" y="80"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#F87171" font-weight="700">NONE</tspan> : Test File Untouched</text>
+      <text x="0" y="20"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#6FE3D1" font-weight="700">STRONG</tspan> : Changed Test Calls It</text>
+      <text x="0" y="40"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#BAC6C2" font-weight="700">WEAK</tspan> : Same File or Range</text>
+      <text x="0" y="60"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#FBBF24" font-weight="700">UNCERTAIN</tspan> : Reserved, Unclear</text>
+      <text x="0" y="80"><tspan fill="#5CCFBE">◆</tspan> <tspan fill="#F87171" font-weight="700">NONE</tspan> : No Related Change</text>
       <text x="0" y="98" fill="#5F757A">// Calibrated rule-based hypotheses</text>
     </g>
   </g>

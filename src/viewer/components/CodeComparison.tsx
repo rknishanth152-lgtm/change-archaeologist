@@ -288,7 +288,7 @@ export const CodeComparison: React.FC<CodeComparisonProps> = ({
     };
   }, [isEditorMounted]);
 
-  // Editor Options per DESIGN.md Section 9
+  // Read-only diff options
   const editorOptions: editor.IDiffEditorOptions = useMemo(
     () => ({
       readOnly: true,

@@ -70,7 +70,7 @@
   <!-- Header Strip -->
   <g transform="translate(24, 26)">
     <circle cx="6" cy="6" r="3" fill="#4EBEAD" />
-    <text x="18" y="10" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#86DDCF" letter-spacing="1.2">FORENSIC DEMONSTRATION SUITE // 6 CANONICAL EVOLUTION PATTERNS</text>
+    <text x="18" y="10" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#86DDCF" letter-spacing="1.2">DEMONSTRATION SUITE // 6 CHANGE PATTERNS</text>
     
     <g transform="translate(630, -2)">
       <rect width="222" height="18" rx="4" fill="#111B1E" stroke="#1D2A2E" stroke-width="0.8" />
@@ -94,18 +94,18 @@
     <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#FCA5A5">SCENARIO A • GUARD REMOVAL</text>
     <!-- Badge -->
     <rect x="190" y="5" width="72" height="16" rx="3" fill="#381E21" stroke="#5C252B" stroke-width="0.8" />
-    <text x="226" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#F87171" text-anchor="middle">REVIEW FIRST</text>
+    <text x="226" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#5CCFBE" text-anchor="middle">WORTH A LOOK</text>
     
     <!-- Content Body -->
     <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
       <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">processPayment <tspan fill="#64748B">in auth.ts</tspan></text>
-      <text x="0" y="24" fill="#94A3B8">Mutation: <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">if (!user) throw Error()</tspan> dropped</text>
-      <text x="0" y="38" fill="#94A3B8">Companion: Assertion modified in test</text>
+      <text x="0" y="24" fill="#94A3B8">Change: <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">if (!payment.valid) throw</tspan> dropped</text>
+      <text x="0" y="38" fill="#94A3B8">Tests: none supplied for this run</text>
       
       <!-- Footer Metric -->
       <line x1="0" y1="46" x2="246" y2="46" stroke="#1D282B" stroke-width="0.8" />
       <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
-      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">STRONG (SYNTACTIC BIND)</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">NOT ANALYZED</text>
     </g>
   </g>
 
@@ -117,16 +117,16 @@
     <circle cx="12" cy="13" r="3" fill="#F58D84" class="anim-led-coral" />
     <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#FCA5A5">SCENARIO B • OPERATOR MUTATION</text>
     <rect x="190" y="5" width="72" height="16" rx="3" fill="#381E21" stroke="#5C252B" stroke-width="0.8" />
-    <text x="226" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#F87171" text-anchor="middle">REVIEW FIRST</text>
+    <text x="226" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#5CCFBE" text-anchor="middle">WORTH A LOOK</text>
     
     <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
       <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">authorizeUser <tspan fill="#64748B">in access.ts</tspan></text>
-      <text x="0" y="24" fill="#94A3B8">Mutation: <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">&amp;&amp;</tspan> replaced by <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">||</tspan> in auth check</text>
-      <text x="0" y="38" fill="#94A3B8">Companion: Assertion updated to match</text>
+      <text x="0" y="24" fill="#94A3B8">Change: <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">&amp;&amp;</tspan> replaced by <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">||</tspan> in auth check</text>
+      <text x="0" y="38" fill="#94A3B8">Tests: none supplied for this run</text>
       
       <line x1="0" y1="46" x2="246" y2="46" stroke="#1D282B" stroke-width="0.8" />
       <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
-      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">STRONG (BOOLEAN DELTA)</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">NOT ANALYZED</text>
     </g>
   </g>
 
@@ -142,12 +142,12 @@
     
     <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
       <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">loadConfig <tspan fill="#64748B">in config.ts</tspan></text>
-      <text x="0" y="24" fill="#94A3B8">Mutation: <tspan fill="#5CCFBE" font-family="ui-monospace, monospace">throw</tspan> converted to <tspan fill="#5CCFBE" font-family="ui-monospace, monospace">return null</tspan></text>
-      <text x="0" y="38" fill="#94A3B8">Companion: Error assertion rewrote to null check</text>
+      <text x="0" y="24" fill="#94A3B8">Change: <tspan fill="#5CCFBE" font-family="ui-monospace, monospace">throw</tspan> converted to <tspan fill="#5CCFBE" font-family="ui-monospace, monospace">return {}</tspan></text>
+      <text x="0" y="38" fill="#94A3B8">Tests: none supplied for this run</text>
       
       <line x1="0" y1="46" x2="248" y2="46" stroke="#1D282B" stroke-width="0.8" />
       <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
-      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">STRONG (CONTROL FLOW)</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">NOT ANALYZED</text>
     </g>
   </g>
 
@@ -159,18 +159,18 @@
     <rect width="270" height="26" rx="8" fill="#12251D" />
     <rect x="0" y="18" width="270" height="8" fill="#12251D" />
     <circle cx="12" cy="13" r="3" fill="#34D399" class="anim-led-green" />
-    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#BBF7D0">SCENARIO D • TEST ADDITION</text>
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#BBF7D0">SCENARIO D • TEST CHANGE</text>
     <rect x="180" y="5" width="82" height="16" rx="3" fill="#0D2E1F" stroke="#1A5338" stroke-width="0.8" />
-    <text x="221" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#34D399" text-anchor="middle">INFORMATIONAL</text>
+    <text x="221" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#34D399" text-anchor="middle">WORTH A LOOK</text>
     
     <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
       <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">calculateDiscount <tspan fill="#64748B">in order.ts</tspan></text>
-      <text x="0" y="24" fill="#94A3B8">Mutation: Added VIP tier discount computation</text>
-      <text x="0" y="38" fill="#94A3B8">Companion: New test block &amp; assertion added</text>
+      <text x="0" y="24" fill="#94A3B8">Change: return rate moved from 0.10 to 0.15</text>
+      <text x="0" y="38" fill="#94A3B8">Tests: one assertion changed</text>
       
       <line x1="0" y1="46" x2="246" y2="46" stroke="#1D282B" stroke-width="0.8" />
       <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
-      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#34D399">STRONG (POSITIVE BIND)</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#34D399">STRONG + WEAK LINKS</text>
     </g>
   </g>
 
@@ -180,18 +180,18 @@
     <rect width="270" height="26" rx="8" fill="#2B210F" />
     <rect x="0" y="18" width="270" height="8" fill="#2B210F" />
     <circle cx="12" cy="13" r="3" fill="#F59E0B" class="anim-led-amber" />
-    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#FDE68A">SCENARIO E • UNTOUCHED TEST</text>
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#FDE68A">SCENARIO E • CAREFUL LINKS</text>
     <rect x="182" y="5" width="80" height="16" rx="3" fill="#3D2908" stroke="#784C0F" stroke-width="0.8" />
-    <text x="222" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#F59E0B" text-anchor="middle">REGRESSION !</text>
+    <text x="222" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#5CCFBE" text-anchor="middle">WORTH A LOOK</text>
     
     <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
       <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">calculateDiscount <tspan fill="#64748B">in order.ts</tspan></text>
-      <text x="0" y="24" fill="#FDE68A">Mutation: Production rates altered</text>
-      <text x="0" y="38" fill="#EF4444" font-weight="600">Companion: Test file left COMPLETELY UNTOUCHED</text>
+      <text x="0" y="24" fill="#94A3B8">Change: return rate moved from 0.10 to 0.15</text>
+      <text x="0" y="38" fill="#94A3B8">Tests: linked, but the report never claims proof</text>
       
       <line x1="0" y1="46" x2="246" y2="46" stroke="#2B210F" stroke-width="0.8" />
       <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
-      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#EF4444">NONE (ZERO TEST UPDATE)</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#5CCFBE">OVERALL WEAK</text>
     </g>
   </g>
 
@@ -203,11 +203,11 @@
     <circle cx="12" cy="13" r="3" fill="#38BDF8" class="anim-led-blue" />
     <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#BAE6FD">SCENARIO F • MISSING TARGET</text>
     <rect x="176" y="5" width="88" height="16" rx="3" fill="#0C2538" stroke="#164E63" stroke-width="0.8" />
-    <text x="220" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#38BDF8" text-anchor="middle">EPISTEMIC LIMIT</text>
+    <text x="220" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#38BDF8" text-anchor="middle">REVIEW FIRST</text>
     
     <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
       <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">deprecatedHelper <tspan fill="#64748B">in legacy.ts</tspan></text>
-      <text x="0" y="24" fill="#94A3B8">Mutation: Function removed/renamed in HEAD</text>
+      <text x="0" y="24" fill="#94A3B8">Change: Function removed/renamed in HEAD</text>
       <text x="0" y="38" fill="#38BDF8">Boundary: Emits INCOMPLETE report (No guessing)</text>
       
       <line x1="0" y1="46" x2="248" y2="46" stroke="#1D282B" stroke-width="0.8" />

@@ -1,7 +1,26 @@
 {
   "name": "change-archaeologist",
   "version": "0.1.0",
-  "description": "Local-first JavaScript and TypeScript Git-history analysis tool",
+  "description": "See how a function changed between two Git versions, and whether its tests moved with it. Local-first AST analysis for JavaScript and TypeScript.",
+  "keywords": [
+    "git",
+    "ast",
+    "static-analysis",
+    "typescript",
+    "javascript",
+    "code-review",
+    "testing",
+    "cli",
+    "local-first"
+  ],
+  "homepage": "https://github.com/rknishanth152-lgtm/change-archaeologist#readme",
+  "bugs": {
+    "url": "https://github.com/rknishanth152-lgtm/change-archaeologist/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rknishanth152-lgtm/change-archaeologist.git"
+  },
   "type": "module",
   "license": "MIT",
   "engines": {

@@ -16,7 +16,7 @@ import { layoutDig } from "../utils/dig-layout.js";
 import { DigCanvas } from "./dig/DigCanvas.js";
 import { DigDetail } from "./dig/DigDetail.js";
 import { DigLegend } from "./dig/DigLegend.js";
-import { GraphAccessibleView } from "./graph/GraphAccessibleView.js";
+import { GraphAccessibleView } from "./dig/GraphAccessibleView.js";
 import { ViewHeader } from "./ui/Headings.js";
 import { GlyphDig } from "./icons/HeadingGlyphs.js";
 

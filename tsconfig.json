@@ -16,7 +16,6 @@
     "src/**/*.tsx",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "spike/**/*.ts",
     "validation/**/*.ts",
     "scripts/**/*.ts"
   ]
