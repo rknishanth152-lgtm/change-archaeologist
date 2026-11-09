@@ -373,20 +373,20 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
   return (
     <div ref={containerRef} className="flex flex-col h-full bg-ground text-text-primary">
       {/* 1. Header Toolbar */}
-      <div className="h-11 border-b border-hairline px-4 bg-panel flex items-center justify-between font-mono text-xs select-none shrink-0">
-        <div className="flex items-center space-x-2">
+      <div className="h-10 border-b border-hairline px-4 bg-panel flex items-center justify-between font-mono text-xs select-none shrink-0 gap-2 overflow-hidden">
+        <div className="flex items-center space-x-2 truncate">
           <Network size={15} className="text-text-accent shrink-0" />
-          <span className="font-semibold text-text-primary">
+          <span className="font-semibold text-text-primary truncate">
             Production-Test Correlation Graph
           </span>
-          <span className="text-[10px] text-text-muted px-1.5 py-0.2 rounded-xs bg-ground border border-hairline hidden sm:inline-block">
+          <span className="text-[10px] text-text-muted px-1.5 py-0.5 rounded-xs bg-ground border border-hairline hidden sm:inline-block shrink-0">
             {report.baseCommit.sha.slice(0, 7)} → {report.headCommit.sha.slice(0, 7)}
           </span>
         </div>
 
         {/* View Mode Toggle, Fit View & Metrics */}
-        <div className="flex items-center space-x-2">
-          <span className="text-[11px] text-text-muted hidden md:inline-block tabular-nums">
+        <div className="flex items-center space-x-2 shrink-0">
+          <span className="text-[11px] text-text-muted hidden lg:inline-block tabular-nums px-2 py-0.5 rounded-xs bg-ground border border-hairline">
             {model.summary.productionNodeCount} Prod / {model.summary.testNodeCount} Test /{" "}
             {model.summary.correlationEdgeCount} Corr
           </span>
@@ -398,7 +398,7 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
                 type="button"
                 onClick={() => setIsFocusMode(!isFocusMode)}
                 aria-pressed={isFocusMode}
-                className={`px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 border focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                className={`px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 border focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus cursor-pointer ${
                   isFocusMode
                     ? "bg-text-accent text-white border-text-accent font-semibold"
                     : "text-text-muted hover:text-text-primary hover:bg-surface-elevated border-hairline"
@@ -420,7 +420,7 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
                 type="button"
                 onClick={handleFitView}
                 aria-label="Fit view to all nodes"
-                className="px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 text-text-muted hover:text-text-primary hover:bg-surface-elevated border border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                className="px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 text-text-muted hover:text-text-primary hover:bg-surface-elevated border border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus cursor-pointer"
                 title="Reset viewport to fit all nodes cleanly"
               >
                 <Maximize2 size={12} />
@@ -434,9 +434,9 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
               type="button"
               onClick={() => setViewMode("visual")}
               aria-pressed={viewMode === "visual"}
-              className={`px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+              className={`px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus cursor-pointer ${
                 viewMode === "visual"
-                  ? "bg-surface-elevated text-text-primary font-semibold"
+                  ? "bg-surface-elevated text-text-primary font-semibold shadow-xs"
                   : "text-text-muted hover:text-text-secondary"
               }`}
             >
@@ -447,9 +447,9 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
               type="button"
               onClick={() => setViewMode("accessible")}
               aria-pressed={viewMode === "accessible"}
-              className={`px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+              className={`px-2 py-0.5 rounded-xs transition-colors flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus cursor-pointer ${
                 viewMode === "accessible"
-                  ? "bg-surface-elevated text-text-primary font-semibold"
+                  ? "bg-surface-elevated text-text-primary font-semibold shadow-xs"
                   : "text-text-muted hover:text-text-secondary"
               }`}
             >
@@ -461,17 +461,17 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
       </div>
 
       {/* 2. Sub-Toolbar: Search and Quick Filter Chips */}
-      <div className="h-9 border-b border-hairline px-4 bg-ground flex items-center justify-between font-mono text-[11px] gap-2 overflow-x-auto select-none shrink-0">
-        <div className="flex items-center space-x-2 shrink-0">
+      <div className="min-h-[38px] border-b border-hairline px-4 py-1.5 bg-ground flex flex-wrap items-center justify-between font-mono text-[11px] gap-2 select-none shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           {/* Search Input */}
           <div className="relative flex items-center">
-            <Search size={12} className="absolute left-2 text-text-muted pointer-events-none" />
+            <Search size={12} className="absolute left-2.5 text-text-muted pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search nodes or coordinates..."
-              className="pl-6 pr-6 py-0.5 rounded-xs bg-panel border border-hairline text-[11px] text-text-primary placeholder:text-text-muted/70 focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus w-44 transition-all"
+              className="pl-7 pr-6 py-1 rounded-xs bg-panel border border-hairline text-[11px] text-text-primary placeholder:text-text-muted/70 focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus w-44 sm:w-56 transition-all"
             />
             {searchQuery && (
               <button
@@ -486,17 +486,17 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex items-center space-x-1 border-l border-hairline pl-2">
-            <span className="text-[10px] text-text-muted uppercase">Scope:</span>
+          <div className="flex items-center space-x-1 sm:border-l sm:border-hairline sm:pl-2">
+            <span className="text-[10px] text-text-muted uppercase font-medium">Scope:</span>
             {(["ALL", "PROD", "TEST", "CORR"] as const).map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setCategoryFilter(cat)}
-                className={`px-1.5 py-0.2 rounded-xs text-[10px] border transition-colors ${
+                className={`px-2 py-0.5 rounded-xs text-[10px] border transition-colors cursor-pointer ${
                   categoryFilter === cat
-                    ? "bg-surface-elevated border-text-accent text-text-primary font-semibold"
-                    : "border-hairline text-text-muted hover:text-text-secondary"
+                    ? "bg-surface-elevated border-text-accent text-text-primary font-semibold shadow-xs"
+                    : "border-hairline text-text-muted hover:text-text-secondary hover:bg-surface-elevated/50"
                 }`}
               >
                 {cat === "ALL" ? "All" : cat === "PROD" ? "Production" : cat === "TEST" ? "Tests" : "Correlated"}
@@ -505,17 +505,17 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
           </div>
 
           {/* Status Filter Pills */}
-          <div className="flex items-center space-x-1 border-l border-hairline pl-2">
-            <span className="text-[10px] text-text-muted uppercase">Status:</span>
+          <div className="flex items-center space-x-1 sm:border-l sm:border-hairline sm:pl-2">
+            <span className="text-[10px] text-text-muted uppercase font-medium">Status:</span>
             {(["ALL", "STRONG", "WEAK", "UNCERTAIN"] as const).map((st) => (
               <button
                 key={st}
                 type="button"
                 onClick={() => setStatusFilter(st)}
-                className={`px-1.5 py-0.2 rounded-xs text-[10px] border transition-colors ${
+                className={`px-2 py-0.5 rounded-xs text-[10px] border transition-colors cursor-pointer ${
                   statusFilter === st
-                    ? "bg-surface-elevated border-text-accent text-text-primary font-semibold"
-                    : "border-hairline text-text-muted hover:text-text-secondary"
+                    ? "bg-surface-elevated border-text-accent text-text-primary font-semibold shadow-xs"
+                    : "border-hairline text-text-muted hover:text-text-secondary hover:bg-surface-elevated/50"
                 }`}
               >
                 {st === "ALL" ? "All" : st}
@@ -526,28 +526,28 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
 
         {/* View toggles: minimap & legend */}
         {viewMode === "visual" && (
-          <div className="flex items-center space-x-2 shrink-0">
+          <div className="flex items-center space-x-1.5 shrink-0">
             <button
               type="button"
               onClick={() => setShowMinimap(!showMinimap)}
-              className={`p-1 rounded-xs border transition-colors ${
-                showMinimap ? "bg-surface-elevated border-hairline text-text-primary" : "border-hairline text-text-muted hover:text-text-secondary"
+              className={`p-1.5 rounded-xs border transition-colors cursor-pointer ${
+                showMinimap ? "bg-surface-elevated border-hairline text-text-primary shadow-xs" : "border-hairline text-text-muted hover:text-text-secondary hover:bg-surface-elevated/50"
               }`}
               title="Toggle minimap"
               aria-label="Toggle minimap"
             >
-              <MapIcon size={12} />
+              <MapIcon size={13} />
             </button>
             <button
               type="button"
               onClick={() => setShowLegend(!showLegend)}
-              className={`p-1 rounded-xs border transition-colors ${
-                showLegend ? "bg-surface-elevated border-hairline text-text-primary" : "border-hairline text-text-muted hover:text-text-secondary"
+              className={`p-1.5 rounded-xs border transition-colors cursor-pointer ${
+                showLegend ? "bg-surface-elevated border-hairline text-text-primary shadow-xs" : "border-hairline text-text-muted hover:text-text-secondary hover:bg-surface-elevated/50"
               }`}
               title="Toggle graph legend"
               aria-label="Toggle graph legend"
             >
-              <HelpCircle size={12} />
+              <HelpCircle size={13} />
             </button>
           </div>
         )}

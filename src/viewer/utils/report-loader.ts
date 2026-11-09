@@ -73,9 +73,30 @@ export function loadReportFromJsonString(
 }
 
 /**
+ * Maximum allowable report file size for in-browser processing (20 MB).
+ * Protects against main-thread memory exhaustion and browser tab crashes.
+ */
+export const MAX_REPORT_FILE_BYTES = 20 * 1024 * 1024; // 20 MB
+
+/**
  * Loads and validates a report from a browser File object.
  */
 export async function loadReportFromFile(file: File): Promise<ReportLoadResult> {
+  if (file.size > MAX_REPORT_FILE_BYTES) {
+    return {
+      success: false,
+      fileName: file.name,
+      error: `Report file size (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds the maximum safety limit of 20 MB.`,
+      issues: [
+        {
+          path: "file.size",
+          code: "SECURITY_VIOLATION",
+          message: "Report file exceeds maximum allowable size for browser analysis (20 MB).",
+        },
+      ],
+    };
+  }
+
   try {
     const text = await file.text();
     return loadReportFromJsonString(text, file.name);

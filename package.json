@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Local-first JavaScript and TypeScript Git-history analysis tool",
   "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "bin": {
     "change-archaeologist": "./bin/change-archaeologist.js"
   },

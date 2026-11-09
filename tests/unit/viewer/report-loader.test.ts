@@ -6,7 +6,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { loadReportFromJsonString } from "../../../src/viewer/utils/report-loader.js";
+import {
+  loadReportFromJsonString,
+  loadReportFromFile,
+  MAX_REPORT_FILE_BYTES,
+} from "../../../src/viewer/utils/report-loader.js";
 import { DEMO_SCENARIO_A, DEMO_SCENARIO_E, DEMO_SCENARIO_F } from "../../../src/viewer/data/demo-fixtures.js";
 
 describe("Frontend Report Loader & Schema Ingestion", () => {
@@ -91,5 +95,34 @@ describe("Frontend Report Loader & Schema Ingestion", () => {
     const result = loadReportFromJsonString(JSON.stringify(badVersion), "bad-version.json");
     expect(result.success).toBe(false);
     expect(result.issues?.some((i) => i.path === "report.schemaVersion")).toBe(true);
+  });
+
+  it("loadReportFromFile rejects oversized files exceeding MAX_REPORT_FILE_BYTES (20 MB)", async () => {
+    // Mock File object exceeding 20 MB without allocating 25 MB in memory
+    const oversizedFile = {
+      name: "huge-report.json",
+      size: 25 * 1024 * 1024, // 25 MB
+      text: async () => JSON.stringify(DEMO_SCENARIO_A),
+    } as unknown as File;
+
+    const result = await loadReportFromFile(oversizedFile);
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("exceeds the maximum safety limit of 20 MB");
+    expect(result.issues?.[0].code).toBe("SECURITY_VIOLATION");
+    expect(result.issues?.[0].path).toBe("file.size");
+  });
+
+  it("loadReportFromFile successfully loads and validates valid files within the size limit", async () => {
+    const rawJson = JSON.stringify(DEMO_SCENARIO_A);
+    const validFile = {
+      name: "valid-report.json",
+      size: Buffer.byteLength(rawJson),
+      text: async () => rawJson,
+    } as unknown as File;
+
+    const result = await loadReportFromFile(validFile);
+    expect(result.success).toBe(true);
+    expect(result.report).toBeDefined();
+    expect(result.report?.request.targetFunctionName).toBe("processPayment");
   });
 });

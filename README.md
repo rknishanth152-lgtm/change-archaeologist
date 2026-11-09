@@ -7,7 +7,7 @@ The tool strictly separates:
 - **`INFERRED`**: Rule-based interpretations and hypotheses supported by observed facts.
 - **`UNKNOWN`**: Explicit epistemic boundaries acknowledging what static analysis cannot prove.
 
-> **Project Status:** Core static-analysis engine, domain schemas, historical AST comparison, test-change analysis, conservative correlation, reporting, CLI, security hardening, and end-to-end demonstration environment are fully implemented and verified with automated test suites (186 passing tests across 13 suites). Web viewer and graphical UI components remain out of scope for the current engine.
+> **Project Status:** Core static-analysis engine, domain schemas, historical AST comparison, companion test analysis, conservative correlation, JSON/Markdown reporting, CLI orchestration, security hardening, end-to-end demonstration environment, and the interactive Evidence Atlas web viewer are fully implemented and verified with automated test suites (359 passing tests across 29 test files, 6/6 demonstration scenarios passing).
 
 ---
 
@@ -71,6 +71,29 @@ Verify tests and type safety:
 npm run typecheck
 npm run test
 ```
+
+---
+
+## Interactive Evidence Atlas (Web Viewer)
+
+Change Archaeologist includes a local-first, interactive forensic analysis viewer called **Evidence Atlas**. It provides side-by-side Monaco code comparison, an archaeological change timeline, and an interactive Production–Test Correlation Graph.
+
+### 1. Launch the Viewer Locally
+
+```bash
+# Start local development server (Vite on http://localhost:5173)
+npm run dev
+
+# Or preview the production build
+npm run build
+npm run preview
+```
+
+### 2. Inspecting Reports
+
+- **Preloaded Demonstrations:** Use the **Demo Preset** dropdown in the header to switch between Scenarios A through F with zero setup.
+- **Importing CLI Reports:** Generate a JSON report via the CLI (`--format json --output report.json`), then click **Import JSON** in the top navigation to load and explore it.
+- **How to Read This Report Guide:** Click **Guide** in the header for an interactive explanation of what changed, what tests tell us, and epistemic boundaries.
 
 ---
 
@@ -196,3 +219,9 @@ node bin/change-archaeologist.js analyze \
 ## Project Principle
 
 **Show the evidence. Label the inference. Admit what is unknown.**
+
+---
+
+## License
+
+MIT © 2026 Change Archaeologist Authors. See [LICENSE](LICENSE) for details.

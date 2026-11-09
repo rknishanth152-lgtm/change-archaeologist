@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Build & Test (${{ matrix.os }})
@@ -40,4 +43,7 @@ jobs:
 
       - name: Run production build
         run: npm run build
+
+      - name: Run end-to-end demonstration verification
+        run: npm run demo
 

@@ -4,7 +4,7 @@
 > **Version:** 2.0.0 (Evidence Atlas Redesign Specification)  
 > **Aesthetic Archetype:** Investigative Evidence Atlas (`impeccable` *Operate* / *Read* mode + archival cartographic instrument)  
 > **Stack Target:** React 19, TypeScript, Vite, Tailwind CSS, Motion, Monaco Editor, Lucide Icons, React Flow  
-> **Verified Baseline:** 290 automated tests across 23 test suites; 6 deterministic demonstration scenarios  
+> **Verified Baseline:** 359 automated tests across 29 test suites; 6 deterministic demonstration scenarios
 
 ---
 

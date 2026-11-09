@@ -5,16 +5,16 @@
  *
  * Implements the "Forensic Stratigraphy & Epistemic Bridge" top chrome:
  * - Target height: 78 px (acceptance ceiling 84 px).
- * - Primary command row (42 px):
- *   * Product identity (GlyphMark) & target function/file context.
- *   * BASE → HEAD revision comparison.
- *   * Analysis status badge.
- *   * Essential actions: scenario selection, exactly ONE Guide button, and prominent Import JSON.
- * - Secondary workspace row (36 px):
- *   * Three workspace modes (Stratigraphy, Correlation Bridge, Synthesis) with clear active mode.
- *   * Full 6 workspace tabs with WCAG tablist semantics, keyboard navigation, and domain glyphs.
- *   * Compact, readable analysis-state information (mutations, tests, correlations, findings).
- *   * Zero redundant status badges or duplicate Guide buttons.
+ * - Primary Command Row (Height: 42 px):
+ *   * Brand identity: Archaeological Stamp (GlyphMark), "Change Archaeologist" (H1),
+ *     "Console v1.0" pill, and "EVIDENCE ATLAS" descriptor.
+ *   * Global Actions: Demo Scenario Preset dropdown, Guide action, and prominent Import JSON button.
+ * - Secondary Workspace Row (Height: 36 px):
+ *   * Workspace Navigation: Active Mode tag (STRATIGRAPHY / BRIDGE / SYNTHESIS),
+ *     6 tab buttons with WCAG tablist semantics, domain glyphs, and item counters.
+ *   * Forensic Context: Target entity (function & file), revision bridge (BASE → HEAD),
+ *     analysis status badge, and compact analysis-state metrics.
+ *   * Standby state when no report is active.
  */
 
 import React from "react";
@@ -127,27 +127,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const isComplete = report?.status.startsWith("COMPLETED");
 
-  // Metric derivations for compact analysis-state in Row 2
+  // Metrics for compact analysis state in Row 2
   const scCount = report?.structuralChanges.length ?? 0;
   const tcCount = report?.testChanges.length ?? 0;
   const corrCount =
     report?.correlationItems?.length ?? report?.correlations.length ?? 0;
   const findingsCount = report?.findings.length ?? 0;
-  const assertionCount =
-    report?.testChanges.reduce(
-      (acc, tc) => acc + tc.assertionChanges.length,
-      0
-    ) ?? 0;
-
-  const strongCount =
-    report?.correlationItems?.filter((c) => c.status === "STRONG").length ??
-    report?.correlations.filter((c) => c.status === "STRONG").length ??
-    0;
-
-  const weakCount =
-    report?.correlationItems?.filter((c) => c.status === "WEAK").length ??
-    report?.correlations.filter((c) => c.status === "WEAK").length ??
-    0;
 
   const getTabCount = (tab: WorkspaceTab): number => {
     if (!report) return 0;
@@ -159,17 +144,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           (report.declarationChanges?.length ?? 0)
         );
       case "graph":
-        return (
-          report.correlationItems?.length ?? report.correlations.length
-        );
+        return report.correlationItems?.length ?? report.correlations.length;
       case "structural":
         return report.structuralChanges.length;
       case "tests":
         return report.testChanges.length;
       case "correlations":
-        return (
-          report.correlationItems?.length ?? report.correlations.length
-        );
+        return report.correlationItems?.length ?? report.correlations.length;
       case "findings":
         return report.findings.length;
     }
@@ -190,16 +171,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       }}
     >
       {/* ====================================================================
-          Row 1: Primary Command Row (Height: 42px)
-          - Product identity & target function/file context
-          - BASE → HEAD revision comparison
-          - Analysis status badge
-          - Essential actions: scenario selection, Guide, and Import JSON
+          Row 1: Primary Command & Identity Row (Height: 42px)
+          - Left: Brand Logo, Level 1 Heading, Console v1.0, Evidence Atlas
+          - Right: Demo Scenario Selector, Guide Action, Prominent Import JSON
           ==================================================================== */}
-      <div className="w-full h-[42px] px-3.5 flex items-center justify-between gap-2.5 border-b border-hairline shrink-0">
-        {/* Left: Brand Identity + Context */}
-        <div className="flex items-center space-x-2.5 min-w-0">
-          {/* Archaeological Stamp */}
+      <div className="w-full h-[42px] px-3 sm:px-4 flex items-center justify-between gap-3 border-b border-hairline shrink-0">
+        {/* Left: Product Brand Identity Group */}
+        <div className="flex items-center space-x-2.5 min-w-0 shrink-0">
+          {/* Archaeological Stamp Icon */}
           <div
             className="flex items-center justify-center w-6.5 h-6.5 rounded-xs text-text-accent shrink-0"
             aria-hidden="true"
@@ -211,8 +190,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <GlyphMark size={14} />
           </div>
 
-          {/* Product Title */}
-          <div className="flex items-baseline space-x-1.5 min-w-0 shrink-0">
+          {/* Product Title & Brand Badges */}
+          <div className="flex items-baseline space-x-2 min-w-0 shrink-0">
             <h1
               className="font-display font-semibold text-sm text-text-primary m-0 p-0 tracking-tight whitespace-nowrap"
               style={{ letterSpacing: "-0.01em" }}
@@ -229,91 +208,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               evidence atlas
             </span>
           </div>
-
-          {/* Target File & Function Context Pill */}
-          {report ? (
-            <div className="hidden md:flex items-center space-x-2 min-w-0">
-              <span
-                className="w-px h-3.5 bg-border-hairline shrink-0"
-                aria-hidden="true"
-              />
-              <div
-                className="flex items-center space-x-1.5 px-2 py-0.5 text-text-secondary min-w-0 max-w-[240px] lg:max-w-xs truncate font-mono text-xs rounded-xs"
-                style={{
-                  background: "var(--surface-ground)",
-                  border: "1px solid var(--border-hairline)",
-                }}
-                title={`${report.request.targetFilePath}:${report.request.targetFunctionName}`}
-              >
-                <FileCode
-                  size={11}
-                  strokeWidth={1.5}
-                  className="text-text-muted shrink-0"
-                />
-                <span className="text-text-muted truncate">
-                  {report.request.targetFilePath}:
-                </span>
-                <span className="text-text-primary font-medium shrink-0">
-                  {report.request.targetFunctionName}
-                </span>
-                <span className="text-[9px] text-text-muted font-mono uppercase px-1 rounded-xs bg-ground border border-hairline shrink-0 hidden xl:inline">
-                  TARGET ENTITY
-                </span>
-              </div>
-
-              {/* Revision Range Comparison */}
-              <div
-                className="hidden lg:flex items-center space-x-1.5 px-2 py-0.5 text-text-muted shrink-0 font-mono text-xs rounded-xs"
-                style={{
-                  background: "var(--surface-ground)",
-                  border: "1px solid var(--border-hairline)",
-                }}
-                title={`Analyzing revisions ${report.baseCommit.shortSha} to ${report.headCommit.shortSha}`}
-              >
-                <GitCommit size={11} strokeWidth={1.5} />
-                <span className="text-text-secondary tabular-nums">
-                  {report.baseCommit.shortSha}
-                </span>
-                <span className="text-text-muted">→</span>
-                <span className="text-text-secondary tabular-nums">
-                  {report.headCommit.shortSha}
-                </span>
-              </div>
-
-              {/* Analysis Status Badge */}
-              <Badge
-                variant={isComplete ? "verdigris" : "amber"}
-                dot
-                className="shrink-0 text-[10px] py-0 px-1.5 font-mono"
-              >
-                {isComplete ? (
-                  <CheckCircle2 size={11} strokeWidth={1.5} />
-                ) : (
-                  <AlertCircle size={11} strokeWidth={1.5} />
-                )}
-                <span>[{report.status}]</span>
-              </Badge>
-            </div>
-          ) : (
-            <div className="hidden md:flex items-center space-x-2 text-text-muted text-[11px] font-mono truncate">
-              <span
-                className="w-1.5 h-1.5 rounded-full bg-text-muted shrink-0"
-                aria-hidden="true"
-              />
-              <span>
-                Standby — Ingest a JSON report or choose a demonstration scenario
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Right: Essential Actions (Scenario Switcher, Guide, Prominent Import JSON) */}
-        <div className="flex items-center space-x-2 shrink-0">
+        {/* Right: Workspace Actions Group (Scenario Switcher, Guide, Prominent Import JSON) */}
+        <div className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
           {/* Demonstration Scenario Selector */}
           <div className="flex items-center space-x-1.5 shrink-0">
             <label
               htmlFor="scenario-preset-select"
-              className="text-[10px] text-text-muted hidden xl:inline uppercase tracking-wider font-mono"
+              className="text-[10px] text-text-muted hidden md:inline uppercase tracking-wider font-mono"
             >
               Demo Preset:
             </label>
@@ -323,7 +226,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onChange={(e) => {
                 if (e.target.value) onSelectScenario(e.target.value);
               }}
-              className="h-6.5 px-2 text-[11px] font-mono text-text-secondary rounded-xs transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus cursor-pointer"
+              className="h-6.5 px-2 text-[11px] font-mono text-text-secondary rounded-xs transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus cursor-pointer max-w-[150px] sm:max-w-[200px] truncate"
               style={{
                 background: "var(--surface-ground)",
                 border: "1px solid var(--border-hairline)",
@@ -378,17 +281,16 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* ====================================================================
-          Row 2: Secondary Workspace Row (Height: 36px)
-          - Three workspace modes (Stratigraphy, Correlation Bridge, Synthesis)
-          - Clear active mode indicator
-          - Compact, readable analysis-state metrics
-          - No redundant status badges or duplicated Guide buttons
+          Row 2: Workspace Navigation & Forensic Context Row (Height: 36px)
+          - Left: Active Mode Tag, Workspace Tabs
+          - Right: Forensic Context (Target function, revision range, status badge)
+                   + Analysis Summary State
           ==================================================================== */}
       <div
-        className="w-full h-[36px] px-3.5 flex items-center justify-between gap-3 bg-panel/85 shrink-0 overflow-x-auto select-none font-mono text-xs"
+        className="w-full h-[36px] px-3 sm:px-4 flex items-center justify-between gap-3 bg-panel/85 shrink-0 overflow-x-auto select-none font-mono text-xs"
         style={{ background: "var(--surface-panel)" }}
       >
-        {/* Left: Active Mode Chip + Workspace Tabs */}
+        {/* Left: Active Mode Tag + 6 Workspace Tabs */}
         <div className="flex items-center space-x-2 shrink-0">
           {/* Active Mode Tag */}
           <span
@@ -451,10 +353,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     >
                       {config.glyph}
                     </span>
-                    <span className="font-sans font-medium text-[11px]">
+                    <span className="font-sans font-medium text-[11px] whitespace-nowrap">
                       {config.plain}
                     </span>
-                    <span className="text-[10px] opacity-75 font-mono hidden md:inline">
+                    <span className="text-[10px] opacity-75 font-mono hidden xl:inline">
                       ({config.technical})
                     </span>
                     <span
@@ -480,91 +382,136 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Right: Compact, readable analysis-state information */}
+        {/* Right: Forensic Context & Analysis State */}
         {report ? (
-          <div
-            className="flex items-center space-x-3 text-text-secondary font-mono text-[11px] shrink-0 ml-auto"
-            aria-label="Analysis summary state"
-          >
-            {/* Structural Mutations */}
-            <span
-              className="flex items-center space-x-1"
-              title={`${scCount} Structural Mutations in ${report.request.targetFunctionName}`}
+          <div className="flex items-center space-x-2 shrink-0 ml-auto">
+            {/* Target File & Function Context Pill */}
+            <div
+              className="flex items-center space-x-1 px-1.5 py-0.5 text-text-secondary min-w-0 max-w-[200px] lg:max-w-[240px] truncate font-mono text-[11px] rounded-xs"
+              style={{
+                background: "var(--surface-ground)",
+                border: "1px solid var(--border-hairline)",
+              }}
+              title={`${report.request.targetFilePath}:${report.request.targetFunctionName}`}
             >
-              <GlyphDeltaModified
+              <FileCode
                 size={11}
-                className="text-status-modified shrink-0"
+                strokeWidth={1.5}
+                className="text-text-muted shrink-0"
               />
-              <strong className="text-text-primary tabular-nums">
-                {scCount}
-              </strong>
-              <span className="text-[10px] text-text-muted hidden 2xl:inline">
-                mutations
+              <span className="text-text-muted truncate">
+                {report.request.targetFilePath}:
               </span>
-            </span>
-
-            {/* Companion Tests */}
-            <span
-              className="flex items-center space-x-1"
-              title={`${tcCount} Companion Test Files (${assertionCount} Assertions)`}
-            >
-              <GlyphDeltaAdded
-                size={11}
-                className="text-status-strong shrink-0"
-              />
-              <strong className="text-text-primary tabular-nums">
-                {tcCount}
-              </strong>
-              <span className="text-[10px] text-text-muted hidden 2xl:inline">
-                tests
+              <span className="text-text-primary font-medium shrink-0">
+                {report.request.targetFunctionName}
               </span>
-            </span>
-
-            {/* Correlation Links */}
-            <span
-              className="flex items-center space-x-1"
-              title={`${corrCount} Correlation Links (${strongCount} Strong, ${weakCount} Weak)`}
-            >
-              <GlyphCorrStrong
-                size={11}
-                className="text-text-accent shrink-0"
-              />
-              <strong className="text-text-primary tabular-nums">
-                {corrCount}
-              </strong>
-              <span className="text-[10px] text-text-muted hidden 2xl:inline">
-                links
+              <span className="text-[9px] text-text-muted font-mono uppercase px-1 rounded-xs bg-ground border border-hairline shrink-0 hidden xl:inline">
+                TARGET ENTITY
               </span>
-            </span>
+            </div>
 
-            {/* Epistemic Findings */}
-            <span
-              className="flex items-center space-x-1"
-              title={`${findingsCount} Epistemic Findings & Observations`}
+            {/* Revision Range Comparison */}
+            <div
+              className="hidden lg:flex items-center space-x-1 px-1.5 py-0.5 text-text-muted shrink-0 font-mono text-[11px] rounded-xs"
+              style={{
+                background: "var(--surface-ground)",
+                border: "1px solid var(--border-hairline)",
+              }}
+              title={`Analyzing revisions ${report.baseCommit.shortSha} to ${report.headCommit.shortSha}`}
             >
-              <GlyphEpistemicTier
-                size={11}
-                className="text-text-secondary shrink-0"
-              />
-              <strong className="text-text-primary tabular-nums">
-                {findingsCount}
-              </strong>
-              <span className="text-[10px] text-text-muted hidden 2xl:inline">
-                findings
+              <GitCommit size={11} strokeWidth={1.5} />
+              <span className="text-text-secondary tabular-nums">
+                {report.baseCommit.shortSha}
               </span>
-            </span>
+              <span className="text-text-muted">→</span>
+              <span className="text-text-secondary tabular-nums">
+                {report.headCommit.shortSha}
+              </span>
+            </div>
 
-            {/* Guardrail Callout */}
-            <span
-              className="hidden xl:inline-block text-[9px] text-text-muted font-mono uppercase px-1.5 py-0.5 rounded-xs bg-ground border border-hairline"
-              title="Static AST analysis • No code executed • Companion tests are not runtime coverage"
+            {/* Analysis Status Badge */}
+            <Badge
+              variant={isComplete ? "verdigris" : "amber"}
+              dot
+              className="shrink-0 text-[10px] py-0 px-1.5 font-mono"
             >
-              Static AST
-            </span>
+              {isComplete ? (
+                <CheckCircle2 size={11} strokeWidth={1.5} />
+              ) : (
+                <AlertCircle size={11} strokeWidth={1.5} />
+              )}
+              <span>[{report.status}]</span>
+            </Badge>
+
+            {/* Analysis Summary State Metrics */}
+            <div
+              className="hidden xl:flex items-center space-x-2.5 text-text-secondary font-mono text-[11px] shrink-0 border-l border-hairline pl-2"
+              aria-label="Analysis summary state"
+            >
+              {/* Structural Mutations */}
+              <span
+                className="flex items-center space-x-1"
+                title={`${scCount} Structural Mutations`}
+              >
+                <GlyphDeltaModified
+                  size={11}
+                  className="text-status-modified shrink-0"
+                />
+                <strong className="text-text-primary tabular-nums">
+                  {scCount}
+                </strong>
+                <span className="text-[10px] text-text-muted">mutations</span>
+              </span>
+
+              {/* Companion Tests */}
+              <span
+                className="flex items-center space-x-1"
+                title={`${tcCount} Companion Test Files`}
+              >
+                <GlyphDeltaAdded
+                  size={11}
+                  className="text-status-strong shrink-0"
+                />
+                <strong className="text-text-primary tabular-nums">
+                  {tcCount}
+                </strong>
+                <span className="text-[10px] text-text-muted">tests</span>
+              </span>
+
+              {/* Correlation Links */}
+              <span
+                className="flex items-center space-x-1"
+                title={`${corrCount} Correlation Links`}
+              >
+                <GlyphCorrStrong
+                  size={11}
+                  className="text-text-accent shrink-0"
+                />
+                <strong className="text-text-primary tabular-nums">
+                  {corrCount}
+                </strong>
+                <span className="text-[10px] text-text-muted">links</span>
+              </span>
+
+              {/* Epistemic Findings */}
+              <span
+                className="flex items-center space-x-1"
+                title={`${findingsCount} Epistemic Findings`}
+              >
+                <GlyphEpistemicTier
+                  size={11}
+                  className="text-text-secondary shrink-0"
+                />
+                <strong className="text-text-primary tabular-nums">
+                  {findingsCount}
+                </strong>
+                <span className="text-[10px] text-text-muted">findings</span>
+              </span>
+            </div>
           </div>
         ) : (
-          <span className="text-text-muted text-[11px] font-mono shrink-0 ml-auto hidden sm:inline">
-            Awaiting analysis report ingestion
+          <span className="text-text-muted text-[11px] font-mono shrink-0 ml-auto">
+            Standby — Ingest a JSON report or choose a demonstration scenario
           </span>
         )}
       </div>

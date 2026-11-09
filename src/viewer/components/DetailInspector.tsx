@@ -194,7 +194,7 @@ export const DetailInspector: React.FC<DetailInspectorProps> = ({
 
         {/* Main Monaco Code Comparison View */}
         {viewMode === "monaco" ? (
-          <div className="h-80 border border-hairline rounded-md overflow-hidden bg-ground">
+          <div className="h-[420px] min-h-[380px] border border-hairline rounded-md overflow-hidden bg-ground">
             <CodeComparison
               report={report}
               selectedChange={selectedChange}
