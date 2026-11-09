@@ -265,8 +265,13 @@ describe("Git History Adapter Integration", () => {
 
   // 8. Subprocess timeout or failure
   it("8. handles subprocess timeout gracefully with GIT_TIMEOUT", async () => {
-    // Runner with an unachievable 1ms timeout
-    const quickTimeoutRunner = new GitRunner({ defaultTimeoutMs: 1 });
+    // Every call becomes git hash-object --stdin, which waits for stdin the runner
+    // never closes, so the timeout always wins however fast the machine is.
+    class HangingGitRunner extends GitRunner {
+      override exec(cwd: string) {
+        return super.exec(cwd, ["hash-object", "--stdin"]);
+      }
+    }
 
     await expect(
       retrieveHistoricalSource({
@@ -274,23 +279,13 @@ describe("Git History Adapter Integration", () => {
         targetFilePath: "src/calc.ts",
         baseRevisionInput: "HEAD~1",
         headRevisionInput: "HEAD",
-        runner: quickTimeoutRunner,
+        runner: new HangingGitRunner({ defaultTimeoutMs: 100 }),
       })
-    ).rejects.toThrowError(GitError);
-
-    try {
-      await retrieveHistoricalSource({
-        repoPath: repo.dir,
-        targetFilePath: "src/calc.ts",
-        baseRevisionInput: "HEAD~1",
-        headRevisionInput: "HEAD",
-        runner: quickTimeoutRunner,
-      });
-    } catch (err) {
-      expect(err).toBeInstanceOf(GitError);
-      expect((err as GitError).code).toBe("GIT_TIMEOUT");
-      expect((err as GitError).message).toContain("timed out");
-    }
+    ).rejects.toMatchObject({
+      name: "GitError",
+      code: "GIT_TIMEOUT",
+      message: expect.stringContaining("timed out"),
+    });
   });
 
   // 9. Dirty working tree: returns committed source, not unsaved working-tree content
