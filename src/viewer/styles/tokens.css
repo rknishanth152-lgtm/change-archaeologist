@@ -1,110 +1,61 @@
 /* ==========================================================================
-   Change Archaeologist — Evidence Atlas Design Tokens v2.0
-   Three-Tier Architecture: Primitives → Semantics → Components
-   Visual World: Warm archival paper · Charcoal ink · Terracotta accent
+   Change Archaeologist — Design Tokens v3.0
+   Three tiers: Primitives → Semantics → Components
+   Visual world: cool mineral neutrals, one verdigris accent, light and dark.
+   Components use semantic tokens, so a theme is one block of overrides.
    ========================================================================== */
 
 :root {
+  color-scheme: light;
+
   /* ========================================================================
-     Tier 1: Primitive Tokens (Raw Palette & Scales)
+     Tier 1: Primitive Tokens
      ======================================================================== */
 
-  /* Primitive Neutrals — Warm Parchment Ramp (Evidence Atlas) */
-  --primitive-parchment-50:  #FDFAF5; /* Lightest highlight */
-  --primitive-parchment-100: #F9F4EC; /* Near-white parchment */
-  --primitive-parchment-200: #F5F0E8; /* Page ground */
-  --primitive-parchment-300: #EDE8DF; /* Panel surface */
-  --primitive-parchment-400: #E6E0D5; /* Elevated surface */
-  --primitive-parchment-500: #DDD7CC; /* Hover surface */
-  --primitive-parchment-600: #D0C9BC; /* Active surface */
-  --primitive-parchment-700: #BDB4A5; /* Strong border */
-  --primitive-parchment-800: #A09689; /* Divider */
+  /* Mineral — light surfaces */
+  --primitive-mineral-50:  #FBFCFA;
+  --primitive-mineral-100: #F7F9F6;
+  --primitive-mineral-200: #EFF2EF;
+  --primitive-mineral-300: #E6EBE6;
+  --primitive-mineral-400: #DDE4DE;
+  --primitive-mineral-500: #D2DBD4;
 
-  /* Primitive Ink — Warm Charcoal Ramp (Evidence Atlas) */
-  --primitive-ink-950: #0F0A04; /* Deepest ink */
-  --primitive-ink-900: #1C1409; /* Primary text */
-  --primitive-ink-800: #2E2010; /* Heading dark */
-  --primitive-ink-700: #4A3728; /* Secondary text */
-  --primitive-ink-600: #6B5240; /* Muted text */
-  --primitive-ink-500: #8A7560; /* Tertiary / metadata */
-  --primitive-ink-400: #A8957E; /* Subdued */
-  --primitive-ink-300: #C4AE98; /* Placeholder */
+  /* Basalt — dark surfaces */
+  --primitive-basalt-950: #12181A;
+  --primitive-basalt-900: #151C1E;
+  --primitive-basalt-850: #1A2225;
+  --primitive-basalt-800: #232C2F;
+  --primitive-basalt-750: #2B3538;
+  --primitive-basalt-700: #344043;
 
-  /* Primitive Alpha Borders — Warm tinted */
-  --primitive-alpha-ink-6:  rgba(90, 70, 50, 0.06);
-  --primitive-alpha-ink-12: rgba(90, 70, 50, 0.12);
-  --primitive-alpha-ink-20: rgba(90, 70, 50, 0.20);
-  --primitive-alpha-ink-35: rgba(90, 70, 50, 0.35);
-  --primitive-alpha-ink-50: rgba(90, 70, 50, 0.50);
+  /* Ink — text on light */
+  --primitive-ink-900: #15201F;
+  --primitive-ink-700: #3D4B48;
+  --primitive-ink-600: #4F5D5A;
 
-  /* Primitive Accent — Oxidized Terracotta / Burnt Orange */
-  --primitive-terra-900: #6B1E0A;
-  --primitive-terra-800: #8B2910;
-  --primitive-terra-700: #A8371A;
-  --primitive-terra-600: #C4521A; /* Canonical brand accent */
-  --primitive-terra-500: #D4642A;
-  --primitive-terra-400: #E07A45;
-  --primitive-terra-200: rgba(196, 82, 26, 0.15);
-  --primitive-terra-border: rgba(196, 82, 26, 0.30);
+  /* Frost — text on dark */
+  --primitive-frost-100: #E9EFEC;
+  --primitive-frost-300: #BAC6C2;
+  --primitive-frost-400: #A1AFAB;
 
-  /* Primitive Semantic Hues — Muted for archival legibility on warm paper */
-  --primitive-green-700: #1A5C2E;
-  --primitive-green-600: #2E7D32;
-  --primitive-green-500: #388E3C;
-  --primitive-green-bg:  rgba(46, 125, 50, 0.08);
-  --primitive-green-border: rgba(46, 125, 50, 0.25);
+  /* Verdigris — the one accent */
+  --primitive-verdigris-800: #094F49;
+  --primitive-verdigris-700: #0B6B62;
+  --primitive-verdigris-300: #5CCFBE;
+  --primitive-verdigris-200: #86DDCF;
 
-  --primitive-red-700: #8B1C1C;
-  --primitive-red-600: #B71C1C;
-  --primitive-red-500: #C62828;
-  --primitive-red-bg:  rgba(183, 28, 28, 0.08);
-  --primitive-red-border: rgba(183, 28, 28, 0.25);
-
-  --primitive-amber-700: #7A4000;
-  --primitive-amber-600: #E65100;
-  --primitive-amber-bg:  rgba(230, 81, 0, 0.08);
-  --primitive-amber-border: rgba(230, 81, 0, 0.25);
-
-  --primitive-purple-700: #3D1B77;
-  --primitive-purple-600: #5C3D99;
-  --primitive-purple-bg:  rgba(92, 61, 153, 0.08);
-  --primitive-purple-border: rgba(92, 61, 153, 0.25);
-
-  --primitive-ochre-700: #7A5000;
-  --primitive-ochre-600: #9E6B00;
-  --primitive-ochre-bg:  rgba(158, 107, 0, 0.08);
-  --primitive-ochre-border: rgba(158, 107, 0, 0.25);
-
-  --primitive-gray-600: #5C6472;
-  --primitive-gray-500: #6B7280;
-  --primitive-gray-bg:  rgba(107, 114, 128, 0.08);
-  --primitive-gray-border: rgba(107, 114, 128, 0.20);
-
-  /* Legacy & Architectural Verification Primitives (Preserved for compatibility) */
-  --primitive-gray-950: #08090A;
-  --primitive-gray-925: #0B0C0E;
-  --primitive-gray-900: #0E0F11;
-  --primitive-gray-850: #131417;
-  --primitive-gray-800: #181A1D;
-  --primitive-gray-750: #222429;
-  --primitive-gray-700: #2E3238;
-  --primitive-gray-400: #7A828E;
-  --primitive-gray-300: #9CA3AD;
-  --primitive-gray-200: #C5CBD3;
-  --primitive-gray-100: #E6E8EB;
-  --primitive-gray-50:  #F7F7F8;
-  --primitive-white:    #FFFFFF;
-
-  --primitive-slate-900: #0F172A;
-  --primitive-slate-500: #64748B;
-  --primitive-slate-400: #94A3B8;
-  --primitive-slate-300: #CBD5E1;
-
-  --primitive-indigo-500:  #5E6AD2;
-  --primitive-emerald-500: #34D399;
-  --primitive-coral-500:   #F87171;
-  --primitive-amber-500:   #FBBF24;
-  --primitive-violet-500:  #A78BFA;
+  /* Status hues, each stepped for its surface */
+  --primitive-green-700: #0A6647;
+  --primitive-green-600: #136639;
+  --primitive-green-300: #5AD2A9;
+  --primitive-green-200: #68D596;
+  --primitive-red-700:   #A02019;
+  --primitive-red-300:   #F58D84;
+  --primitive-amber-700: #744B00;
+  --primitive-amber-300: #E6B84C;
+  --primitive-violet-700: #5A41A6;
+  --primitive-violet-300: #B3A6F4;
+  --primitive-white: #FFFFFF;
 
   /* Spacing Scale (4px Module) */
   --space-1:  4px;
@@ -116,12 +67,12 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  /* Border Radii — Sharp instrument aesthetic */
-  --radius-xs: 1px;
-  --radius-sm: 2px;
-  --radius-md: 3px;
-  --radius-lg: 4px;
-  --radius-xl: 6px;
+  /* Border Radii */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
 
   /* Motion Tokens */
   --ease-out-ui:   cubic-bezier(0.23, 1, 0.32, 1);
@@ -131,83 +82,79 @@
   --dur-slow:   300ms;
 
   /* Typography Tokens */
-  --font-display: 'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
-  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-mono:    ui-monospace, 'JetBrains Mono', 'IBM Plex Mono', 'Cascadia Code', 'Menlo', monospace;
+  --font-display: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-body:    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, 'Cascadia Code', Menlo, monospace;
 
   /* ========================================================================
-     Tier 2: Semantic Tokens (Role-Based Meaning)
+     Tier 2: Semantic Tokens (light values; dark overrides below)
      ======================================================================== */
 
-  /* Surfaces — Warm parchment progression */
-  --surface-ground:   var(--primitive-parchment-200); /* #F5F0E8 — page base */
-  --surface-panel:    var(--primitive-parchment-300); /* #EDE8DF — sidebar, navbar */
-  --surface-elevated: var(--primitive-parchment-400); /* #E6E0D5 — cards, raised */
-  --surface-hover:    var(--primitive-parchment-500); /* #DDD7CC — hover state */
-  --surface-active:   var(--primitive-parchment-600); /* #D0C9BC — active/pressed */
-  --surface-code:     var(--primitive-parchment-100); /* #F9F4EC — code/diff areas */
+  --surface-ground:   var(--primitive-mineral-200);
+  --surface-panel:    var(--primitive-mineral-100);
+  --surface-elevated: var(--primitive-mineral-300);
+  --surface-hover:    var(--primitive-mineral-400);
+  --surface-active:   var(--primitive-mineral-500);
+  --surface-code:     var(--primitive-mineral-50);
+  --overlay-scrim:    rgba(18, 24, 26, 0.55);
+  --selection-bg:     rgba(11, 107, 98, 0.22);
 
-  /* Borders & Dividers — Warm ink alpha */
-  --border-hairline:    var(--primitive-alpha-ink-12);
-  --border-subtle:      var(--primitive-alpha-ink-20);
-  --border-interactive: var(--primitive-alpha-ink-35);
-  --border-focus:       var(--primitive-terra-600);
+  --border-hairline:    rgba(21, 32, 31, 0.12);
+  --border-subtle:      rgba(21, 32, 31, 0.22);
+  --border-interactive: rgba(21, 32, 31, 0.5);
+  --border-focus:       var(--primitive-verdigris-700);
 
-  /* Typography / Text Roles — Warm ink */
-  --text-primary:   var(--primitive-ink-900);  /* #1C1409 — deep charcoal */
-  --text-secondary: var(--primitive-ink-700);  /* #4A3728 — warm brown */
-  --text-muted:     var(--primitive-ink-500);  /* #8A7560 — medium brown */
-  --text-accent:    var(--primitive-terra-600); /* #C4521A — terracotta */
+  --text-primary:   var(--primitive-ink-900);
+  --text-secondary: var(--primitive-ink-700);
+  --text-muted:     var(--primitive-ink-600);
+  --text-accent:    var(--primitive-verdigris-700);
 
-  /* Brand / Action — Terracotta */
-  --action-primary-bg:    var(--primitive-terra-600);
-  --action-primary-hover: var(--primitive-terra-700);
-  --action-primary-text:  #FFFFFF;
-  --action-ghost-hover:   var(--primitive-alpha-ink-6);
+  --action-primary-bg:    var(--primitive-verdigris-700);
+  --action-primary-hover: var(--primitive-verdigris-800);
+  --action-primary-text:  var(--primitive-white);
+  --action-ghost-hover:   rgba(21, 32, 31, 0.06);
 
-  /* Epistemic & Mutation Status Tokens — Muted archival palette */
   --status-added-fg:     var(--primitive-green-600);
-  --status-added-bg:     var(--primitive-green-bg);
-  --status-added-border: var(--primitive-green-border);
+  --status-added-bg:     rgba(19, 102, 57, 0.10);
+  --status-added-border: rgba(19, 102, 57, 0.34);
 
-  --status-removed-fg:     var(--primitive-red-600);
-  --status-removed-bg:     var(--primitive-red-bg);
-  --status-removed-border: var(--primitive-red-border);
+  --status-removed-fg:     var(--primitive-red-700);
+  --status-removed-bg:     rgba(160, 32, 25, 0.09);
+  --status-removed-border: rgba(160, 32, 25, 0.32);
 
-  --status-modified-fg:     var(--primitive-amber-600);
-  --status-modified-bg:     var(--primitive-amber-bg);
-  --status-modified-border: var(--primitive-amber-border);
+  --status-modified-fg:     var(--primitive-amber-700);
+  --status-modified-bg:     rgba(116, 75, 0, 0.11);
+  --status-modified-border: rgba(116, 75, 0, 0.34);
 
-  /* Domain Correlation Status Tokens (STRONG, WEAK, NONE, UNCERTAIN) */
+  /* Correlation statuses: STRONG, WEAK, UNCERTAIN, NONE */
   --status-strong-fg:     var(--primitive-green-700);
-  --status-strong-bg:     var(--primitive-green-bg);
-  --status-strong-border: var(--primitive-green-border);
+  --status-strong-bg:     rgba(10, 102, 71, 0.10);
+  --status-strong-border: rgba(10, 102, 71, 0.34);
 
-  --status-weak-fg:     var(--primitive-purple-600);
-  --status-weak-bg:     var(--primitive-purple-bg);
-  --status-weak-border: var(--primitive-purple-border);
+  --status-weak-fg:     var(--primitive-violet-700);
+  --status-weak-bg:     rgba(90, 65, 166, 0.09);
+  --status-weak-border: rgba(90, 65, 166, 0.32);
 
-  --status-none-fg:     var(--primitive-gray-500);
+  --status-none-fg:     var(--primitive-ink-600);
   --status-none-bg:     transparent;
-  --status-none-border: var(--primitive-alpha-ink-12);
+  --status-none-border: var(--border-subtle);
 
-  --status-uncertain-fg:     var(--primitive-ochre-600);
-  --status-uncertain-bg:     var(--primitive-ochre-bg);
-  --status-uncertain-border: var(--primitive-ochre-border);
+  --status-uncertain-fg:     var(--primitive-amber-700);
+  --status-uncertain-bg:     rgba(116, 75, 0, 0.11);
+  --status-uncertain-border: rgba(116, 75, 0, 0.34);
 
-  /* Epistemic Unknown Boundary Tokens */
-  --status-unknown-fg:     var(--primitive-gray-500);
-  --status-unknown-bg:     var(--primitive-gray-bg);
-  --status-unknown-border: var(--primitive-gray-border);
+  --status-unknown-fg:     var(--primitive-ink-600);
+  --status-unknown-bg:     rgba(21, 32, 31, 0.06);
+  --status-unknown-border: var(--border-subtle);
 
   /* ========================================================================
-     Tier 3: Component Tokens (Component-Scoped Aliases)
+     Tier 3: Component Tokens
      ======================================================================== */
 
   /* Navigation Bar */
   --navbar-bg:     var(--surface-panel);
   --navbar-border: var(--border-hairline);
-  --navbar-height: 52px;
+  --navbar-height: 78px;
 
   /* Card & Panel */
   --panel-bg:      var(--surface-panel);
@@ -229,11 +176,87 @@
   /* Correlation Badge */
   --badge-radius:    var(--radius-xs);
   --badge-padding:   2px 6px;
-  --badge-font-size: 10px;
+  --badge-font-size: 12px;
 
-  /* Cartographic grid for workspace panels */
-  --grid-line-color: rgba(90, 70, 50, 0.055);
-  --grid-size: 20px;
+  /* The Dig (excavation cross-section) */
+  --dig-canvas:     var(--surface-code);
+  --dig-stratum-a:  var(--surface-elevated);
+  --dig-stratum-b:  var(--surface-hover);
+  --dig-test:       #E0E8EC;
+  --dig-hatch:      var(--border-subtle);
+  --dig-added:      rgba(19, 102, 57, 0.22);
+  --dig-removed:    rgba(160, 32, 25, 0.20);
+  --dig-modified:   rgba(116, 75, 0, 0.22);
+  --dig-shaft-strong:    var(--status-strong-fg);
+  --dig-shaft-weak:      var(--status-weak-fg);
+  --dig-shaft-uncertain: var(--status-uncertain-fg);
+  --dig-shaft-none:      var(--status-none-fg);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface-ground:   var(--primitive-basalt-950);
+  --surface-panel:    var(--primitive-basalt-850);
+  --surface-elevated: var(--primitive-basalt-800);
+  --surface-hover:    var(--primitive-basalt-750);
+  --surface-active:   var(--primitive-basalt-700);
+  --surface-code:     var(--primitive-basalt-900);
+  --overlay-scrim:    rgba(0, 0, 0, 0.62);
+  --selection-bg:     rgba(92, 207, 190, 0.28);
+
+  --border-hairline:    rgba(233, 239, 236, 0.11);
+  --border-subtle:      rgba(233, 239, 236, 0.2);
+  --border-interactive: rgba(233, 239, 236, 0.46);
+  --border-focus:       var(--primitive-verdigris-300);
+
+  --text-primary:   var(--primitive-frost-100);
+  --text-secondary: var(--primitive-frost-300);
+  --text-muted:     var(--primitive-frost-400);
+  --text-accent:    var(--primitive-verdigris-300);
+
+  --action-primary-bg:    var(--primitive-verdigris-300);
+  --action-primary-hover: var(--primitive-verdigris-200);
+  --action-primary-text:  var(--primitive-basalt-950);
+  --action-ghost-hover:   rgba(233, 239, 236, 0.07);
+
+  --status-added-fg:     var(--primitive-green-200);
+  --status-added-bg:     rgba(104, 213, 150, 0.13);
+  --status-added-border: rgba(104, 213, 150, 0.36);
+
+  --status-removed-fg:     var(--primitive-red-300);
+  --status-removed-bg:     rgba(245, 141, 132, 0.13);
+  --status-removed-border: rgba(245, 141, 132, 0.36);
+
+  --status-modified-fg:     var(--primitive-amber-300);
+  --status-modified-bg:     rgba(230, 184, 76, 0.13);
+  --status-modified-border: rgba(230, 184, 76, 0.36);
+
+  --status-strong-fg:     var(--primitive-green-300);
+  --status-strong-bg:     rgba(90, 210, 169, 0.13);
+  --status-strong-border: rgba(90, 210, 169, 0.36);
+
+  --status-weak-fg:     var(--primitive-violet-300);
+  --status-weak-bg:     rgba(179, 166, 244, 0.13);
+  --status-weak-border: rgba(179, 166, 244, 0.36);
+
+  --status-none-fg:     var(--primitive-frost-400);
+  --status-unknown-fg:  var(--primitive-frost-400);
+  --status-unknown-bg:  rgba(233, 239, 236, 0.07);
+
+  --status-uncertain-fg:     var(--primitive-amber-300);
+  --status-uncertain-bg:     rgba(230, 184, 76, 0.13);
+  --status-uncertain-border: rgba(230, 184, 76, 0.36);
+
+  --dig-test:     #2A363D;
+  --dig-added:    rgba(104, 213, 150, 0.24);
+  --dig-removed:  rgba(245, 141, 132, 0.24);
+  --dig-modified: rgba(230, 184, 76, 0.24);
+}
+
+.theme-switching,
+.theme-switching * {
+  transition: none !important;
 }
 
 /* Reduced Motion Override */

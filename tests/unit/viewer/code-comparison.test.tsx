@@ -64,12 +64,12 @@ describe("Code Comparison & Evidence Navigation Components", () => {
         />
       );
 
-      expect(screen.getByText("Target Function Removed in HEAD")).toBeInTheDocument();
-      expect(screen.getByText(/was deleted or renamed in HEAD/)).toBeInTheDocument();
+      expect(screen.getByText("This function isn't in the newer version")).toBeInTheDocument();
+      expect(screen.getByText(/deleted or renamed/)).toBeInTheDocument();
       expect(screen.getByText("legacyProcess")).toBeInTheDocument();
-      expect(screen.getByText("[-] BASE Revision Content")).toBeInTheDocument();
+      expect(screen.getByText("Before")).toBeInTheDocument();
       expect(screen.getByText(/function legacyProcess/)).toBeInTheDocument();
-      expect(screen.getByText("[DELETED IN HEAD]")).toBeInTheDocument();
+      expect(screen.getByText("Removed")).toBeInTheDocument();
     });
 
     it("renders FUNCTION_ABSENT state when function is missing in BASE", () => {
@@ -82,12 +82,12 @@ describe("Code Comparison & Evidence Navigation Components", () => {
         />
       );
 
-      expect(screen.getByText("Target Function Absent in BASE")).toBeInTheDocument();
-      expect(screen.getByText(/does not exist in BASE/)).toBeInTheDocument();
+      expect(screen.getByText("This function isn't in the older version")).toBeInTheDocument();
+      expect(screen.getByText(/added in the newer version/)).toBeInTheDocument();
       expect(screen.getByText("newFeature")).toBeInTheDocument();
-      expect(screen.getByText("[+] HEAD Revision Content")).toBeInTheDocument();
+      expect(screen.getByText("After")).toBeInTheDocument();
       expect(screen.getByText(/function newFeature/)).toBeInTheDocument();
-      expect(screen.getByText("[INTRODUCED IN HEAD]")).toBeInTheDocument();
+      expect(screen.getByText("New")).toBeInTheDocument();
     });
 
     it("renders INCOMPLETE_ANALYSIS state when analysis could not complete", () => {
@@ -99,9 +99,9 @@ describe("Code Comparison & Evidence Navigation Components", () => {
         />
       );
 
-      expect(screen.getByText("Incomplete Analysis Report")).toBeInTheDocument();
-      expect(screen.getByText(/AST function snapshots were not preserved/)).toBeInTheDocument();
-      expect(screen.getByText("[INCOMPLETE ANALYSIS]")).toBeInTheDocument();
+      expect(screen.getByText("This analysis is incomplete")).toBeInTheDocument();
+      expect(screen.getByText(/couldn't be read from one or both versions/)).toBeInTheDocument();
+      expect(screen.getByText("Incomplete")).toBeInTheDocument();
     });
 
     it("renders INITIALIZATION_FAILED state with a retry button", () => {
@@ -115,8 +115,8 @@ describe("Code Comparison & Evidence Navigation Components", () => {
         />
       );
 
-      expect(screen.getByText("Editor Engine Unavailable")).toBeInTheDocument();
-      const retryBtn = screen.getByRole("button", { name: /Retry Editor Initialization/i });
+      expect(screen.getByText("The code comparison couldn't start")).toBeInTheDocument();
+      const retryBtn = screen.getByRole("button", { name: /Try again/i });
       expect(retryBtn).toBeInTheDocument();
       fireEvent.click(retryBtn);
       expect(handleRetry).toHaveBeenCalledTimes(1);
@@ -211,8 +211,8 @@ describe("Code Comparison & Evidence Navigation Components", () => {
       );
 
       // In EV-001 (index 0), prev is disabled, next points to EV-002
-      const prevBtn = screen.getByRole("button", { name: /Navigate to previous evidence item/i });
-      const nextBtn = screen.getByRole("button", { name: /Navigate to next evidence item/i });
+      const prevBtn = screen.getByRole("button", { name: /Previous evidence/i });
+      const nextBtn = screen.getByRole("button", { name: /Next evidence/i });
 
       expect(prevBtn).toBeDisabled();
       expect(nextBtn).toBeEnabled();
@@ -235,10 +235,10 @@ describe("Code Comparison & Evidence Navigation Components", () => {
         />
       );
 
-      expect(screen.getByRole("button", { name: /Navigate to previous evidence item/i })).toBeEnabled();
-      expect(screen.getByRole("button", { name: /Navigate to next evidence item/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /Previous evidence/i })).toBeEnabled();
+      expect(screen.getByRole("button", { name: /Next evidence/i })).toBeDisabled();
 
-      fireEvent.click(screen.getByRole("button", { name: /Navigate to previous evidence item/i }));
+      fireEvent.click(screen.getByRole("button", { name: /Previous evidence/i }));
       expect(handleSelectEvidence).toHaveBeenCalledWith("EV-001");
     });
   });
@@ -258,7 +258,7 @@ describe("Code Comparison & Evidence Navigation Components", () => {
       const diffEditor = screen.getByTestId("monaco-diff-editor");
       expect(diffEditor).toBeInTheDocument();
       expect(diffEditor).toHaveAttribute("data-language", "typescript");
-      expect(diffEditor).toHaveAttribute("data-diff-mode", "side-by-side");
+      expect(diffEditor).toHaveAttribute("data-diff-mode", "unified");
 
       const original = screen.getByTestId("monaco-diff-original");
       const modified = screen.getByTestId("monaco-diff-modified");
@@ -281,7 +281,7 @@ describe("Code Comparison & Evidence Navigation Components", () => {
 
       // DiffEditor should not render when function is deleted
       expect(screen.queryByTestId("monaco-diff-editor")).not.toBeInTheDocument();
-      expect(screen.getByText("Target Function Removed in HEAD")).toBeInTheDocument();
+      expect(screen.getByText("This function isn't in the newer version")).toBeInTheDocument();
       expect(screen.getByText("deprecatedHelper")).toBeInTheDocument();
     });
 
@@ -297,12 +297,12 @@ describe("Code Comparison & Evidence Navigation Components", () => {
       );
 
       const diffEditor = screen.getByTestId("monaco-diff-editor");
-      expect(diffEditor).toHaveAttribute("data-diff-mode", "side-by-side");
+      expect(diffEditor).toHaveAttribute("data-diff-mode", "unified");
 
-      const unifiedBtn = screen.getByRole("button", { name: /Unified diff/i });
-      fireEvent.click(unifiedBtn);
+      const sideBySideBtn = screen.getByRole("button", { name: /Side by side diff/i });
+      fireEvent.click(sideBySideBtn);
 
-      expect(screen.getByTestId("monaco-diff-editor")).toHaveAttribute("data-diff-mode", "unified");
+      expect(screen.getByTestId("monaco-diff-editor")).toHaveAttribute("data-diff-mode", "side-by-side");
     });
   });
 
@@ -321,16 +321,16 @@ describe("Code Comparison & Evidence Navigation Components", () => {
       expect(screen.getByTestId("monaco-diff-editor")).toBeInTheDocument();
 
       // Click Compact Text view button
-      const textModeBtn = screen.getByRole("button", { name: /Switch to Text View/i });
+      const textModeBtn = screen.getByRole("button", { name: /Show as text/i });
       fireEvent.click(textModeBtn);
 
       // Now compact view is active, DiffEditor is not rendered
       expect(screen.queryByTestId("monaco-diff-editor")).not.toBeInTheDocument();
-      expect(screen.getByText(/\[-\] BASE Revision/)).toBeInTheDocument();
-      expect(screen.getByText(/\[\+\] HEAD Revision/)).toBeInTheDocument();
+      expect(screen.getByText(/Before \(/)).toBeInTheDocument();
+      expect(screen.getByText(/After \(/)).toBeInTheDocument();
 
       // Click Diff View button to return to Monaco
-      const diffViewBtn = screen.getByRole("button", { name: /Switch to Monaco Diff/i });
+      const diffViewBtn = screen.getByRole("button", { name: /Show diff/i });
       fireEvent.click(diffViewBtn);
       expect(screen.getByTestId("monaco-diff-editor")).toBeInTheDocument();
     });

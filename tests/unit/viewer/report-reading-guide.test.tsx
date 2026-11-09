@@ -52,7 +52,6 @@ describe("ReportReadingGuide & Newcomer Comprehension", () => {
 
     // Guide Header & Tag
     expect(screen.getByText("How to Read This Report")).toBeInTheDocument();
-    expect(screen.getByText("Newcomer Guide")).toBeInTheDocument();
 
     // The 3 core questions
     expect(screen.getByText("1. What changed?")).toBeInTheDocument();
@@ -60,14 +59,14 @@ describe("ReportReadingGuide & Newcomer Comprehension", () => {
     expect(screen.getByText("3. What can we conclude?")).toBeInTheDocument();
 
     // Plain English subtitles
-    expect(screen.getByText("Code Changes (Structural AST Mutations)")).toBeInTheDocument();
-    expect(screen.getByText("Related Tests & Assertions")).toBeInTheDocument();
-    expect(screen.getByText("What We Know & Epistemic Boundaries")).toBeInTheDocument();
+    expect(screen.getByText("Changes to how the function is built")).toBeInTheDocument();
+    expect(screen.getByText("Tests that changed in the same range")).toBeInTheDocument();
+    expect(screen.getByText("What is known, and what isn't")).toBeInTheDocument();
 
     // Grounded details for Scenario E
-    expect(screen.getByText(/We compared function 'calculateDiscount'/)).toBeInTheDocument();
-    expect(screen.getByText(/We searched for test changes committed in the same revision range/)).toBeInTheDocument();
-    expect(screen.getByText(/Static analysis inspects code structure in Git; it does NOT run the tests/)).toBeInTheDocument();
+    expect(screen.getByText(/We compared 'calculateDiscount'/)).toBeInTheDocument();
+    expect(screen.getByText(/We looked for test changes in the same range/)).toBeInTheDocument();
+    expect(screen.getByText(/This tool read the code. It did not run the tests/)).toBeInTheDocument();
   });
 
   it("does not render when isOpen is false", () => {
@@ -108,11 +107,10 @@ describe("ReportReadingGuide & Newcomer Comprehension", () => {
     );
 
     const glossaryBtn = screen.getByRole("button", { name: /Show glossary of terms/i });
-    expect(screen.queryByText("GLOSSARY OF TERMS & STATUSES")).not.toBeInTheDocument();
+    expect(screen.queryByText(/^STRONG:/)).not.toBeInTheDocument();
 
     fireEvent.click(glossaryBtn);
-    expect(screen.getByText("GLOSSARY OF TERMS & STATUSES")).toBeInTheDocument();
-    expect(screen.getByText(/STRONG Correlation:/)).toBeInTheDocument();
+    expect(screen.getByText(/^STRONG:/)).toBeInTheDocument();
   });
 
   it("renders the 'How to Read This Report' trigger button in ExecutiveSummaryStrip and fires onToggleGuide", () => {
@@ -126,7 +124,7 @@ describe("ReportReadingGuide & Newcomer Comprehension", () => {
       />
     );
 
-    const guideBtn = screen.getByRole("button", { name: /Open How to Read This Report Guide/i });
+    const guideBtn = screen.getByRole("button", { name: /How to read this report/i });
     expect(guideBtn).toBeInTheDocument();
     fireEvent.click(guideBtn);
     expect(handleToggle).toHaveBeenCalledTimes(1);
@@ -145,12 +143,12 @@ describe("ReportReadingGuide & Newcomer Comprehension", () => {
     );
 
     // Plain-English Explanation region
-    const explanationRegion = screen.getByRole("region", { name: "Plain-English Explanation" });
+    const explanationRegion = screen.getByRole("region", { name: "What this means" });
     expect(explanationRegion).toBeInTheDocument();
 
     expect(screen.getByText("Defensive Safety Check Removed")).toBeInTheDocument();
-    expect(screen.getByText("Establishes")).toBeInTheDocument();
-    expect(screen.getByText("Does NOT Establish")).toBeInTheDocument();
+    expect(screen.getByText("What this shows")).toBeInTheDocument();
+    expect(screen.getByText("What this doesn't show")).toBeInTheDocument();
     expect(screen.getByText(/The syntax tree of this function was structurally altered/)).toBeInTheDocument();
     expect(screen.getByText(/Whether this change caused a bug/)).toBeInTheDocument();
   });

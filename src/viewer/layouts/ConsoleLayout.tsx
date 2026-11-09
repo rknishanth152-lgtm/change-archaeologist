@@ -1,22 +1,17 @@
 /**
- * ConsoleLayout Component
+ * Change Archaeologist — Application shell
  *
- * Change Archaeologist — Master Shell & Workspace Layout
- *
- * Implements the "Forensic Stratigraphy & Epistemic Bridge" workspace:
- * - 78 px compact top chrome via Navbar (primary command row + secondary workspace row).
- * - Immediate viewport utilization: primary split workspace begins at y = 78 px.
- * - Slide-over ReportReadingGuide drawer overlay (does NOT push workspace downward).
- * - Main workspace (left) with active tab view + Right persistent DetailInspector.
- * - Bottom epistemic LimitationsBanner.
- * - Full WCAG 2.2 AA accessibility, live regions, and keyboard arrow tab switching.
+ * Header, then the active view beside a resizable detail panel, then the
+ * analysis limits, which stay visible. Below 1024px the panels stack.
  */
 
-import React from "react";
-import { Navbar } from "../components/Navbar.js";
+import React, { useEffect, useState } from "react";
+import { useGroupRef } from "react-resizable-panels";
+import { Navbar, TAB_LABELS, TAB_ORDER } from "../components/Navbar.js";
 import { DetailInspector } from "../components/DetailInspector.js";
 import { LimitationsBanner } from "../components/LimitationsBanner.js";
 import { ReportReadingGuide } from "../components/ReportReadingGuide.js";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../components/ui/resizable.js";
 import type {
   AnalysisReport,
   WorkspaceTab,
@@ -45,23 +40,22 @@ export interface ConsoleLayoutProps {
   readonly children: React.ReactNode;
 }
 
-const TAB_ORDER: WorkspaceTab[] = [
-  "timeline",
-  "graph",
-  "structural",
-  "tests",
-  "correlations",
-  "findings",
-];
+/** How much room the view gets; the Code view hands most of it to the diff. */
+const VIEW_SHARE: Record<WorkspaceTab, number> = { dig: 66, code: 30, findings: 58 };
+const WIDE_QUERY = "(min-width: 1024px)";
 
-const TAB_LABELS: Record<WorkspaceTab, string> = {
-  timeline:     "Change Timeline view",
-  structural:   "Structural Mutations view",
-  graph:        "Correlation Graph view",
-  correlations: "Correlation Matrix view",
-  tests:        "Test Changes view",
-  findings:     "Epistemic Findings view",
-};
+function useIsWide(): boolean {
+  const [isWide, setIsWide] = useState(() => window.matchMedia?.(WIDE_QUERY).matches ?? false);
+  useEffect(() => {
+    const media = window.matchMedia?.(WIDE_QUERY);
+    if (!media?.addEventListener) return;
+    const update = () => setIsWide(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  return isWide;
+}
 
 export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
   report,
@@ -81,58 +75,71 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
   onCloseGuide,
   children,
 }) => {
-  const [announcement, setAnnouncement] = React.useState<string>("");
+  const isWide = useIsWide();
+  const groupRef = useGroupRef();
 
-  const handleTabKeyDown = (e: React.KeyboardEvent) => {
-    const currentIndex = TAB_ORDER.indexOf(activeTab);
-    if (currentIndex === -1) return;
+  useEffect(() => {
+    if (!isWide || !report) return;
+    const share = VIEW_SHARE[activeTab];
+    groupRef.current?.setLayout({ workspace: share, inspector: 100 - share });
+  }, [activeTab, isWide, report, groupRef]);
 
-    let nextIndex = -1;
-    if (e.key === "ArrowRight") {
-      nextIndex = (currentIndex + 1) % TAB_ORDER.length;
-    } else if (e.key === "ArrowLeft") {
-      nextIndex = (currentIndex - 1 + TAB_ORDER.length) % TAB_ORDER.length;
-    } else if (e.key === "Home") {
-      nextIndex = 0;
-    } else if (e.key === "End") {
-      nextIndex = TAB_ORDER.length - 1;
-    }
+  const handleTabKeyDown = (event: React.KeyboardEvent) => {
+    const index = TAB_ORDER.indexOf(activeTab);
+    const last = TAB_ORDER.length - 1;
+    const next =
+      event.key === "ArrowRight"
+        ? (index + 1) % TAB_ORDER.length
+        : event.key === "ArrowLeft"
+        ? (index - 1 + TAB_ORDER.length) % TAB_ORDER.length
+        : event.key === "Home"
+        ? 0
+        : event.key === "End"
+        ? last
+        : -1;
 
-    if (nextIndex !== -1) {
-      e.preventDefault();
-      const nextTab = TAB_ORDER[nextIndex];
-      onTabChange(nextTab);
-      document.getElementById(`tab-${nextTab}`)?.focus();
+    if (next !== -1) {
+      event.preventDefault();
+      onTabChange(TAB_ORDER[next]);
+      document.getElementById(`tab-${TAB_ORDER[next]}`)?.focus();
     }
   };
 
-  React.useEffect(() => {
-    if (report) {
-      setAnnouncement(
-        `Viewing ${TAB_LABELS[activeTab]} for ${report.request.targetFunctionName} (${report.request.targetFilePath}).`
-      );
-    }
-  }, [activeTab, report]);
+  const announcement = report ? `${TAB_LABELS[activeTab]} for ${report.request.targetFunctionName}.` : "";
+
+  const workspace = (
+    <main
+      id="panel-workspace"
+      role="tabpanel"
+      aria-labelledby={`tab-${activeTab}`}
+      tabIndex={0}
+      className="h-full min-h-0 overflow-y-auto focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus"
+    >
+      {children}
+    </main>
+  );
+
+  const inspector = report && (
+    <aside aria-label="Details of the selected item" className="h-full overflow-hidden bg-panel">
+      <DetailInspector
+        report={report}
+        selectedChange={selectedChange}
+        selectedTestChange={selectedTestChange}
+        selectedCorrelation={selectedCorrelation}
+        associatedEvidence={associatedEvidence}
+        selectedEvidenceId={selectedEvidenceId}
+        onSelectEvidence={onSelectEvidence}
+        prefersSideBySide={isWide && activeTab === "code"}
+      />
+    </aside>
+  );
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{
-        background: "var(--surface-ground)",
-        color: "var(--text-primary)",
-      }}
-    >
-      {/* Screen Reader Live Status Region */}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+    <div className="min-h-dvh lg:h-dvh flex flex-col bg-ground text-text-primary">
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {announcement}
       </div>
 
-      {/* Top Application Shell (78px Compact Top Chrome) */}
       <Navbar
         report={report}
         onLoadClick={onLoadClick}
@@ -145,57 +152,31 @@ export const ConsoleLayout: React.FC<ConsoleLayoutProps> = ({
         onTabKeyDown={handleTabKeyDown}
       />
 
-      {/* Slide-over How to Read This Report Guide Drawer */}
-      {report && (
-        <ReportReadingGuide
-          report={report}
-          isOpen={isGuideOpen}
-          onClose={onCloseGuide ?? onToggleGuide ?? (() => {})}
-        />
-      )}
-
-      {/* Main Container */}
       {report ? (
-        <div className="flex-1 flex flex-col min-h-0">
-          {/* Primary Split Workspace */}
-          <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
-            {/* Left: Active Tab View */}
-            <main
-              id="panel-workspace"
-              role="tabpanel"
-              aria-labelledby={`tab-${activeTab}`}
-              tabIndex={0}
-              className="flex-1 flex flex-col min-h-0 overflow-y-auto focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus atlas-grid"
-              style={{ background: "var(--surface-ground)" }}
-            >
-              {children}
-            </main>
+        <>
+          <ReportReadingGuide report={report} isOpen={isGuideOpen} onClose={onCloseGuide ?? onToggleGuide ?? (() => {})} />
 
-            {/* Right: Detail Inspector */}
-            <aside
-              aria-label="Entity and Evidence Detail Inspector"
-              className="w-full lg:w-[460px] xl:w-[520px] h-96 lg:h-auto overflow-hidden shrink-0 border-t lg:border-t-0 lg:border-l border-hairline"
-              style={{ background: "var(--surface-panel)" }}
-            >
-              <DetailInspector
-                report={report}
-                selectedChange={selectedChange}
-                selectedTestChange={selectedTestChange}
-                selectedCorrelation={selectedCorrelation}
-                associatedEvidence={associatedEvidence}
-                selectedEvidenceId={selectedEvidenceId}
-                onSelectEvidence={onSelectEvidence}
-              />
-            </aside>
-          </div>
+          {isWide ? (
+            <ResizablePanelGroup orientation="horizontal" groupRef={groupRef} className="flex-1 min-h-0">
+              <ResizablePanel id="workspace" defaultSize={`${VIEW_SHARE[activeTab]}%`} minSize="24%">
+                {workspace}
+              </ResizablePanel>
+              <ResizableHandle aria-label="Resize the detail panel" />
+              <ResizablePanel id="inspector" defaultSize={`${100 - VIEW_SHARE[activeTab]}%`} minSize="26%">
+                {inspector}
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          ) : (
+            <div className="flex-1 flex flex-col min-h-0">
+              {workspace}
+              <div className="h-96 shrink-0 border-t border-hairline">{inspector}</div>
+            </div>
+          )}
 
-          {/* Bottom Limitations Tray */}
           <LimitationsBanner report={report} />
-        </div>
+        </>
       ) : (
-        <div className="flex-1 flex items-center justify-center p-8 atlas-grid">
-          {children}
-        </div>
+        children
       )}
     </div>
   );

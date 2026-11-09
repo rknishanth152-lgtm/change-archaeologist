@@ -26,7 +26,6 @@ import {
 } from "./ui/Disclosure.js";
 import { AnimatedGroup } from "./ui/AnimatedGroup.js";
 import { TactileButton } from "./ui/TactileButton.js";
-import { Badge } from "./ui/Badge.js";
 import {
   GlyphMark,
   GlyphDeltaModified,
@@ -95,7 +94,8 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Backdrop overlay */}
       <div
-        className="fixed inset-0 bg-primitive-ink-950/40 backdrop-blur-[2px] transition-opacity duration-200"
+        className="fixed inset-0"
+        style={{ backgroundColor: "var(--overlay-scrim)" }}
         aria-hidden="true"
         onClick={onClose}
       />
@@ -131,20 +131,17 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
                 >
                   How to Read This Report
                 </h2>
-                <Badge variant="sandstone" className="shrink-0 text-[10px]">
-                  Newcomer Guide
-                </Badge>
               </div>
               <p
                 id="reading-guide-desc"
                 className="font-body text-xs text-text-secondary mt-1 leading-normal"
               >
-                Understand what Change Archaeologist found in{" "}
-                <code className="font-mono text-[11px] text-text-primary font-medium">
+                What was found in{" "}
+                <code className="font-mono text-xs text-text-primary font-medium">
                   {guideData.targetName}
                 </code>{" "}
-                between commits{" "}
-                <code className="font-mono text-[10px] text-text-secondary">
+                between{" "}
+                <code className="font-mono text-xs text-text-secondary">
                   {guideData.commitRange}
                 </code>
                 .
@@ -160,7 +157,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
               aria-expanded={showGlossary}
               aria-label={showGlossary ? "Hide glossary of terms" : "Show glossary of terms"}
             >
-              {showGlossary ? "Hide Terms" : "Glossary"}
+              {showGlossary ? "Hide terms" : "Terms"}
             </TactileButton>
 
             <button
@@ -186,14 +183,14 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
             >
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-hairline">
-                  <div className="flex items-center space-x-2 text-xs font-mono font-semibold text-text-primary">
+                  <div className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
                     <GlyphDeltaModified size={15} className="text-status-modified" />
                     <span>1. What changed?</span>
                   </div>
-                  <Badge variant="terracotta">AST DIFF</Badge>
+                  
                 </div>
                 <div className="font-sans font-medium text-xs text-text-primary mt-2">
-                  Code Changes (Structural AST Mutations)
+                  Changes to how the function is built
                 </div>
                 <p className="font-body text-xs text-text-secondary mt-1 leading-relaxed">
                   {guideData.whatChanged.summary}
@@ -202,7 +199,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
 
               <div className="space-y-1.5 pt-2 border-t border-hairline">
                 {guideData.whatChanged.details.map((detail, idx) => (
-                  <div key={idx} className="flex items-start space-x-1.5 text-[11px] font-mono text-text-secondary">
+                  <div key={idx} className="flex items-start space-x-1.5 text-xs font-sans text-text-secondary">
                     <span className="text-text-accent mt-0.5">•</span>
                     <span>{detail}</span>
                   </div>
@@ -214,22 +211,22 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
                 <DisclosureTrigger>
                   <button
                     type="button"
-                    className="w-full text-[11px] font-mono text-text-accent flex items-center justify-between pt-1 hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer"
+                    className="w-full text-xs font-sans text-text-accent flex items-center justify-between pt-1 hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer"
                     aria-expanded={openSection1}
                     aria-label="Toggle details for Question 1: What changed?"
                   >
-                    <span>{openSection1 ? "Hide AST details" : "Learn what AST mutation means"}</span>
+                    <span>{openSection1 ? "Hide details" : "How changes are detected"}</span>
                     {openSection1 ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                   </button>
                 </DisclosureTrigger>
 
                 <DisclosureContent>
-                  <div className="p-2.5 mt-2 rounded-sm bg-panel border border-hairline text-[11px] font-body text-text-secondary space-y-1">
+                  <div className="p-2.5 mt-2 rounded-sm bg-panel border border-hairline text-xs font-body text-text-secondary space-y-1">
                     <p>
-                      <strong>Abstract Syntax Tree (AST):</strong> Unlike a simple text diff that looks at lines and whitespace, an AST compares the parsed grammar of the code.
+                      <strong>Structure, not text:</strong> A normal diff compares lines. This tool compares how the code is built (its syntax tree).
                     </p>
                     <p className="text-text-muted">
-                      This catches meaningful structural shifts — such as a removed <code className="font-mono">if (...)</code> check or altered <code className="font-mono">return</code> value — while ignoring pure reformatting.
+                      So it notices things like a removed <code className="font-mono">if (...)</code> check or altered <code className="font-mono">return</code> value, and ignores reformatting.
                     </p>
                   </div>
                 </DisclosureContent>
@@ -243,14 +240,14 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
             >
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-hairline">
-                  <div className="flex items-center space-x-2 text-xs font-mono font-semibold text-text-primary">
+                  <div className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
                     <GlyphCorrStrong size={15} className="text-status-strong" />
                     <span>2. What do the tests tell us?</span>
                   </div>
-                  <Badge variant="verdigris">COMPANION TESTS</Badge>
+                  
                 </div>
                 <div className="font-sans font-medium text-xs text-text-primary mt-2">
-                  Related Tests & Assertions
+                  Tests that changed in the same range
                 </div>
                 <p className="font-body text-xs text-text-secondary mt-1 leading-relaxed">
                   {guideData.whatTestsTellUs.summary}
@@ -259,7 +256,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
 
               <div className="space-y-1.5 pt-2 border-t border-hairline">
                 {guideData.whatTestsTellUs.details.map((detail, idx) => (
-                  <div key={idx} className="flex items-start space-x-1.5 text-[11px] font-mono text-text-secondary">
+                  <div key={idx} className="flex items-start space-x-1.5 text-xs font-sans text-text-secondary">
                     <span className="text-status-strong mt-0.5">•</span>
                     <span>{detail}</span>
                   </div>
@@ -271,22 +268,22 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
                 <DisclosureTrigger>
                   <button
                     type="button"
-                    className="w-full text-[11px] font-mono text-text-accent flex items-center justify-between pt-1 hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer"
+                    className="w-full text-xs font-sans text-text-accent flex items-center justify-between pt-1 hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer"
                     aria-expanded={openSection2}
                     aria-label="Toggle details for Question 2: What do tests tell us?"
                   >
-                    <span>{openSection2 ? "Hide test details" : "Why companion tests matter"}</span>
+                    <span>{openSection2 ? "Hide details" : "Why this matters"}</span>
                     {openSection2 ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                   </button>
                 </DisclosureTrigger>
 
                 <DisclosureContent>
-                  <div className="p-2.5 mt-2 rounded-sm bg-panel border border-hairline text-[11px] font-body text-text-secondary space-y-1">
+                  <div className="p-2.5 mt-2 rounded-sm bg-panel border border-hairline text-xs font-body text-text-secondary space-y-1">
                     <p>
-                      <strong>Companion Tests:</strong> When engineers change production code, they often commit corresponding test changes in the same commit.
+                      <strong>Tests that move with code:</strong> When people change code, they often update its tests at the same time.
                     </p>
                     <p className="text-text-muted">
-                      We detect whether assertions were updated to match the new behavior, or if the code change went into production without any companion test updates.
+                      This shows whether any assertions changed alongside the code. It can't tell whether they cover the change.
                     </p>
                   </div>
                 </DisclosureContent>
@@ -300,14 +297,14 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
             >
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-hairline">
-                  <div className="flex items-center space-x-2 text-xs font-mono font-semibold text-text-primary">
+                  <div className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
                     <GlyphEpistemicTier size={15} className="text-text-secondary" />
                     <span>3. What can we conclude?</span>
                   </div>
-                  <Badge variant="sandstone">EPISTEMIC LIMITS</Badge>
+                  
                 </div>
                 <div className="font-sans font-medium text-xs text-text-primary mt-2">
-                  What We Know & Epistemic Boundaries
+                  What is known, and what isn't
                 </div>
                 <p className="font-body text-xs text-text-secondary mt-1 leading-relaxed">
                   {guideData.whatWeCanConclude.summary}
@@ -316,7 +313,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
 
               <div className="space-y-1.5 pt-2 border-t border-hairline">
                 {guideData.whatWeCanConclude.details.map((detail, idx) => (
-                  <div key={idx} className="flex items-start space-x-1.5 text-[11px] font-mono text-text-secondary">
+                  <div key={idx} className="flex items-start space-x-1.5 text-xs font-sans text-text-secondary">
                     <span className="text-text-secondary mt-0.5">•</span>
                     <span>{detail}</span>
                   </div>
@@ -328,19 +325,19 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
                 <DisclosureTrigger>
                   <button
                     type="button"
-                    className="w-full text-[11px] font-mono text-text-accent flex items-center justify-between pt-1 hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer"
+                    className="w-full text-xs font-sans text-text-accent flex items-center justify-between pt-1 hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer"
                     aria-expanded={openSection3}
                     aria-label="Toggle details for Question 3: What can we conclude?"
                   >
-                    <span>{openSection3 ? "Hide limits" : "Limits of static analysis"}</span>
+                    <span>{openSection3 ? "Hide details" : "What this tool can't do"}</span>
                     {openSection3 ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                   </button>
                 </DisclosureTrigger>
 
                 <DisclosureContent>
-                  <div className="p-2.5 mt-2 rounded-sm bg-panel border border-hairline text-[11px] font-body text-text-secondary space-y-1">
+                  <div className="p-2.5 mt-2 rounded-sm bg-panel border border-hairline text-xs font-body text-text-secondary space-y-1">
                     <p>
-                      <strong>Epistemic Humility:</strong> Static analysis reads code without executing it.
+                      <strong>It reads code and never runs it.</strong>
                     </p>
                     <p className="text-text-muted">
                       A &quot;STRONG&quot; correlation means a test directly calls the changed function in the same commit — it does{" "}
@@ -354,12 +351,11 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
 
           {/* Optional Expandable Glossary Section */}
           {showGlossary && (
-            <div className="p-4 rounded-md border border-hairline bg-ground space-y-3 font-mono text-xs animate-fadeIn">
+            <div className="p-4 rounded-md border border-hairline bg-ground space-y-3 font-sans text-xs animate-fadeIn">
               <div className="flex items-center justify-between pb-2 border-b border-hairline">
-                <span className="font-semibold text-text-primary">GLOSSARY OF TERMS & STATUSES</span>
-                <span className="text-[10px] text-text-muted">Definitions grounded in static analysis</span>
+                <span className="font-semibold text-text-primary">Terms</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div>
                   <strong className="text-text-primary">{CONCEPT_EXPLANATIONS.strongStatus.term}:</strong>{" "}
                   <span className="text-text-secondary font-body">{CONCEPT_EXPLANATIONS.strongStatus.plain}</span>
@@ -390,12 +386,12 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
         </div>
 
         {/* Footer Bar */}
-        <div className="px-5 py-3 border-t border-hairline bg-panel flex items-center justify-between text-xs font-mono shrink-0">
-          <span className="text-text-muted text-[11px]">
-            Forensic Stratigraphy &bull; Press <kbd className="px-1 py-0.5 rounded-xs bg-ground border border-hairline text-text-secondary">Esc</kbd> to dismiss
+        <div className="px-5 py-3 border-t border-hairline bg-panel flex items-center justify-between text-xs font-sans shrink-0">
+          <span className="text-text-muted text-xs">
+            Press <kbd className="px-1 py-0.5 rounded-xs bg-ground border border-hairline text-text-secondary">Esc</kbd> to dismiss
           </span>
           <TactileButton variant="secondary" size="xs" onClick={onClose}>
-            Close Guide
+            Close
           </TactileButton>
         </div>
       </div>

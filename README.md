@@ -7,7 +7,7 @@ The tool strictly separates:
 - **`INFERRED`**: Rule-based interpretations and hypotheses supported by observed facts.
 - **`UNKNOWN`**: Explicit epistemic boundaries acknowledging what static analysis cannot prove.
 
-> **Project Status:** Core static-analysis engine, domain schemas, historical AST comparison, companion test analysis, conservative correlation, JSON/Markdown reporting, CLI orchestration, security hardening, end-to-end demonstration environment, and the interactive Evidence Atlas web viewer are fully implemented and verified with automated test suites (359 passing tests across 29 test files, 6/6 demonstration scenarios passing).
+> **Project Status:** Core static-analysis engine, domain schemas, historical AST comparison, companion test analysis, conservative correlation, JSON/Markdown reporting, CLI orchestration, security hardening, end-to-end demonstration environment, and the interactive web viewer are fully implemented and verified with automated test suites (385 passing tests across 30 test files, 6/6 demonstration scenarios passing).
 
 ---
 
@@ -74,26 +74,24 @@ npm run test
 
 ---
 
-## Interactive Evidence Atlas (Web Viewer)
+## Web Viewer
 
-Change Archaeologist includes a local-first, interactive forensic analysis viewer called **Evidence Atlas**. It provides side-by-side Monaco code comparison, an archaeological change timeline, and an interactive Production–Test Correlation Graph.
-
-### 1. Launch the Viewer Locally
+The viewer is local-first: reports are read in your browser, and fonts and editor workers ship with the app.
 
 ```bash
-# Start local development server (Vite on http://localhost:5173)
-npm run dev
+npm run dev      # http://localhost:5173
 
-# Or preview the production build
-npm run build
+npm run build    # or a production build
 npm run preview
 ```
 
-### 2. Inspecting Reports
+Open a report from the start screen, by dropping in the JSON from `--format json --output report.json`, or try one of the samples. Each report has three views:
 
-- **Preloaded Demonstrations:** Use the **Demo Preset** dropdown in the header to switch between Scenarios A through F with zero setup.
-- **Importing CLI Reports:** Generate a JSON report via the CLI (`--format json --output report.json`), then click **Import JSON** in the top navigation to load and explore it.
-- **How to Read This Report Guide:** Click **Guide** in the header for an interactive explanation of what changed, what tests tell us, and epistemic boundaries.
+- **The Dig** draws the function as an excavation cross-section: code lines are rock layers, changes are faults, and shafts link them to the tests they may relate to. **Table view** lists the same content for keyboards and screen readers.
+- **Code & tests** lists every change beside a full-width diff.
+- **Findings** separates what was seen, what that suggests, and what can't be told.
+
+**Guide** explains how to read the current report, and the sun/moon button switches between light and dark.
 
 ---
 

@@ -150,23 +150,23 @@ describe("Plain-English Explanation Helpers", () => {
 
       // Question 1: What changed?
       expect(data.whatChanged.summary).toContain("calculateDiscount");
-      expect(data.whatChanged.summary).toContain("1 structural code change");
-      expect(data.whatChanged.details.some((d) => d.includes("syntax element(s) modified"))).toBe(true);
+      expect(data.whatChanged.summary).toContain("1 structural change");
+      expect(data.whatChanged.details.some((d) => d.includes("1 part changed"))).toBe(true);
 
       // Question 2: What do the tests tell us?
-      expect(data.whatTestsTellUs.summary).toContain("1 companion test file");
-      expect(data.whatTestsTellUs.details.some((d) => d.includes("directly invoke 'calculateDiscount'"))).toBe(true);
+      expect(data.whatTestsTellUs.summary).toContain("1 test change");
+      expect(data.whatTestsTellUs.details.some((d) => d.includes("Calls 'calculateDiscount' directly"))).toBe(true);
 
       // Question 3: What can we conclude?
-      expect(data.whatWeCanConclude.details.some((d) => d.includes("STRONG correlation"))).toBe(true);
-      expect(data.whatWeCanConclude.details.some((d) => d.includes("Static analysis inspects code structure in Git; it does NOT run the tests"))).toBe(true);
+      expect(data.whatWeCanConclude.details.some((d) => d.includes("STRONG link"))).toBe(true);
+      expect(data.whatWeCanConclude.details.some((d) => d.includes("did not run the tests"))).toBe(true);
     });
 
     it("generates grounded guide data for Scenario A with zero companion tests", () => {
       const data = buildReportReadingGuideData(DEMO_SCENARIO_A);
 
-      expect(data.whatTestsTellUs.summary).toContain("Zero companion test files were touched in the same commit range");
-      expect(data.whatWeCanConclude.details.some((d) => d.includes("Unaccompanied production change"))).toBe(true);
+      expect(data.whatTestsTellUs.summary).toContain("No test files changed in this range");
+      expect(data.whatWeCanConclude.details.some((d) => d.includes("no test changes in the same range"))).toBe(true);
     });
   });
 

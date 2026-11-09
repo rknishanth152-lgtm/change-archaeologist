@@ -1,9 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/viewer/**/*.{ts,tsx,html}",
-  ],
   theme: {
     extend: {
       colors: {
@@ -30,6 +26,7 @@ export default {
         "action-primary": "var(--action-primary-bg)",
         "action-hover": "var(--action-primary-hover)",
         "action-ghost-hover": "var(--action-ghost-hover)",
+        "on-action": "var(--action-primary-text)",
 
         "status-added": "var(--status-added-fg)",
         "status-added-bg": "var(--status-added-bg)",
@@ -64,9 +61,10 @@ export default {
         "status-unknown-border": "var(--status-unknown-border)",
       },
       fontFamily: {
-        display: ["'Libre Baskerville'", "Georgia", "'Times New Roman'", "serif"],
-        body:    ["'Inter'", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "system-ui", "sans-serif"],
-        mono:    ["ui-monospace", "'JetBrains Mono'", "'IBM Plex Mono'", "'Cascadia Code'", "Menlo", "monospace"],
+        display: ["var(--font-display)"],
+        sans:    ["var(--font-body)"],
+        body:    ["var(--font-body)"],
+        mono:    ["var(--font-mono)"],
       },
       borderRadius: {
         xs: "var(--radius-xs)",

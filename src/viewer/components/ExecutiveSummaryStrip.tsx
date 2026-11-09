@@ -77,12 +77,12 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
       >
         {/* Card 1: TARGET ENTITY */}
         <div className="flex flex-col justify-between px-4 py-3 min-w-0">
-          <div className="flex items-center justify-between text-text-muted text-[10px] font-mono tracking-wider">
+          <div className="flex items-center justify-between text-text-muted text-xs font-sans tracking-wider">
             <div className="flex items-center space-x-1.5 truncate">
-              <span className="font-sans font-semibold text-text-secondary text-[11px]">
+              <span className="font-sans font-semibold text-text-secondary text-xs">
                 Target Entity
               </span>
-              <span className="text-[9px] text-text-muted font-mono uppercase px-1 rounded-xs bg-ground border border-hairline">
+              <span className="text-xs text-text-muted font-sans uppercase px-1 rounded-xs bg-ground border border-hairline">
                 TARGET ENTITY
               </span>
             </div>
@@ -101,7 +101,7 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
               {report.request.targetFunctionName}
             </div>
             <div
-              className="font-mono text-[10px] text-text-muted truncate mt-0.5"
+              className="font-mono text-xs text-text-muted truncate mt-0.5"
               title={report.request.targetFilePath}
             >
               {report.request.targetFilePath}
@@ -111,12 +111,12 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
 
         {/* Card 2: STRUCTURAL MUTATIONS */}
         <div className="flex flex-col justify-between px-4 py-3 min-w-0">
-          <div className="flex items-center justify-between text-text-muted text-[10px] font-mono tracking-wider">
+          <div className="flex items-center justify-between text-text-muted text-xs font-sans tracking-wider">
             <div className="flex items-center space-x-1.5 truncate">
-              <span className="font-sans font-semibold text-text-secondary text-[11px]">
+              <span className="font-sans font-semibold text-text-secondary text-xs">
                 Code Changes
               </span>
-              <span className="text-[9px] text-text-muted font-mono uppercase px-1 rounded-xs bg-ground border border-hairline">
+              <span className="text-xs text-text-muted font-sans uppercase px-1 rounded-xs bg-ground border border-hairline">
                 STRUCTURAL MUTATIONS
               </span>
             </div>
@@ -129,23 +129,23 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
             <span className="font-mono text-xl font-semibold text-text-primary tabular-nums">
               {scCount}
             </span>
-            <div className="flex items-center space-x-1 font-mono text-[9px]">
+            <div className="flex items-center space-x-1 font-sans text-xs">
               {report.structuralChanges.some((s) => s.changeType === "ADDED") && (
-                <Badge variant="verdigris" dot className="px-1 py-0 text-[9px]">
+                <Badge variant="verdigris" dot className="px-1 py-0 text-xs">
                   <span className="sr-only">Added: </span>+ADD
                 </Badge>
               )}
               {report.structuralChanges.some(
                 (s) => s.changeType === "MODIFIED"
               ) && (
-                <Badge variant="terracotta" dot className="px-1 py-0 text-[9px]">
+                <Badge variant="terracotta" dot className="px-1 py-0 text-xs">
                   <span className="sr-only">Modified: </span>ΔMOD
                 </Badge>
               )}
               {report.structuralChanges.some(
                 (s) => s.changeType === "REMOVED"
               ) && (
-                <Badge variant="amber" dot className="px-1 py-0 text-[9px]">
+                <Badge variant="amber" dot className="px-1 py-0 text-xs">
                   <span className="sr-only">Removed: </span>-REM
                 </Badge>
               )}
@@ -155,12 +155,12 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
 
         {/* Card 3: COMPANION TEST FILES */}
         <div className="flex flex-col justify-between px-4 py-3 min-w-0">
-          <div className="flex items-center justify-between text-text-muted text-[10px] font-mono tracking-wider">
+          <div className="flex items-center justify-between text-text-muted text-xs font-sans tracking-wider">
             <div className="flex items-center space-x-1.5 truncate">
-              <span className="font-sans font-semibold text-text-secondary text-[11px]">
+              <span className="font-sans font-semibold text-text-secondary text-xs">
                 Related Tests
               </span>
-              <span className="text-[9px] text-text-muted font-mono uppercase px-1 rounded-xs bg-ground border border-hairline">
+              <span className="text-xs text-text-muted font-sans uppercase px-1 rounded-xs bg-ground border border-hairline">
                 COMPANION TEST FILES
               </span>
             </div>
@@ -173,7 +173,7 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
             <span className="font-mono text-xl font-semibold text-text-primary tabular-nums">
               {tcCount}
             </span>
-            <span className="font-mono text-[10px] text-text-muted tabular-nums">
+            <span className="font-mono text-xs text-text-muted tabular-nums">
               {assertionCount} assertions
             </span>
           </div>
@@ -181,12 +181,12 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
 
         {/* Card 4: CORRELATION LINKS */}
         <div className="flex flex-col justify-between px-4 py-3 min-w-0">
-          <div className="flex items-center justify-between text-text-muted text-[10px] font-mono tracking-wider">
+          <div className="flex items-center justify-between text-text-muted text-xs font-sans tracking-wider">
             <div className="flex items-center space-x-1.5 truncate">
-              <span className="font-sans font-semibold text-text-secondary text-[11px]">
+              <span className="font-sans font-semibold text-text-secondary text-xs">
                 Code–Test Links
               </span>
-              <span className="text-[9px] text-text-muted font-mono uppercase px-1 rounded-xs bg-ground border border-hairline">
+              <span className="text-xs text-text-muted font-sans uppercase px-1 rounded-xs bg-ground border border-hairline">
                 CORRELATION LINKS
               </span>
             </div>
@@ -199,7 +199,7 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
             <span className="font-mono text-xl font-semibold text-text-primary tabular-nums">
               {corrCount}
             </span>
-            <div className="flex items-center space-x-1.5 font-mono text-[9px]">
+            <div className="flex items-center space-x-1.5 font-sans text-xs">
               {strongCount > 0 && (
                 <span
                   className="font-semibold"
@@ -237,12 +237,12 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
 
         {/* Card 5: EPISTEMIC FINDINGS */}
         <div className="hidden lg:flex flex-col justify-between px-4 py-3 min-w-0">
-          <div className="flex items-center justify-between text-text-muted text-[10px] font-mono tracking-wider">
+          <div className="flex items-center justify-between text-text-muted text-xs font-sans tracking-wider">
             <div className="flex items-center space-x-1.5 truncate">
-              <span className="font-sans font-semibold text-text-secondary text-[11px]">
+              <span className="font-sans font-semibold text-text-secondary text-xs">
                 What We Know
               </span>
-              <span className="text-[9px] text-text-muted font-mono uppercase px-1 rounded-xs bg-ground border border-hairline">
+              <span className="text-xs text-text-muted font-sans uppercase px-1 rounded-xs bg-ground border border-hairline">
                 EPISTEMIC FINDINGS
               </span>
             </div>
@@ -263,7 +263,7 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
       </div>
 
       {/* Epistemic guardrail notice & Guide button */}
-      <div className="px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
+      <div className="px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-sans">
         <div className="flex items-center space-x-2 text-text-secondary min-w-0">
           <ShieldAlert
             size={13}
@@ -271,7 +271,7 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
             style={{ color: "var(--status-uncertain-fg)", flexShrink: 0 }}
           />
           <span
-            className="text-[11px] leading-normal font-body"
+            className="text-xs leading-normal font-body"
             style={{ color: "var(--text-secondary)" }}
           >
             <strong className="text-text-primary font-semibold">
@@ -305,7 +305,7 @@ export const ExecutiveSummaryStrip: React.FC<ExecutiveSummaryStripProps> = ({
           )}
 
           <span
-            className="hidden md:inline-block text-[9px] text-text-muted tracking-wider uppercase px-1.5 py-0.5 rounded-xs"
+            className="hidden md:inline-block text-xs text-text-muted tracking-wider uppercase px-1.5 py-0.5 rounded-xs"
             style={{
               background: "var(--surface-ground)",
               border: "1px solid var(--border-hairline)",

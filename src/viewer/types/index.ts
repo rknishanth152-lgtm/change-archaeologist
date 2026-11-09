@@ -38,15 +38,7 @@ export type {
 import type { AnalysisReport } from "../../core/domain/types.js";
 import type { ValidationIssue } from "../../core/domain/schemas.js";
 
-export type WorkspaceTab = "timeline" | "graph" | "structural" | "tests" | "correlations" | "findings";
-
-export type {
-  TimelineItemType,
-  TimelineFilter,
-  RevisionAnchor,
-  TimelineChangeItem,
-  TimelineModel,
-} from "./timeline.js";
+export type WorkspaceTab = "dig" | "code" | "findings";
 
 export type {
   GraphNodeCategory,

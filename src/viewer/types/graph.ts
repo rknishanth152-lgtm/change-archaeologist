@@ -9,6 +9,7 @@ import type {
   SourceSpan,
   CorrelationStatus,
   CorrelationClassification,
+  CorrelationItem,
   StructuralChange,
   TestChange,
   TestDeclarationChange,
@@ -101,6 +102,8 @@ export interface CorrelationGraphModel {
   readonly nodes: readonly CorrelationGraphNode[];
   readonly edges: readonly CorrelationGraphEdge[];
   readonly summary: GraphSummary;
+  /** Correlation items with no drawable edge, such as file-level or NONE links. */
+  readonly unattachedItems: readonly CorrelationItem[];
   readonly isIncomplete: boolean;
   readonly incompleteReason: string | null;
   readonly isEmpty: boolean;

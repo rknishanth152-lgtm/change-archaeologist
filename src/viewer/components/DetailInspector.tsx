@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { Code, GitCommit, Copy, Check, Info, FileCode2, Layers } from "lucide-react";
-import { GlyphEvidencePin } from "./icons/ArchaeologistGlyphs.js";
+import React, { useMemo, useState } from "react";
+import { Check, Copy, MousePointerClick } from "lucide-react";
 import type {
   AnalysisReport,
   StructuralChange,
@@ -9,14 +8,13 @@ import type {
   CorrelationItem,
 } from "../types/index.js";
 import { CodeComparison } from "./CodeComparison.js";
-import { formatSpanCoordinates } from "../utils/source-location.js";
 import {
   explainStructuralChange,
   explainTestChange,
   explainCorrelation,
   type PlainEnglishExplanation,
 } from "../utils/explanation-helpers.js";
-import { Badge } from "./ui/Badge.js";
+import { EVIDENCE_KIND_LABEL, formatLines } from "../utils/labels.js";
 import { TactileButton } from "./ui/TactileButton.js";
 
 interface DetailInspectorProps {
@@ -27,7 +25,41 @@ interface DetailInspectorProps {
   readonly associatedEvidence?: readonly EvidenceItem[];
   readonly selectedEvidenceId?: string | null;
   readonly onSelectEvidence?: (evidenceId: string) => void;
+  readonly prefersSideBySide?: boolean;
 }
+
+const SnippetPanel: React.FC<{
+  readonly label: string;
+  readonly code: string | null;
+  readonly absentText: string;
+  readonly tone: string;
+}> = ({ label, code, absentText, tone }) => {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="rounded-md border border-hairline overflow-hidden">
+      <div className="min-h-8 px-3 bg-surface-elevated flex items-center justify-between text-xs">
+        <span className={`font-medium ${tone}`}>{label}</span>
+        {code && (
+          <button
+            type="button"
+            onClick={() => {
+              navigator?.clipboard?.writeText(code).catch(() => {});
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            className="p-1 text-text-secondary hover:text-text-primary rounded-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            aria-label={`Copy: ${label}`}
+          >
+            {copied ? <Check size={12} className="text-status-strong" /> : <Copy size={12} />}
+          </button>
+        )}
+      </div>
+      <pre className="m-0 p-3 font-mono text-xs text-text-primary overflow-x-auto bg-surface-code leading-relaxed">
+        <code>{code ?? absentText}</code>
+      </pre>
+    </div>
+  );
+};
 
 export const DetailInspector: React.FC<DetailInspectorProps> = ({
   report,
@@ -37,308 +69,138 @@ export const DetailInspector: React.FC<DetailInspectorProps> = ({
   associatedEvidence = [],
   selectedEvidenceId = null,
   onSelectEvidence,
+  prefersSideBySide = false,
 }) => {
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"monaco" | "compact">("monaco");
+  const [viewMode, setViewMode] = useState<"diff" | "text">("diff");
 
-  const handleCopy = (text: string, key: string) => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).catch(() => {});
-    }
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
-  };
+  const selectedEvidence = useMemo(
+    () => associatedEvidence.find((item) => item.id === selectedEvidenceId) ?? null,
+    [selectedEvidenceId, associatedEvidence]
+  );
 
-  const selectedEvidence = useMemo(() => {
-    if (!selectedEvidenceId) return null;
-    return associatedEvidence.find((e) => e.id === selectedEvidenceId) ?? null;
-  }, [selectedEvidenceId, associatedEvidence]);
-
-  const handleEvidenceClick = (evId: string) => {
-    if (onSelectEvidence) {
-      onSelectEvidence(evId);
-    }
-  };
-
-  // Derive plain-English explanation grounded in report data
-  const plainExplanation = useMemo<PlainEnglishExplanation | null>(() => {
-    const targetName = report.request.targetFunctionName;
-    if (selectedCorrelation) {
-      return explainCorrelation(selectedCorrelation, targetName);
-    }
-    if (selectedChange) {
-      return explainStructuralChange(selectedChange, targetName);
-    }
-    if (selectedTestChange) {
-      return explainTestChange(selectedTestChange, targetName);
-    }
+  const explanation = useMemo<PlainEnglishExplanation | null>(() => {
+    const target = report.request.targetFunctionName;
+    if (selectedCorrelation) return explainCorrelation(selectedCorrelation, target);
+    if (selectedChange) return explainStructuralChange(selectedChange, target);
+    if (selectedTestChange) return explainTestChange(selectedTestChange, target);
     return null;
   }, [selectedCorrelation, selectedChange, selectedTestChange, report.request.targetFunctionName]);
 
   if (!selectedChange && !selectedCorrelation && !selectedTestChange && associatedEvidence.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8 text-center text-text-muted bg-panel border-l border-hairline">
-        <Code size={32} strokeWidth={1.5} className="mb-3 text-text-muted opacity-50" />
-        <div className="font-display font-medium text-sm text-text-secondary">
-          Inspector Standby
-        </div>
-        <div className="font-mono text-xs max-w-xs mt-1 text-text-muted leading-relaxed">
-          Select any structural mutation, companion test, or correlation link from the workspace to inspect Monaco code comparison and epistemic evidence anchors.
-        </div>
+      <div className="flex flex-col items-center justify-center h-full p-8 text-center text-text-secondary">
+        <MousePointerClick size={28} strokeWidth={1.5} className="mb-3" aria-hidden="true" />
+        <p className="m-0 text-sm">Select a change, test or link to see its details and code here.</p>
       </div>
     );
   }
 
-  const headerTitle = selectedChange
-    ? `EVIDENCE: ${selectedChange.id}`
-    : selectedCorrelation
-    ? `CORRELATION: ${selectedCorrelation.id}`
-    : selectedTestChange
-    ? `TEST CHANGE: ${selectedTestChange.id}`
-    : `EVIDENCE: ${selectedEvidenceId ?? "INSPECTION"}`;
-
-  const headerCategory = selectedChange
-    ? selectedChange.category
-    : selectedCorrelation
-    ? selectedCorrelation.classification
-    : selectedTestChange
-    ? (selectedTestChange.mentionsTargetFunction || selectedTestChange.assertionChanges.some((a) => a.callsTargetFunctionInBlock))
-      ? "CALLS TARGET"
-      : "TEST FILE"
-    : "INSPECTION";
+  const heading = explanation?.plainTitle ?? "Evidence";
+  const tag = selectedCorrelation?.id ?? selectedChange?.id ?? selectedTestChange?.id ?? selectedEvidenceId ?? "";
 
   return (
-    <div className="flex flex-col h-full bg-panel border-l border-hairline overflow-y-auto">
-      {/* Inspector Header */}
-      <div className="h-10 border-b border-hairline px-4 bg-surface-elevated flex items-center justify-between font-mono text-xs select-none shrink-0">
-        <div className="flex items-center space-x-2 truncate">
-          <span className="font-semibold text-text-primary truncate">
-            {headerTitle}
-          </span>
-          <Badge variant="sandstone" className="shrink-0 uppercase">
-            {headerCategory}
-          </Badge>
+    <div className="flex flex-col h-full overflow-y-auto overscroll-contain">
+      <div className="min-h-12 px-4 py-2 border-b border-hairline flex items-center justify-between gap-3 shrink-0">
+        <div className="flex items-baseline gap-2 min-w-0">
+          <h2 className="m-0 text-sm font-semibold text-text-primary truncate">{heading}</h2>
+          <span className="font-mono text-xs text-text-secondary shrink-0">{tag}</span>
         </div>
-
-        {/* View Mode Switcher */}
-        <div className="flex items-center space-x-1 shrink-0 ml-2">
-          <TactileButton
-            variant="outline"
-            size="xs"
-            onClick={() => setViewMode(viewMode === "monaco" ? "compact" : "monaco")}
-            aria-label={viewMode === "monaco" ? "Switch to Text View" : "Switch to Monaco Diff"}
-          >
-            {viewMode === "monaco" ? "Switch to Text View" : "Switch to Monaco Diff"}
-          </TactileButton>
-        </div>
+        <TactileButton
+          variant="outline"
+          size="xs"
+          className="shrink-0"
+          onClick={() => setViewMode(viewMode === "diff" ? "text" : "diff")}
+        >
+          {viewMode === "diff" ? "Show as text" : "Show diff"}
+        </TactileButton>
       </div>
 
-      <div className="p-3 space-y-3.5">
-        {/* Plain-English Meaning & Epistemic Boundaries Card */}
-        {plainExplanation && (
-          <div
-            role="region"
-            aria-label="Plain-English Explanation"
-            className="rounded-md border border-hairline p-3 bg-ground space-y-2.5 font-mono text-xs"
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-hairline">
-              <div className="flex items-center space-x-2">
-                <Info size={13} className="text-text-accent shrink-0" />
-                <span className="font-sans font-semibold text-xs text-text-primary">
-                  {plainExplanation.plainTitle}
-                </span>
+      <div className="p-4 space-y-4">
+        {explanation && (
+          <div role="region" aria-label="What this means" className="space-y-3">
+            <p className="m-0 text-sm leading-relaxed text-text-secondary">{explanation.whatChanged}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div className="min-w-0 space-y-1">
+                <h3 className="m-0 text-xs font-semibold text-text-primary">What this shows</h3>
+                <p className="m-0 leading-relaxed text-text-secondary">{explanation.establishes}</p>
               </div>
-              {plainExplanation.technicalBadge && (
-                <Badge variant="terracotta" className="shrink-0 font-mono">
-                  {plainExplanation.technicalBadge}
-                </Badge>
-              )}
-            </div>
-
-            {/* What changed / was detected */}
-            <div className="font-body text-xs text-text-secondary leading-relaxed">
-              <strong className="text-text-primary">Detected: </strong>
-              {plainExplanation.whatChanged}
-            </div>
-
-            {/* Grounded Evidence Summary */}
-            <div className="text-[11px] text-text-muted flex items-center space-x-1.5 pt-0.5">
-              <span className="text-text-accent font-bold">§</span>
-              <span>{plainExplanation.evidenceSummary}</span>
-            </div>
-
-            {/* Epistemic boundaries: Establishes vs Does NOT Establish */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-hairline text-[11px]">
-              <div className="p-2 rounded-xs bg-surface-elevated border border-hairline text-text-secondary space-y-1">
-                <div className="flex items-center space-x-1 font-semibold text-status-strong text-[10px] uppercase">
-                  <Check size={11} strokeWidth={2} />
-                  <span>Establishes</span>
-                </div>
-                <p className="font-body text-[11px] leading-tight text-text-secondary">
-                  {plainExplanation.establishes}
-                </p>
-              </div>
-
-              <div className="p-2 rounded-xs bg-surface-elevated border border-hairline text-text-secondary space-y-1">
-                <div className="flex items-center space-x-1 font-semibold text-status-removed text-[10px] uppercase">
-                  <span>✕</span>
-                  <span>Does NOT Establish</span>
-                </div>
-                <p className="font-body text-[11px] leading-tight text-text-muted">
-                  {plainExplanation.doesNotEstablish}
-                </p>
+              <div className="min-w-0 space-y-1">
+                <h3 className="m-0 text-xs font-semibold text-text-primary">What this doesn't show</h3>
+                <p className="m-0 leading-relaxed text-text-secondary">{explanation.doesNotEstablish}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Main Monaco Code Comparison View */}
-        {viewMode === "monaco" ? (
-          <div className="h-[420px] min-h-[380px] border border-hairline rounded-md overflow-hidden bg-ground">
+        {viewMode === "diff" ? (
+          <div className={`min-h-[320px] border border-hairline rounded-md overflow-hidden ${prefersSideBySide ? "h-[min(56vh,560px)]" : "h-[380px]"}`}>
             <CodeComparison
               report={report}
               selectedChange={selectedChange}
               selectedEvidence={selectedEvidence}
               evidenceList={associatedEvidence}
-              onSelectEvidence={handleEvidenceClick}
+              onSelectEvidence={(id) => onSelectEvidence?.(id)}
+              prefersSideBySide={prefersSideBySide}
             />
           </div>
         ) : (
-          /* Compact Snippets Fallback View */
           selectedChange && (
-            <div className="space-y-3 font-mono text-xs">
-              {/* Before Snippet */}
-              <div className="rounded-md border border-hairline overflow-hidden bg-ground">
-                <div className="h-7 px-3 bg-surface-elevated border-b border-hairline flex items-center justify-between text-[11px] text-text-muted">
-                  <span className="flex items-center space-x-1.5 text-status-removed font-medium">
-                    <span>[-] BASE Revision ({report.baseCommit.shortSha})</span>
-                    {selectedChange.beforeSpan && (
-                      <span className="text-text-muted">
-                        {formatSpanCoordinates(selectedChange.beforeSpan)}
-                      </span>
-                    )}
-                  </span>
-                  {selectedChange.beforeSnippet && (
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(selectedChange.beforeSnippet!, "before")}
-                      className="p-1 hover:text-text-primary text-text-muted rounded-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus transition-colors cursor-pointer"
-                      title="Copy BASE snippet"
-                      aria-label="Copy BASE snippet to clipboard"
-                    >
-                      {copiedKey === "before" ? <Check size={12} className="text-status-strong" /> : <Copy size={12} />}
-                    </button>
-                  )}
-                </div>
-                <pre className="p-3 text-[11px] text-text-primary overflow-x-auto bg-surface-code leading-relaxed">
-                  <code>{selectedChange.beforeSnippet ?? "// (absent or not applicable)"}</code>
-                </pre>
-              </div>
-
-              {/* After Snippet */}
-              <div className="rounded-md border border-hairline overflow-hidden bg-ground">
-                <div className="h-7 px-3 bg-surface-elevated border-b border-hairline flex items-center justify-between text-[11px] text-text-muted">
-                  <span className="flex items-center space-x-1.5 text-status-added font-medium">
-                    <span>[+] HEAD Revision ({report.headCommit.shortSha})</span>
-                    {selectedChange.afterSpan && (
-                      <span className="text-text-muted">
-                        {formatSpanCoordinates(selectedChange.afterSpan)}
-                      </span>
-                    )}
-                  </span>
-                  {selectedChange.afterSnippet && (
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(selectedChange.afterSnippet!, "after")}
-                      className="p-1 hover:text-text-primary text-text-muted rounded-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus transition-colors cursor-pointer"
-                      title="Copy HEAD snippet"
-                      aria-label="Copy HEAD snippet to clipboard"
-                    >
-                      {copiedKey === "after" ? <Check size={12} className="text-status-strong" /> : <Copy size={12} />}
-                    </button>
-                  )}
-                </div>
-                <pre className="p-3 text-[11px] text-text-primary overflow-x-auto bg-surface-code leading-relaxed">
-                  <code>{selectedChange.afterSnippet ?? "// (removed or not applicable)"}</code>
-                </pre>
-              </div>
+            <div className="space-y-3">
+              <SnippetPanel
+                label={`Before (${report.baseCommit.shortSha})`}
+                code={selectedChange.beforeSnippet}
+                absentText="Not present in this version"
+                tone="text-status-removed"
+              />
+              <SnippetPanel
+                label={`After (${report.headCommit.shortSha})`}
+                code={selectedChange.afterSnippet}
+                absentText="Not present in this version"
+                tone="text-status-added"
+              />
             </div>
           )
         )}
 
-        {/* Associated Traceable Evidence Anchors */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs font-mono text-text-muted">
-            <span className="font-semibold text-text-secondary">TRACEABLE EVIDENCE ANCHORS</span>
-            <span className="text-[10px] tabular-nums">{associatedEvidence.length} items</span>
-          </div>
+        <section aria-label="Evidence" className="space-y-2">
+          <h3 className="m-0 text-sm font-semibold text-text-primary">
+            Evidence <span className="font-normal text-text-secondary tabular-nums">{associatedEvidence.length}</span>
+          </h3>
 
           {associatedEvidence.length === 0 ? (
-            <div className="p-3 rounded-sm bg-ground border border-hairline text-xs font-mono text-text-muted">
-              No directly linked evidence records in report pool.
-            </div>
+            <p className="m-0 text-sm text-text-secondary">No evidence is linked to this item.</p>
           ) : (
-            associatedEvidence.map((ev) => {
-              const isSelected = selectedEvidenceId === ev.id;
-
+            associatedEvidence.map((item) => {
+              const isSelected = selectedEvidenceId === item.id;
               return (
-                <div
-                  key={ev.id}
-                  onClick={() => handleEvidenceClick(ev.id)}
-                  role="button"
-                  tabIndex={0}
-                  aria-selected={isSelected}
-                  aria-label={`Evidence anchor ${ev.id}: ${ev.description}`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleEvidenceClick(ev.id);
-                    }
-                  }}
-                  className={`p-2.5 rounded-sm bg-ground border text-xs font-mono space-y-1.5 cursor-pointer transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus ${
-                    isSelected
-                      ? "border-border-focus bg-surface-elevated ring-1 ring-border-focus"
-                      : "border-hairline hover:border-border-interactive hover:bg-surface-hover"
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onSelectEvidence?.(item.id)}
+                  aria-pressed={isSelected}
+                  className={`w-full p-3 rounded-md border text-left space-y-1.5 transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                    isSelected ? "border-border-focus bg-surface-elevated" : "border-hairline hover:bg-surface-hover"
                   }`}
                 >
-                  <div className="flex items-center justify-between text-[11px]">
-                    <div className="flex items-center space-x-1.5">
-                      <GlyphEvidencePin size={11} className="text-text-accent shrink-0" />
-                      <span className="font-semibold text-text-primary">{ev.id}</span>
-                      {isSelected && (
-                        <span className="text-[9px] font-semibold text-text-accent px-1 rounded-xs bg-surface-elevated border border-border-interactive">
-                          ACTIVE ANCHOR
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] text-text-muted px-1.5 py-0.2 rounded-xs bg-surface-elevated">
-                      {ev.kind}
-                    </span>
-                  </div>
-
-                  <div className="text-[11px] text-text-secondary leading-normal">
-                    {ev.description}
-                  </div>
-
-                  <div className="flex items-center space-x-2 text-[10px] text-text-muted pt-1 border-t border-hairline">
-                    <span className="truncate max-w-[200px]">{ev.posixFilePath}</span>
-                    {ev.span && (
-                      <span className="text-text-secondary font-mono">
-                        ({formatSpanCoordinates(ev.span)})
-                      </span>
-                    )}
-                  </div>
-
-                  {ev.codeSnippet && (
-                    <pre className="p-2 text-[10px] text-text-primary bg-surface-code border border-hairline rounded-xs overflow-x-auto">
-                      <code>{ev.codeSnippet}</code>
-                    </pre>
+                  <span className="flex items-center justify-between gap-2 text-xs">
+                    <span className="font-semibold text-text-primary">{EVIDENCE_KIND_LABEL[item.kind]}</span>
+                    <span className="font-mono text-text-secondary">{item.id}</span>
+                  </span>
+                  <span className="block text-sm text-text-secondary">{item.description}</span>
+                  <span className="block font-mono text-xs text-text-secondary break-all">
+                    {item.posixFilePath}
+                    {formatLines(item.span) ? ` · ${formatLines(item.span)}` : ""}
+                  </span>
+                  {item.codeSnippet && (
+                    <code className="block p-2 font-mono text-xs text-text-primary bg-surface-code rounded-xs overflow-x-auto whitespace-pre">
+                      {item.codeSnippet}
+                    </code>
                   )}
-                </div>
+                </button>
               );
             })
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

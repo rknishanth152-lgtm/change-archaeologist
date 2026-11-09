@@ -34,9 +34,11 @@ import type {
   CorrelationGraphModel,
   CorrelationGraphNode,
   CorrelationGraphEdge,
+  CorrelationItem,
 } from "../../types/index.js";
 import { formatSpanCoordinates } from "../../utils/source-location.js";
 import { Badge } from "../ui/Badge.js";
+import { humanizeEnum } from "../../utils/labels.js";
 
 interface GraphAccessibleViewProps {
   readonly model: CorrelationGraphModel;
@@ -45,6 +47,7 @@ interface GraphAccessibleViewProps {
   readonly searchQuery?: string;
   readonly onSelectNode: (node: CorrelationGraphNode) => void;
   readonly onSelectEdge: (edge: CorrelationGraphEdge) => void;
+  readonly onSelectUnattached?: (item: CorrelationItem) => void;
   readonly onSelectEvidence?: (evidenceId: string) => void;
 }
 
@@ -64,29 +67,29 @@ function renderChangeBadge(changeType?: string) {
   const upper = changeType.toUpperCase();
   if (upper === "ADDED" || upper === "ADD") {
     return (
-      <Badge variant="verdigris" className="text-[9px] px-1.5 py-0 font-semibold inline-flex items-center gap-1">
+      <Badge variant="verdigris" className="text-xs px-1.5 py-0 font-semibold inline-flex items-center gap-1">
         <GlyphDeltaAdded size={10} className="shrink-0" />
-        <span>[+] ADD</span>
+        <span>Added</span>
       </Badge>
     );
   }
   if (upper === "MODIFIED" || upper === "MOD") {
     return (
-      <Badge variant="terracotta" className="text-[9px] px-1.5 py-0 font-semibold inline-flex items-center gap-1">
+      <Badge variant="terracotta" className="text-xs px-1.5 py-0 font-semibold inline-flex items-center gap-1">
         <GlyphDeltaModified size={10} className="shrink-0" />
-        <span>[Δ] MOD</span>
+        <span>Changed</span>
       </Badge>
     );
   }
   if (upper === "REMOVED" || upper === "DELETED" || upper === "REM") {
     return (
-      <Badge variant="amber" className="text-[9px] px-1.5 py-0 font-semibold inline-flex items-center gap-1">
+      <Badge variant="amber" className="text-xs px-1.5 py-0 font-semibold inline-flex items-center gap-1">
         <GlyphDeltaRemoved size={10} className="shrink-0" />
-        <span>[-] REM</span>
+        <span>Removed</span>
       </Badge>
     );
   }
-  return <Badge variant="outline" className="text-[9px] px-1.5 py-0">{changeType}</Badge>;
+  return <Badge variant="outline" className="text-xs px-1.5 py-0">{changeType}</Badge>;
 }
 
 export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
@@ -96,6 +99,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
   searchQuery = "",
   onSelectNode,
   onSelectEdge,
+  onSelectUnattached,
   onSelectEvidence,
 }) => {
   const query = searchQuery.trim().toLowerCase();
@@ -137,18 +141,24 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
     );
   });
 
+  const unattachedItems = model.unattachedItems.filter((item) => {
+    if (!query) return true;
+    return [item.structuralChangeId, item.testChangeId, item.posixTestFilePath, item.status, item.rationale].some(
+      (value) => value?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div
       role="region"
       aria-label="Accessible Linear Graph Table View"
-      className="p-4 space-y-6 max-w-5xl mx-auto font-mono text-xs text-text-primary"
+      className="p-4 space-y-6 max-w-5xl mx-auto text-sm text-text-primary"
     >
       {/* Epistemic Humility Banner */}
       <div className="rounded-md border border-hairline bg-panel p-3 flex items-center space-x-2.5 text-text-muted">
         <Info size={14} className="text-status-uncertain shrink-0" />
         <span>
-          <strong className="text-text-secondary font-semibold">Accessible Linear Representation:</strong>{" "}
-          Presents all graph nodes, containment relationships, and analytical correlations in a keyboard-navigable linear format.
+          Everything in The Dig as a list, for keyboards and screen readers.
         </span>
       </div>
 
@@ -156,7 +166,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
       <div className="space-y-2">
         <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
           <GlyphMark size={14} className="text-text-accent" />
-          <span>1. Production Function & Structural Mutations ({productionNodes.length})</span>
+          <span>Code ({productionNodes.length})</span>
         </div>
 
         <div role="list" aria-label="Production nodes" className="space-y-2">
@@ -176,9 +186,9 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                     onSelectNode(node);
                   }
                 }}
-                className={`p-3 rounded-md border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                className={`p-3 rounded-md border transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
                   isSelected
-                    ? "bg-surface-elevated border-text-accent shadow-xs"
+                    ? "bg-surface-elevated border-text-accent"
                     : "bg-panel border-hairline hover:border-border-interactive"
                 }`}
               >
@@ -189,23 +199,20 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                     ) : (
                       getCategoryGlyph(node.data.subtitle)
                     )}
-                    <span className="font-semibold text-text-primary">{node.data.title}</span>
-                    <span className="text-[10px] text-text-muted uppercase px-1.5 py-0.2 rounded-xs bg-ground border border-hairline">
-                      {node.data.category}
-                    </span>
+                    <span className="font-mono font-semibold text-text-primary">{node.data.title}</span>
                     {renderChangeBadge(node.data.changeType)}
                   </div>
-                  {spanStr && <span className="text-[10px] text-text-muted">{spanStr}</span>}
+                  {spanStr && <span className="font-mono text-xs text-text-secondary">{spanStr}</span>}
                 </div>
 
-                <div className="text-[11px] text-text-secondary mt-1">{node.data.subtitle}</div>
-                <div className="text-[10px] text-text-muted mt-0.5">{node.data.filePath}</div>
+                <div className="text-xs text-text-secondary mt-1">{node.data.category === "STRUCTURAL_CHANGE" ? humanizeEnum(node.data.subtitle) : node.data.subtitle}</div>
+                <div className="font-mono text-xs text-text-secondary mt-0.5 break-all">{node.data.filePath}</div>
 
                 {node.data.evidenceIds.length > 0 && (
                   <div className="mt-2 pt-1.5 border-t border-hairline flex items-center space-x-1.5">
-                    <span className="text-[10px] text-text-muted inline-flex items-center gap-1">
+                    <span className="text-xs text-text-muted inline-flex items-center gap-1">
                       <GlyphEvidencePin size={10} className="text-text-accent" />
-                      <span>Evidence:</span>
+                      <span>Evidence</span>
                     </span>
                     {node.data.evidenceIds.map((evId) => (
                       <button
@@ -216,8 +223,8 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                           if (onSelectEvidence) onSelectEvidence(evId);
                           onSelectNode(node);
                         }}
-                        className="px-1.5 py-0.2 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-[10px] cursor-pointer"
-                        title="Inspect evidence in Monaco diff"
+                        className="px-1.5 py-0.5 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-xs cursor-pointer"
+                        title="Show this evidence"
                       >
                         {evId}
                       </button>
@@ -234,12 +241,12 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
       <div className="space-y-2">
         <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
           <FileCheck size={14} className="text-status-strong" />
-          <span>2. Companion Test Files & Changes ({testNodes.length})</span>
+          <span>Tests ({testNodes.length})</span>
         </div>
 
         {testNodes.length === 0 ? (
           <div className="p-4 rounded-md border border-hairline bg-panel text-text-muted text-xs">
-            No companion test files or test assertion changes recorded in this report.
+            No test changes in this report. That does not mean the code is untested.
           </div>
         ) : (
           <div role="list" aria-label="Test nodes" className="space-y-2">
@@ -259,9 +266,9 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                       onSelectNode(node);
                     }
                   }}
-                  className={`p-3 rounded-md border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                  className={`p-3 rounded-md border transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
                     isSelected
-                      ? "bg-surface-elevated border-status-strong shadow-xs"
+                      ? "bg-surface-elevated border-status-strong"
                       : "bg-panel border-hairline hover:border-border-interactive"
                   }`}
                 >
@@ -274,23 +281,20 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                       ) : (
                         <Tag size={13} className="text-status-weak" />
                       )}
-                      <span className="font-semibold text-text-primary">{node.data.title}</span>
-                      <span className="text-[10px] text-text-muted uppercase px-1.5 py-0.2 rounded-xs bg-ground border border-hairline">
-                        {node.data.category}
-                      </span>
+                      <span className="font-mono font-semibold text-text-primary">{node.data.title}</span>
                       {renderChangeBadge(node.data.changeType)}
                     </div>
-                    {spanStr && <span className="text-[10px] text-text-muted">{spanStr}</span>}
+                    {spanStr && <span className="text-xs text-text-muted">{spanStr}</span>}
                   </div>
 
-                  <div className="text-[11px] text-text-secondary mt-1">{node.data.subtitle}</div>
-                  <div className="text-[10px] text-text-muted mt-0.5">{node.data.filePath}</div>
+                  <div className="text-xs text-text-secondary mt-1">{node.data.category === "STRUCTURAL_CHANGE" ? humanizeEnum(node.data.subtitle) : node.data.subtitle}</div>
+                  <div className="font-mono text-xs text-text-secondary mt-0.5 break-all">{node.data.filePath}</div>
 
                   {node.data.evidenceIds.length > 0 && (
                     <div className="mt-2 pt-1.5 border-t border-hairline flex items-center space-x-1.5">
-                      <span className="text-[10px] text-text-muted inline-flex items-center gap-1">
+                      <span className="text-xs text-text-muted inline-flex items-center gap-1">
                         <GlyphEvidencePin size={10} className="text-text-accent" />
-                        <span>Evidence:</span>
+                        <span>Evidence</span>
                       </span>
                       {node.data.evidenceIds.map((evId) => (
                         <button
@@ -301,8 +305,8 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                             if (onSelectEvidence) onSelectEvidence(evId);
                             onSelectNode(node);
                           }}
-                          className="px-1.5 py-0.2 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-[10px] cursor-pointer"
-                          title="Inspect evidence in Monaco diff"
+                          className="px-1.5 py-0.5 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-xs cursor-pointer"
+                          title="Show this evidence"
                         >
                           {evId}
                         </button>
@@ -320,12 +324,12 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
       <div className="space-y-2">
         <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
           <Network size={14} className="text-text-accent" />
-          <span>3. Analytical Correlation Links ({correlationEdges.length})</span>
+          <span>Links ({correlationEdges.length + unattachedItems.length})</span>
         </div>
 
-        {correlationEdges.length === 0 ? (
+        {correlationEdges.length + unattachedItems.length === 0 ? (
           <div className="p-4 rounded-md border border-hairline bg-panel text-text-muted text-xs">
-            No cross-side correlation edges established between production mutations and companion tests.
+            No links between code changes and test changes were recorded.
           </div>
         ) : (
           <div role="list" aria-label="Correlation edges" className="space-y-2">
@@ -344,19 +348,19 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                       onSelectEdge(edge);
                     }
                   }}
-                  className={`p-3 rounded-md border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                  className={`p-3 rounded-md border transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
                     isSelected
-                      ? "bg-surface-elevated border-text-accent shadow-xs"
+                      ? "bg-surface-elevated border-text-accent"
                       : "bg-panel border-hairline hover:border-border-interactive"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <span className="font-semibold text-text-primary">
+                      <span className="font-mono font-semibold text-text-primary">
                         {edge.data.sourceEntityId} → {edge.data.targetEntityId}
                       </span>
                       <span
-                        className={`px-1.5 py-0.2 rounded-xs text-[10px] font-semibold border inline-flex items-center gap-1 ${
+                        className={`px-1.5 py-0.5 rounded-xs text-xs font-semibold border inline-flex items-center gap-1 ${
                           edge.data.status === "STRONG"
                             ? "text-status-strong bg-status-strong-bg border-status-strong-border"
                             : edge.data.status === "WEAK"
@@ -370,25 +374,22 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                         {edge.data.status === "WEAK" && <GlyphCorrWeak size={11} />}
                         {edge.data.status === "UNCERTAIN" && <GlyphCorrUncertain size={11} />}
                         {edge.data.status === "NONE" && <GlyphCorrNone size={11} />}
-                        <span>{edge.data.status} CORRELATION</span>
+                        <span>{edge.data.status}</span>
                       </span>
                     </div>
-                    <span className="text-[10px] text-text-muted uppercase">
-                      [{edge.data.classification ?? "ANALYTICAL_LINK"}]
-                    </span>
                   </div>
 
                   {edge.data.rationale && (
-                    <div className="text-[11px] text-text-secondary mt-1.5 leading-relaxed">
+                    <div className="text-xs text-text-secondary mt-1.5 leading-relaxed">
                       {edge.data.rationale}
                     </div>
                   )}
 
                   {edge.data.evidenceIds.length > 0 && (
                     <div className="mt-2 pt-1.5 border-t border-hairline flex items-center space-x-1.5">
-                      <span className="text-[10px] text-text-muted inline-flex items-center gap-1">
+                      <span className="text-xs text-text-muted inline-flex items-center gap-1">
                         <GlyphEvidencePin size={10} className="text-text-accent" />
-                        <span>Evidence:</span>
+                        <span>Evidence</span>
                       </span>
                       {edge.data.evidenceIds.map((evId) => (
                         <button
@@ -399,8 +400,8 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                             if (onSelectEvidence) onSelectEvidence(evId);
                             onSelectEdge(edge);
                           }}
-                          className="px-1.5 py-0.2 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-[10px] cursor-pointer"
-                          title="Inspect evidence in Monaco diff"
+                          className="px-1.5 py-0.5 rounded-xs bg-ground text-text-accent border border-hairline hover:border-border-interactive text-xs cursor-pointer"
+                          title="Show this evidence"
                         >
                           {evId}
                         </button>
@@ -410,6 +411,34 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
                 </div>
               );
             })}
+
+            {unattachedItems.map((item) => (
+              <div
+                key={item.id}
+                role="listitem"
+                tabIndex={0}
+                onClick={() => onSelectUnattached?.(item)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelectUnattached?.(item);
+                  }
+                }}
+                className={`p-3 rounded-md border transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                  selectedEdgeId === `edge-corr-${item.id}`
+                    ? "bg-surface-elevated border-text-accent"
+                    : "bg-panel border-hairline hover:border-border-interactive"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-semibold text-text-primary">
+                    {item.structuralChangeId || "No code change"} → {item.testChangeId ?? item.posixTestFilePath ?? "No test file"}
+                  </span>
+                  <span className="font-semibold">{item.status}</span>
+                </div>
+                <div className="text-[12px] text-text-secondary mt-1.5 leading-relaxed">{item.rationale}</div>
+              </div>
+            ))}
           </div>
         )}
       </div>

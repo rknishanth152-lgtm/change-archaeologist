@@ -43,7 +43,7 @@ describe("Retrieved & Adapted UI Components", () => {
       render(<Badge>Test Badge</Badge>);
       const badge = screen.getByText("Test Badge");
       expect(badge).toBeInTheDocument();
-      expect(badge.className).toContain("font-mono");
+      expect(badge.className).toContain("font-sans");
     });
 
     it("renders semantic variants: terracotta, verdigris, amber", () => {

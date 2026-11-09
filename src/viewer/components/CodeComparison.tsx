@@ -12,12 +12,43 @@ import {
 } from "../utils/source-location.js";
 import { CodeComparisonToolbar, type DiffRenderMode } from "./CodeComparisonToolbar.js";
 import { EditorUnavailableState, type UnavailableReason } from "./EditorUnavailableState.js";
+import { useTheme } from "../utils/theme.js";
 
 // Ensure Monaco runs completely local-first without external CDN network requests
 loader.config({ monaco });
 
-// Register custom Evidence Atlas theme matching DESIGN.md
-export const THEME_NAME = "change-archaeologist-atlas";
+// Editor themes matching the light and dark tokens in styles/tokens.css
+export const THEME_NAME = "change-archaeologist-light";
+export const THEME_NAME_DARK = "change-archaeologist-dark";
+
+const EDITOR_PALETTES = {
+  [THEME_NAME]: {
+    base: "vs",
+    code: "#FBFCFA",
+    line: "#EFF2EF",
+    ink: "#15201F",
+    secondary: "#3D4B48",
+    muted: "#4F5D5A",
+    keyword: "#0B6B62",
+    number: "#744B00",
+    type: "#5A41A6",
+    added: "#136639",
+    removed: "#A02019",
+  },
+  [THEME_NAME_DARK]: {
+    base: "vs-dark",
+    code: "#151C1E",
+    line: "#1A2225",
+    ink: "#E9EFEC",
+    secondary: "#BAC6C2",
+    muted: "#A1AFAB",
+    keyword: "#5CCFBE",
+    number: "#E6B84C",
+    type: "#B3A6F4",
+    added: "#68D596",
+    removed: "#F58D84",
+  },
+} as const;
 
 let themeRegistered = false;
 export function registerEditorTheme(monacoInstance: typeof monaco): void {
@@ -36,45 +67,38 @@ export function registerEditorTheme(monacoInstance: typeof monaco): void {
       })) as any;
     }
 
-    monacoInstance.editor.defineTheme(THEME_NAME, {
-      base: "vs",
-      inherit: true,
-      rules: [
-        { token: "", background: "F9F4EC", foreground: "1C1409" },
-        { token: "comment", foreground: "8A7560", fontStyle: "italic" },
-        { token: "keyword", foreground: "C4521A", fontStyle: "bold" },
-        { token: "string", foreground: "2E7D32" },
-        { token: "number", foreground: "E65100" },
-        { token: "type", foreground: "5C3D99" },
-        { token: "identifier", foreground: "1C1409" },
-        { token: "delimiter", foreground: "4A3728" },
-      ],
-      colors: {
-        "editor.background": "#F9F4EC",
-        "editor.foreground": "#1C1409",
-        "editorLineNumber.foreground": "#8A7560",
-        "editorLineNumber.activeForeground": "#1C1409",
-        "editorGutter.background": "#F9F4EC",
-        "editor.lineHighlightBackground": "#EDE8DF",
-        "editor.selectionBackground": "rgba(196, 82, 26, 0.18)",
-        "diffEditor.insertedTextBackground": "rgba(46, 125, 50, 0.16)",
-        "diffEditor.removedTextBackground": "rgba(183, 28, 28, 0.16)",
-        "diffEditor.insertedLineBackground": "rgba(46, 125, 50, 0.08)",
-        "diffEditor.removedLineBackground": "rgba(183, 28, 28, 0.08)",
-        "diffEditor.diagonalFill": "rgba(90, 70, 50, 0.06)",
-        "editorOverviewRuler.border": "rgba(90, 70, 50, 0.15)",
-      },
-    });
-    // Also define legacy theme alias for safety
-    monacoInstance.editor.defineTheme("change-archaeologist-dark", {
-      base: "vs",
-      inherit: true,
-      rules: [],
-      colors: {
-        "editor.background": "#F9F4EC",
-        "editor.foreground": "#1C1409",
-      },
-    });
+    // Monaco parses theme colors as hex only; anything else renders as solid red.
+    for (const [name, palette] of Object.entries(EDITOR_PALETTES)) {
+      monacoInstance.editor.defineTheme(name, {
+        base: palette.base,
+        inherit: true,
+        rules: [
+          { token: "", background: palette.code.slice(1), foreground: palette.ink.slice(1) },
+          { token: "comment", foreground: palette.muted.slice(1), fontStyle: "italic" },
+          { token: "keyword", foreground: palette.keyword.slice(1) },
+          { token: "string", foreground: palette.added.slice(1) },
+          { token: "number", foreground: palette.number.slice(1) },
+          { token: "type", foreground: palette.type.slice(1) },
+          { token: "identifier", foreground: palette.ink.slice(1) },
+          { token: "delimiter", foreground: palette.secondary.slice(1) },
+        ],
+        colors: {
+          "editor.background": palette.code,
+          "editor.foreground": palette.ink,
+          "editorLineNumber.foreground": palette.muted,
+          "editorLineNumber.activeForeground": palette.ink,
+          "editorGutter.background": palette.code,
+          "editor.lineHighlightBackground": palette.line,
+          "editor.selectionBackground": `${palette.keyword}38`,
+          "diffEditor.insertedTextBackground": `${palette.added}38`,
+          "diffEditor.removedTextBackground": `${palette.removed}38`,
+          "diffEditor.insertedLineBackground": `${palette.added}1A`,
+          "diffEditor.removedLineBackground": `${palette.removed}1A`,
+          "diffEditor.diagonalFill": `${palette.muted}26`,
+          "editorOverviewRuler.border": `${palette.muted}40`,
+        },
+      });
+    }
     themeRegistered = true;
   } catch {
     // Graceful fallback in non-browser/test environments
@@ -87,6 +111,7 @@ interface CodeComparisonProps {
   readonly selectedEvidence: EvidenceItem | null;
   readonly evidenceList: readonly EvidenceItem[];
   readonly onSelectEvidence: (evidenceId: string) => void;
+  readonly prefersSideBySide?: boolean;
 }
 
 export const CodeComparison: React.FC<CodeComparisonProps> = ({
@@ -95,14 +120,18 @@ export const CodeComparison: React.FC<CodeComparisonProps> = ({
   selectedEvidence,
   evidenceList,
   onSelectEvidence,
+  prefersSideBySide = false,
 }) => {
-  const [diffMode, setDiffMode] = useState<DiffRenderMode>("side-by-side");
+  const uiTheme = useTheme();
+  const [chosenDiffMode, setDiffMode] = useState<DiffRenderMode | null>(null);
+  const diffMode: DiffRenderMode = chosenDiffMode ?? (prefersSideBySide ? "side-by-side" : "unified");
   const [isCopied, setIsCopied] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 
   const diffEditorRef = useRef<editor.IStandaloneDiffEditor | null>(null);
   const originalDecorationsRef = useRef<string[]>([]);
   const modifiedDecorationsRef = useRef<string[]>([]);
+  const diffModelsRef = useRef<editor.IDiffEditorModel | null>(null);
 
   // Extract base and head sources from FunctionDescriptors
   const baseResult = useMemo(() => extractFunctionSource(report.baseFunction), [report.baseFunction]);
@@ -153,6 +182,7 @@ export const CodeComparison: React.FC<CodeComparisonProps> = ({
   // Monaco Editor Mounting Callback
   const handleEditorDidMount = (diffEditor: editor.IStandaloneDiffEditor) => {
     diffEditorRef.current = diffEditor;
+    diffModelsRef.current = diffEditor.getModel();
     applyEvidenceDecorations();
   };
 
@@ -243,16 +273,32 @@ export const CodeComparison: React.FC<CodeComparisonProps> = ({
     applyEvidenceDecorations();
   }, [applyEvidenceDecorations]);
 
+  // @monaco-editor/react disposes models before the diff widget resets, which throws.
+  // It keeps them here, and they are released once the widget itself is gone.
+  const isEditorMounted = unavailableReason === null;
+  useEffect(() => {
+    if (!isEditorMounted) return;
+    return () => {
+      const models = diffModelsRef.current;
+      diffModelsRef.current = null;
+      queueMicrotask(() => {
+        models?.original.dispose();
+        models?.modified.dispose();
+      });
+    };
+  }, [isEditorMounted]);
+
   // Editor Options per DESIGN.md Section 9
   const editorOptions: editor.IDiffEditorOptions = useMemo(
     () => ({
       readOnly: true,
       renderSideBySide: diffMode === "side-by-side",
+      useInlineViewWhenSpaceIsLimited: false,
       automaticLayout: true,
       scrollBeyondLastLine: false,
       minimap: { enabled: false },
       lineNumbers: "on",
-      fontFamily: 'ui-monospace, "IBM Plex Mono", "JetBrains Mono", Menlo, monospace',
+      fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace',
       fontSize: 12,
       lineHeight: 20,
       renderWhitespace: "selection",
@@ -275,8 +321,8 @@ export const CodeComparison: React.FC<CodeComparisonProps> = ({
         <CodeComparisonToolbar
           diffMode={diffMode}
           onDiffModeChange={setDiffMode}
-          baseRevisionLabel={`BASE (${report.baseCommit.shortSha})`}
-          headRevisionLabel={`HEAD (${report.headCommit.shortSha})`}
+          baseRevisionLabel={`Before (${report.baseCommit.shortSha})`}
+          headRevisionLabel={`After (${report.headCommit.shortSha})`}
           targetFunctionName={report.request.targetFunctionName}
           targetFilePath={report.request.targetFilePath}
           activeSpan={activeSpan}
@@ -302,8 +348,8 @@ export const CodeComparison: React.FC<CodeComparisonProps> = ({
       <CodeComparisonToolbar
         diffMode={diffMode}
         onDiffModeChange={setDiffMode}
-        baseRevisionLabel={`BASE (${report.baseCommit.shortSha})`}
-        headRevisionLabel={`HEAD (${report.headCommit.shortSha})`}
+        baseRevisionLabel={`Before (${report.baseCommit.shortSha})`}
+        headRevisionLabel={`After (${report.headCommit.shortSha})`}
         targetFunctionName={report.request.targetFunctionName}
         targetFilePath={report.request.targetFilePath}
         activeSpan={activeSpan}
@@ -320,13 +366,15 @@ export const CodeComparison: React.FC<CodeComparisonProps> = ({
           original={baseResult.source}
           modified={headResult.source}
           language={language}
-          theme={THEME_NAME}
+          theme={uiTheme === "dark" ? THEME_NAME_DARK : THEME_NAME}
           options={editorOptions}
+          keepCurrentOriginalModel
+          keepCurrentModifiedModel
           beforeMount={handleEditorBeforeMount}
           onMount={handleEditorDidMount}
           loading={
-            <div className="flex items-center justify-center h-full text-xs font-mono text-text-muted">
-              Loading local Monaco code comparison engine…
+            <div className="flex items-center justify-center h-full text-xs text-text-secondary">
+              Loading the code comparison…
             </div>
           }
         />

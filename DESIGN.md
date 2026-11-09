@@ -1,216 +1,52 @@
 # Change Archaeologist — Visual Design System Specification (DESIGN.md)
 
-> **Document Status:** Canonical Design Authority  
-> **Version:** 2.0.0 (Evidence Atlas Redesign Specification)  
-> **Aesthetic Archetype:** Investigative Evidence Atlas (`impeccable` *Operate* / *Read* mode + archival cartographic instrument)  
-> **Stack Target:** React 19, TypeScript, Vite, Tailwind CSS, Motion, Monaco Editor, Lucide Icons, React Flow  
-> **Verified Baseline:** 359 automated tests across 29 test suites; 6 deterministic demonstration scenarios
+> **Document Status:** Canonical Design Authority
+> **Version:** 3.0.0
+> **Stack Target:** React 19, TypeScript, Vite, Tailwind CSS, Motion, Monaco Editor, Lucide Icons
 
 ---
 
 ## 1. Product Design Principles
 
-Change Archaeologist is a local-first, deterministic static analysis tool that uncovers AST structural mutations across Git revisions and conservatively correlates them with companion test changes.
+Change Archaeologist is a local-first, deterministic static analysis tool. Its viewer is a working instrument used beside an editor, so clarity and scanning speed outrank expression.
 
-Its visual presentation embodies the metaphor of an **Investigative Evidence Atlas** — an archival record of software changes, mutations, and empirical relationships:
-
-1. **The Investigative Evidence Atlas:**
-   The interface feels like a precision archival instrument. Warm archival paper, charcoal ink typography, fine cartographic gridlines, and restrained terracotta accents convey historical provenance, empirical rigor, and craftsmanship.
-2. **Data and Evidence Are the Heroes:**
-   Code snippets, AST structural diffs, test assertions, line numbers, and commit hashes are the primary aesthetic assets. A bordered panel containing crisp monospaced code and precise line references outranks any decorative graphic.
-3. **Epistemic Humility as a Visual Primitive:**
-   Static analysis establishes observed structural facts, not dynamic runtime truth. Visual styling enforces this distinction:
-   - Correlation is never styled as causation.
-   - Absence of evidence is never presented as proof of absence.
-   - Unknown boundaries and incomplete analysis limitations are surfaced prominently in dedicated trays and banners rather than obscured.
-   - The four domain correlation statuses are strictly preserved: `STRONG`, `WEAK`, `NONE`, `UNCERTAIN`.
-4. **Information Density Without Cognitive Overload:**
-   Compact 11–13px interface typography, hairline borders, and subtle cartographic coordinate references allow extensive comparative analysis in a single viewport. Visual hierarchy is established through strict font contrast (editorial serif display vs. clean sans body vs. monospace evidence identifiers) and tonal surface depth.
-5. **Anti-Slop Craft Floor:**
-   Generic AI-dashboard tropes (indigo-to-purple gradient hero banners, frosted glassmorphism cards everywhere, generic rounded rectangles, and emoji icons) are strictly forbidden. Every border, margin, and token clarifies code relationships.
+1. **Evidence is the subject.** Code, line numbers and commit hashes carry the page. Chrome stays quiet.
+2. **Colour has a job.** Neutrals are cool and mineral. One verdigris accent marks actions and selection. Status hues appear only where they carry meaning.
+3. **Claims stay honest.** Correlation is never styled as causation, and absence of evidence is never styled as proof of absence. The statuses `STRONG`, `WEAK`, `UNCERTAIN` and `NONE` are preserved exactly.
+4. **Local means local.** Fonts and workers ship with the app. The viewer makes no network requests.
 
 ---
 
-## 2. Token Architecture (Three Tiers)
+## 2. Tokens
 
-Tokens strictly adhere to a three-tier model:
-$$\text{Component Tokens} \longrightarrow \text{Semantic Tokens} \longrightarrow \text{Primitive Tokens} \longrightarrow \text{Raw Values}$$
-Components never consume primitive tokens directly.
+`src/viewer/styles/tokens.css` is the source of truth, in three tiers: primitives, semantic roles, and component tokens. Components use semantic roles only, so a theme is one block of overrides.
 
-### Tier 1: Primitive Tokens (Raw Palette & Scales)
-
-```css
-:root {
-  /* Primitive Neutrals — Warm Parchment Ramp */
-  --primitive-parchment-50:  #FDFAF5; /* Lightest highlight */
-  --primitive-parchment-100: #F9F4EC; /* Near-white parchment */
-  --primitive-parchment-200: #F5F0E8; /* Page ground */
-  --primitive-parchment-300: #EDE8DF; /* Panel surface */
-  --primitive-parchment-400: #E6E0D5; /* Elevated surface */
-  --primitive-parchment-500: #DDD7CC; /* Hover surface */
-  --primitive-parchment-600: #D0C9BC; /* Active surface */
-  --primitive-parchment-700: #BDB4A5; /* Strong border */
-  --primitive-parchment-800: #A09689; /* Divider */
-
-  /* Primitive Ink — Warm Charcoal Ramp */
-  --primitive-ink-950: #0F0A04; /* Deepest ink */
-  --primitive-ink-900: #1C1409; /* Primary text */
-  --primitive-ink-800: #2E2010; /* Heading dark */
-  --primitive-ink-700: #4A3728; /* Secondary text */
-  --primitive-ink-600: #6B5240; /* Muted text */
-  --primitive-ink-500: #8A7560; /* Tertiary / metadata */
-  --primitive-ink-400: #A8957E; /* Subdued */
-  --primitive-ink-300: #C4AE98; /* Placeholder */
-
-  /* Primitive Alpha Borders — Warm Ink */
-  --primitive-alpha-ink-6:  rgba(90, 70, 50, 0.06);
-  --primitive-alpha-ink-12: rgba(90, 70, 50, 0.12);
-  --primitive-alpha-ink-20: rgba(90, 70, 50, 0.20);
-  --primitive-alpha-ink-35: rgba(90, 70, 50, 0.35);
-  --primitive-alpha-ink-50: rgba(90, 70, 50, 0.50);
-
-  /* Primitive Accent — Oxidized Terracotta / Burnt Orange */
-  --primitive-terra-900: #6B1E0A;
-  --primitive-terra-800: #8B2910;
-  --primitive-terra-700: #A8371A;
-  --primitive-terra-600: #C4521A; /* Canonical Brand Accent */
-  --primitive-terra-500: #D4642A;
-  --primitive-terra-400: #E07A45;
-  --primitive-terra-200: rgba(196, 82, 26, 0.15);
-  --primitive-terra-border: rgba(196, 82, 26, 0.30);
-
-  /* Primitive Semantic Hues — Muted Archival Palette */
-  --primitive-green-700: #1A5C2E;
-  --primitive-green-600: #2E7D32;
-  --primitive-green-500: #388E3C;
-  --primitive-green-bg:  rgba(46, 125, 50, 0.08);
-  --primitive-green-border: rgba(46, 125, 50, 0.25);
-
-  --primitive-red-700: #8B1C1C;
-  --primitive-red-600: #B71C1C;
-  --primitive-red-500: #C62828;
-  --primitive-red-bg:  rgba(183, 28, 28, 0.08);
-  --primitive-red-border: rgba(183, 28, 28, 0.25);
-
-  --primitive-amber-700: #7A4000;
-  --primitive-amber-600: #E65100;
-  --primitive-amber-bg:  rgba(230, 81, 0, 0.08);
-  --primitive-amber-border: rgba(230, 81, 0, 0.25);
-
-  --primitive-purple-700: #3D1B77;
-  --primitive-purple-600: #5C3D99;
-  --primitive-purple-bg:  rgba(92, 61, 153, 0.08);
-  --primitive-purple-border: rgba(92, 61, 153, 0.25);
-
-  --primitive-ochre-700: #7A5000;
-  --primitive-ochre-600: #9E6B00;
-  --primitive-ochre-bg:  rgba(158, 107, 0, 0.08);
-  --primitive-ochre-border: rgba(158, 107, 0, 0.25);
-
-  --primitive-gray-600: #5C6472;
-  --primitive-gray-500: #6B7280;
-  --primitive-gray-bg:  rgba(107, 114, 128, 0.08);
-  --primitive-gray-border: rgba(107, 114, 128, 0.20);
-}
-```
-
-### Tier 2: Semantic Tokens (Role-Based Meaning)
-
-```css
-:root {
-  /* Surfaces — Warm Parchment Progression */
-  --surface-ground:   var(--primitive-parchment-200); /* #F5F0E8 */
-  --surface-panel:    var(--primitive-parchment-300); /* #EDE8DF */
-  --surface-elevated: var(--primitive-parchment-400); /* #E6E0D5 */
-  --surface-hover:    var(--primitive-parchment-500); /* #DDD7CC */
-  --surface-active:   var(--primitive-parchment-600); /* #D0C9BC */
-  --surface-code:     var(--primitive-parchment-100); /* #F9F4EC */
-
-  /* Borders & Dividers */
-  --border-hairline:    var(--primitive-alpha-ink-12);
-  --border-subtle:      var(--primitive-alpha-ink-20);
-  --border-interactive: var(--primitive-alpha-ink-35);
-  --border-focus:       var(--primitive-terra-600);
-
-  /* Typography Roles */
-  --text-primary:   var(--primitive-ink-900);
-  --text-secondary: var(--primitive-ink-700);
-  --text-muted:     var(--primitive-ink-500);
-  --text-accent:    var(--primitive-terra-600);
-
-  /* Brand / Action */
-  --action-primary-bg:    var(--primitive-terra-600);
-  --action-primary-hover: var(--primitive-terra-700);
-  --action-primary-text:  #FFFFFF;
-  --action-ghost-hover:   var(--primitive-alpha-ink-6);
-
-  /* Status Tokens */
-  --status-added-fg:     var(--primitive-green-600);
-  --status-added-bg:     var(--primitive-green-bg);
-  --status-added-border: var(--primitive-green-border);
-
-  --status-removed-fg:     var(--primitive-red-600);
-  --status-removed-bg:     var(--primitive-red-bg);
-  --status-removed-border: var(--primitive-red-border);
-
-  --status-modified-fg:     var(--primitive-amber-600);
-  --status-modified-bg:     var(--primitive-amber-bg);
-  --status-modified-border: var(--primitive-amber-border);
-
-  /* Correlation Tokens */
-  --status-strong-fg:     var(--primitive-green-700);
-  --status-strong-bg:     var(--primitive-green-bg);
-  --status-strong-border: var(--primitive-green-border);
-
-  --status-weak-fg:     var(--primitive-purple-600);
-  --status-weak-bg:     var(--primitive-purple-bg);
-  --status-weak-border: var(--primitive-purple-border);
-
-  --status-none-fg:     var(--primitive-gray-500);
-  --status-none-bg:     transparent;
-  --status-none-border: var(--primitive-alpha-ink-12);
-
-  --status-uncertain-fg:     var(--primitive-ochre-600);
-  --status-uncertain-bg:     var(--primitive-ochre-bg);
-  --status-uncertain-border: var(--primitive-ochre-border);
-
-  --status-unknown-fg:     var(--primitive-gray-500);
-  --status-unknown-bg:     var(--primitive-gray-bg);
-  --status-unknown-border: var(--primitive-gray-border);
-}
-```
+- **Themes:** light values live on `:root`, dark overrides on `:root[data-theme="dark"]`. `index.html` sets `data-theme` before first paint, from a stored choice or the system setting. `utils/theme.ts` owns changes.
+- **Contrast:** every text role meets 4.5:1 on every surface in both themes, including status text on its own tint.
+- **Monaco:** editor themes in `CodeComparison.tsx` mirror the tokens and must use hex colours, because Monaco renders anything else as solid red.
+- **Radii:** 3, 4, 6, 8 and 12px. Motion: 120ms feedback, 200ms reveals, `cubic-bezier(0.23, 1, 0.32, 1)` for entrances.
 
 ---
 
-## 3. Typography & Cartographic Details
+## 3. Typography
 
-Change Archaeologist pairs three distinct typographic voices:
-1. **Display Typography:** Editorial serif (`'Libre Baskerville', Georgia, serif`) for the masthead, target entity names, and major section titles.
-2. **Interface Typography:** Highly legible system sans-serif (`'Inter', system-ui, sans-serif`) for summaries, labels, controls, and body text.
-3. **Monospace Typography:** Monospace (`ui-monospace, 'JetBrains Mono', 'IBM Plex Mono', monospace`) reserved strictly for code, evidence identifiers (`EV-001`), line spans (`L14:C3-L16:C20`), commit SHAs, and rule identifiers (`RULE_GUARD_REMOVED`).
-4. **Cartographic Annotation Grids:** Subtle 20px / 24px coordinate grid patterns (`.atlas-grid`) provide a cartographic foundation behind workspace canvases and data viewports without distracting from code readability.
+- **IBM Plex Sans** for all interface text, self-hosted with `@fontsource`.
+- **IBM Plex Mono** only for code, identifiers, spans, hashes and file paths. Never for ordinary labels.
+- **12px is the minimum text size.** 14px is the body size.
 
 ---
 
-## 4. Production-Test Correlation Graph Architecture
+## 4. The Dig (Production-Test Correlation View)
 
-The correlation graph visualizes relationships strictly derived from validated `AnalysisReport` data across distinct spatial territories:
+The correlation view draws a validated `AnalysisReport` as an excavation cross-section. Geometry comes from `utils/dig-model.ts` and `utils/dig-layout.ts`; nothing is drawn that the report does not contain.
 
-```
-[ Production Realm ]                      [ Evidence Corridors ]                 [ Test Artifact Realm ]
-+---------------------+                   +--------------------+                 +---------------------+
-| Target Function     | --- contains ---> | Structural Mutation| === STRONG ===> | Companion Test Change| <--- contains --- [ Test File Suite ]
-| (Production Anchor) |                   | (Observed Diff)    |   (Bezier Edge) | (Assertion Diff)     |
-+---------------------+                   +--------------------+                 +---------------------+
-```
-
-- **Production Realm (West):** Target function anchor node (`x: 50`) and contained structural mutation nodes (`x: 410`).
-- **Evidence Corridors (Center):** 260px bridge gap where bezier correlation edges are drawn with distinct status styling (`STRONG`, `WEAK`, `UNCERTAIN`, `NONE`) and accessible relationship labels.
-- **Test Artifact Realm (East):** Companion test changes and declaration blocks (`x: 930`) linked to their parent test file suite roots (`x: 1290`).
-- **Viewport Sizing:** Balanced fit-to-view framing with `minZoom: 0.65` and `padding: 0.12` prevents nodes from collapsing into an unreadable miniature strip.
-- **Accessible Linear Alternative:** Complete structured table view (`GraphAccessibleView`) ensures 100% keyboard navigability and screen-reader accessibility.
-
----
+- **Rock layers:** the target function's real source lines in BASE (left) and HEAD (right). Long functions compress unchanged runs.
+- **Faults:** each structural change, joining its BASE and HEAD lines. A removed or added change pinches to a point on the side where it has no lines.
+- **Shafts:** each correlation, drilled from its fault to an assertion or test file. Shape carries status, always with a text label: `STRONG` solid, `WEAK` broken, `UNCERTAIN` dotted, `NONE` hollow and ending in open ground.
+- **Never dug:** a hatched band below the tests marks what static analysis cannot see. Shafts never enter it.
+- **Absence stays distinct:** a change with no correlation record gets a thin dotted probe, which is not the same as a `NONE` correlation.
+- **Sizing:** text renders at true size and columns reflow to the pane. The diagram scrolls sideways below 760px or when test cards need more room.
+- **Accessible alternative:** `GraphAccessibleView` lists every entity and correlation, including links with no test-change ID, and is the default below 768px.
 
 ## 5. Epistemic Guardrails and Non-Causality
 
@@ -222,39 +58,19 @@ The correlation graph visualizes relationships strictly derived from validated `
 
 ## 6. Accessibility & Responsive Standards
 
-- **WCAG 2.2 Level AA Compliance:** All body and metadata text pairs exceed the 4.5:1 contrast requirement against warm parchment surfaces.
-- **Visible Focus Rings:** Standardized `:focus-visible` indicators using `2px solid var(--border-focus)` (`#C4521A`) with `2px` offset.
+- **WCAG 2.2 Level AA Compliance:** All body and metadata text pairs meet the 4.5:1 contrast requirement in both themes.
+- **Visible Focus Rings:** Standardized `:focus-visible` indicators using `2px solid var(--border-focus)` with `2px` offset.
 - **Roving Tabindex:** Tab controls implement the WAI-ARIA tablist pattern with arrow-key navigation (`ArrowRight`, `ArrowLeft`, `Home`, `End`).
 - **Modal Dialog Focus Trapping:** Dialogs trap focus on open and restore focus to triggering elements upon dismissal via `Escape` or the Close button.
 - **Reduced Motion:** Automatic reset under `prefers-reduced-motion: reduce`.
 
 ---
 
-## 7. Newcomer Comprehension & Plain-English Architecture
+## 7. Structure and Language
 
-To ensure the interface is immediately understandable to newcomers, non-technical users, and computer science students while preserving analytical rigor for experienced engineers:
-
-1. **"How to Read This Report" Guide (`ReportReadingGuide.tsx`):**
-   - Accessible from the Executive Summary Strip and Navbar via a persistent, non-blocking toggle.
-   - Structured around the three foundational questions of code change archaeology:
-     1. **What changed?** Explains AST structural differences between the two Git revisions.
-     2. **What do the tests tell us?** Explains detected companion test changes, assertion edits, and function targeting.
-     3. **What can we conclude?** Clearly articulates observed evidence, inferences, and the inherent limits of static analysis.
-   - Grounded directly in live data from the currently loaded `AnalysisReport`.
-   - Includes an expandable plain-English glossary for static analysis terminology.
-
-2. **Dual-Labeling System:**
-   - Important sections pair intuitive plain-English headings with precise technical domain terms:
-     - *Code Changes* (`STRUCTURAL MUTATIONS`)
-     - *Related Tests* (`COMPANION TEST FILES`)
-     - *Code–Test Links* (`CORRELATION LINKS`)
-     - *What We Know* (`EPISTEMIC FINDINGS`)
-     - *What Changed Between Versions* (`CHANGE TIMELINE`)
-     - *Visual Relationships* (`CORRELATION GRAPH`)
-
-3. **Data-Grounded Selection Explanations:**
-   - Selecting any node, edge, mutation, or test change surfaces a structured explanation in `DetailInspector` and floating canvas cards:
-     - **Entity Representation:** Plain-English role and category.
-     - **Observed Mutation:** Clear narrative of what was modified.
-     - **Evidence Anchors:** Explicit proof IDs (`EV-xxx`) and coordinates (`Lxx:Cxx`).
-     - **Epistemic Invariant:** Explicit separation of what the evidence **Establishes** vs. what it **Does NOT Establish** (e.g., static analysis proves syntax changes; it never proves runtime test passage or dynamic correctness).
+1. **Start screen:** with no report open, the app explains what it answers and offers a drop zone, the CLI command, and samples named by what they show.
+2. **Header:** one row names the report being read. The next gives a verdict sentence, built only from report counts, and the three views.
+3. **Views:** The Dig, Code & tests, and Findings. The detail panel beside them is resizable and follows the single active selection. Code & tests gives it most of the width for a side-by-side diff.
+4. **Plain language:** report enums pass through `utils/labels.ts`. Raw values appear only as tooltips. Correlation statuses keep their exact names, with a short gloss.
+5. **Always the same order:** what we saw, what that suggests, what we can't tell.
+6. **Components:** interactive primitives come from shadcn/ui where they earn their place, currently Resizable, on Tailwind CSS v4.

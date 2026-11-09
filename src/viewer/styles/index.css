@@ -1,8 +1,17 @@
 @import "./tokens.css";
+@import "tailwindcss" source("../");
+@config "../../../tailwind.config.js";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer base {
+  /* Tailwind v4 defaults borders to currentColor; this project expects a quiet hairline. */
+  *, ::before, ::after, ::backdrop {
+    border-color: var(--border-hairline);
+  }
+
+  button:not(:disabled), [role="button"] {
+    cursor: pointer;
+  }
+}
 
 @layer base {
   body {
@@ -11,24 +20,25 @@
     font-family: var(--font-body);
     margin: 0;
     padding: 0;
+    font-size: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
 
-  /* Selection styling — archival accent */
+  /* Selection styling */
   ::selection {
-    background-color: rgba(196, 82, 26, 0.18);
-    color: var(--primitive-ink-900);
+    background-color: var(--selection-bg);
+    color: var(--text-primary);
   }
 
-  /* Focus ring discipline — terracotta accent */
+  /* Focus ring discipline */
   :focus-visible {
     outline: 2px solid var(--border-focus);
     outline-offset: 2px;
   }
 
-  /* Custom scrollbar — warm and minimal */
+  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -39,12 +49,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--primitive-alpha-ink-20);
+    background: var(--border-subtle);
     border-radius: var(--radius-sm);
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--primitive-alpha-ink-35);
+    background: var(--border-interactive);
   }
 
   /* Caret — themed */
@@ -53,22 +63,37 @@
   }
 }
 
-/* Cartographic grid background — subtle annotation grid */
+/* The Dig — text wears text tokens; shape and fill carry status */
+.dig text { fill: var(--text-primary); font-family: var(--font-mono); font-size: 12px; }
+.dig .dig-layer { font-family: var(--font-body); font-size: 13px; font-weight: 600; fill: var(--text-secondary); }
+.dig .dig-note { font-family: var(--font-body); font-size: 13px; fill: var(--text-secondary); }
+.dig .dig-small { fill: var(--text-secondary); }
+.dig .dig-code { white-space: pre; }
+.dig .dig-before { fill: var(--status-removed-fg); }
+.dig .dig-after { fill: var(--status-added-fg); }
+.dig .dig-status { font-weight: 500; }
+.dig-canvas-fill { fill: var(--dig-canvas); }
+.dig-gap { fill: none; stroke: var(--border-subtle); stroke-dasharray: 4 4; }
+.dig-empty { fill: none; stroke: var(--border-interactive); }
+.dig-rule { stroke: var(--border-subtle); }
+.dig-test-card { fill: var(--dig-test); stroke: var(--border-subtle); }
+.dig-probe { stroke: var(--text-secondary); }
+.dig-probe-end { fill: var(--dig-canvas); stroke: var(--text-secondary); }
+.dig-hit-line { stroke: var(--border-focus); stroke-opacity: 0; }
+.dig-pick { cursor: pointer; transition: opacity var(--dur-fast); }
+.dig-pick:focus { outline: none; }
+.dig-pick[aria-pressed="true"] .dig-hit-solid,
+.dig-pick:focus-visible .dig-hit-solid { stroke: var(--border-focus); stroke-width: 2; }
+.dig-pick[aria-pressed="true"] .dig-hit-line,
+.dig-pick:focus-visible .dig-hit-line { stroke-opacity: 0.22; }
+.dig-dimmed { opacity: 0.28; }
+.dig-drill { animation: dig-drill 460ms var(--ease-out-ui) both; }
+@keyframes dig-drill {
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
 @layer utilities {
-  .atlas-grid {
-    background-image:
-      linear-gradient(var(--grid-line-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-line-color) 1px, transparent 1px);
-    background-size: var(--grid-size) var(--grid-size);
-  }
-
-  .atlas-grid-sm {
-    background-image:
-      linear-gradient(var(--grid-line-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-line-color) 1px, transparent 1px);
-    background-size: 12px 12px;
-  }
-
   @keyframes slideInRight {
     from {
       transform: translateX(100%);

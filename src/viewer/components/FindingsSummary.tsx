@@ -1,7 +1,8 @@
 import React from "react";
-import { AlertCircle, Info, AlertTriangle, Tag } from "lucide-react";
+import { AlertCircle, AlertTriangle, Info } from "lucide-react";
 import type { Finding, ReviewAttentionLevel } from "../types/index.js";
-import { GlyphEpistemicTier, GlyphEvidencePin } from "./icons/ArchaeologistGlyphs.js";
+import { ATTENTION_LABEL, UNKNOWN_REASON_LABEL, plainFindingTitle } from "../utils/labels.js";
+import { Badge, type BadgeVariant } from "./ui/Badge.js";
 
 interface FindingsSummaryProps {
   readonly findings: readonly Finding[];
@@ -9,161 +10,79 @@ interface FindingsSummaryProps {
   readonly onSelectFinding: (id: string) => void;
 }
 
-export const FindingsSummary: React.FC<FindingsSummaryProps> = ({
-  findings,
-  selectedId,
-  onSelectFinding,
-}) => {
+const ATTENTION_STYLE: Record<ReviewAttentionLevel, { variant: BadgeVariant; icon: React.ReactNode }> = {
+  HIGH_ATTENTION: { variant: "amber", icon: <AlertCircle size={12} strokeWidth={1.5} /> },
+  MODERATE_ATTENTION: { variant: "terracotta", icon: <AlertTriangle size={12} strokeWidth={1.5} /> },
+  INFORMATIONAL: { variant: "outline", icon: <Info size={12} strokeWidth={1.5} /> },
+};
+
+const Part: React.FC<{ readonly heading: string; readonly children: React.ReactNode }> = ({ heading, children }) => (
+  <span className="block min-w-0 space-y-1 [overflow-wrap:anywhere]">
+    <span className="block text-xs font-semibold text-text-primary">{heading}</span>
+    {children}
+  </span>
+);
+
+export const FindingsSummary: React.FC<FindingsSummaryProps> = ({ findings, selectedId, onSelectFinding }) => {
   if (findings.length === 0) {
-    return (
-      <div className="p-8 text-center text-xs font-mono text-text-muted border border-hairline rounded-md bg-panel m-4">
-        Zero high-level findings synthesized in the current report.
-      </div>
-    );
+    return <p className="m-0 p-4 text-sm text-text-secondary">This report has no findings.</p>;
   }
 
-  const renderAttentionBadge = (level: ReviewAttentionLevel) => {
-    switch (level) {
-      case "HIGH_ATTENTION":
-        return (
-          <span className="inline-flex items-center space-x-1 font-mono text-[10px] font-semibold text-status-removed bg-status-removed-bg border border-status-removed-border px-1.5 py-0.5 rounded-xs">
-            <AlertCircle size={11} strokeWidth={1.5} />
-            <span>HIGH ATTENTION</span>
-          </span>
-        );
-      case "MODERATE_ATTENTION":
-        return (
-          <span className="inline-flex items-center space-x-1 font-mono text-[10px] font-semibold text-status-modified bg-status-modified-bg border border-status-modified-border px-1.5 py-0.5 rounded-xs">
-            <AlertTriangle size={11} strokeWidth={1.5} />
-            <span>MODERATE ATTENTION</span>
-          </span>
-        );
-      case "INFORMATIONAL":
-      default:
-        return (
-          <span className="inline-flex items-center space-x-1 font-mono text-[10px] font-semibold text-text-muted bg-surface-elevated border border-hairline px-1.5 py-0.5 rounded-xs">
-            <Info size={11} strokeWidth={1.5} />
-            <span>INFORMATIONAL</span>
-          </span>
-        );
-    }
-  };
-
   return (
-    <div className="flex flex-col h-full bg-ground overflow-y-auto p-3 space-y-3">
-      {/* Plain-English Explanation Banner */}
-      <div className="rounded-sm bg-panel border border-hairline p-2.5 flex items-center justify-between text-xs font-mono text-text-secondary">
-        <div className="flex items-center space-x-2">
-          <GlyphEpistemicTier size={14} className="text-text-accent shrink-0" />
-          <span className="text-[11px] leading-normal font-body">
-            <strong className="text-text-primary font-sans font-semibold">What We Know (Epistemic Findings):</strong> High-level synthesis separating directly observed syntactic facts from inferred hypotheses and static analysis limits.
-          </span>
-        </div>
-      </div>
-
-      {findings.map((fnd) => {
-        const isSelected = selectedId === fnd.id;
-
+    <div className="p-4 space-y-3">
+      {findings.map((finding) => {
+        const isSelected = selectedId === finding.id;
+        const attention = ATTENTION_STYLE[finding.attentionLevel];
         return (
-          <div
-            key={fnd.id}
-            onClick={() => onSelectFinding(fnd.id)}
-            role="button"
-            tabIndex={0}
-            aria-selected={isSelected}
-            aria-label={`Finding ${fnd.id}: ${fnd.title}, attention level ${fnd.attentionLevel}`}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onSelectFinding(fnd.id);
-              }
-            }}
-            className={`rounded-md border p-3.5 bg-panel transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
-              isSelected ? "border-border-focus ring-1 ring-border-focus bg-surface-elevated" : "border-hairline hover:border-border-interactive hover:bg-surface-hover"
+          <button
+            key={finding.id}
+            type="button"
+            onClick={() => onSelectFinding(finding.id)}
+            aria-pressed={isSelected}
+            className={`w-full p-4 rounded-lg border text-left space-y-3 transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+              isSelected ? "bg-surface-elevated border-border-focus" : "bg-panel border-hairline hover:bg-surface-hover"
             }`}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between pb-2 border-b border-hairline">
-              <div className="flex items-center space-x-2">
-                <span className="font-mono text-xs font-semibold text-text-primary">
-                  {fnd.id}
-                </span>
-                {renderAttentionBadge(fnd.attentionLevel)}
-                <span className="font-mono text-[10px] text-text-muted">
-                  {fnd.category}
-                </span>
-              </div>
-              <div className="flex items-center space-x-1 font-mono text-[10px] text-text-muted">
-                {fnd.structuralChangeIds.map((scId) => (
-                  <span key={scId} className="px-1.5 py-0.2 bg-ground border border-hairline rounded-xs">
-                    {scId}
+            <span className="flex flex-wrap items-start justify-between gap-2">
+              <span className="min-w-0 flex-1 basis-64 text-[15px] font-semibold text-text-primary text-pretty">
+                {plainFindingTitle(finding.title)}
+              </span>
+              <Badge variant={attention.variant} className="shrink-0">
+                {attention.icon}
+                <span>{ATTENTION_LABEL[finding.attentionLevel]}</span>
+              </Badge>
+            </span>
+
+            <span className="grid grid-cols-1 xl:grid-cols-3 gap-4 text-sm text-text-secondary leading-relaxed">
+              <Part heading="What we saw">
+                {finding.observed.map((observation) => (
+                  <span key={observation.id} className="block">
+                    {observation.statement}{" "}
+                    <span className="font-mono text-xs whitespace-nowrap">{observation.evidenceIds.join(", ")}</span>
                   </span>
                 ))}
-              </div>
-            </div>
-
-            {/* Title */}
-            <div className="mt-2 text-xs font-medium text-text-primary font-display">
-              {fnd.title}
-            </div>
-
-            {/* Epistemic Statements Breakdown */}
-            <div className="mt-2.5 space-y-2 font-mono text-[11px]">
-              {/* OBSERVED */}
-              <div className="p-2 rounded-xs bg-ground border border-hairline space-y-1">
-                <div className="flex items-center justify-between text-[10px] font-semibold text-text-muted">
-                  <span>[OBSERVED FACTS]</span>
-                  <span>{fnd.observed.length} statements</span>
-                </div>
-                {fnd.observed.map((obs) => (
-                  <div key={obs.id} className="text-text-primary leading-normal pl-2 border-l border-hairline">
-                    {obs.statement}
-                    <div className="text-[10px] text-text-muted mt-0.5 flex items-center space-x-1">
-                      <GlyphEvidencePin size={10} className="text-text-accent shrink-0" />
-                      <span>Evidence anchors: {obs.evidenceIds.join(", ")}</span>
-                    </div>
-                  </div>
+              </Part>
+              <Part heading="What that suggests">
+                {finding.inferred.length === 0 ? (
+                  <span className="block">Nothing inferred.</span>
+                ) : (
+                  finding.inferred.map((inference) => (
+                    <span key={inference.id} className="block">{inference.statement}</span>
+                  ))
+                )}
+              </Part>
+              <Part heading="What we can't tell">
+                {finding.unknown.map((unknown) => (
+                  <span key={unknown.id} className="block">
+                    {unknown.statement}
+                    <span className="block mt-0.5 text-xs">{UNKNOWN_REASON_LABEL[unknown.reasonCategory]}</span>
+                  </span>
                 ))}
-              </div>
-
-              {/* INFERRED */}
-              {fnd.inferred.length > 0 && (
-                <div className="p-2 rounded-xs bg-ground border border-hairline space-y-1">
-                  <div className="flex items-center justify-between text-[10px] font-semibold text-text-accent">
-                    <span>[INFERRED HYPOTHESES]</span>
-                    <span>{fnd.inferred.length} rules</span>
-                  </div>
-                  {fnd.inferred.map((inf) => (
-                    <div key={inf.id} className="text-text-secondary leading-normal pl-2 border-l border-hairline">
-                      {inf.statement}
-                      <span className="text-[10px] text-text-muted block mt-0.5">
-                        Rule: {inf.ruleId} (via {inf.supportingObservationIds.join(", ")})
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* UNKNOWN */}
-              <div className="p-2 rounded-xs bg-status-unknown-bg border border-status-unknown-border space-y-1">
-                <div className="flex items-center justify-between text-[10px] font-semibold text-text-primary">
-                  <span>[ANALYSIS BOUNDARIES & UNKNOWNS]</span>
-                  <span>{fnd.unknown.length} declared</span>
-                </div>
-                {fnd.unknown.map((unk) => (
-                  <div key={unk.id} className="text-text-secondary leading-normal pl-2 border-l border-status-unknown-border">
-                    {unk.statement}
-                    <span className="text-[10px] text-text-muted block mt-0.5">
-                      Boundary category: {unk.reasonCategory}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+              </Part>
+            </span>
+          </button>
         );
       })}
     </div>
   );
 };
-

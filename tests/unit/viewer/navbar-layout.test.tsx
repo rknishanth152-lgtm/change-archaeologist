@@ -42,19 +42,17 @@ describe("Navbar Two-Level Header Layout", () => {
 
     // Branding
     expect(screen.getByRole("heading", { level: 1, name: "Change Archaeologist" })).toBeInTheDocument();
-    expect(screen.getByText("Console v1.0")).toBeInTheDocument();
-    expect(screen.getByText("evidence atlas")).toBeInTheDocument();
 
     // Guide action
-    const guideBtn = screen.getByRole("button", { name: /Open How to Read This Report Guide/i });
+    const guideBtn = screen.getByRole("button", { name: /How to read this report/i });
     expect(guideBtn).toBeInTheDocument();
     fireEvent.click(guideBtn);
     expect(handleToggleGuide).toHaveBeenCalledTimes(1);
 
     // Prominent Import JSON action
-    const importBtn = screen.getByRole("button", { name: "Import Analysis Report JSON" });
+    const importBtn = screen.getByRole("button", { name: "Open a report" });
     expect(importBtn).toBeInTheDocument();
-    expect(importBtn).toHaveTextContent("Import JSON");
+    expect(importBtn).toHaveTextContent("Open report");
     fireEvent.click(importBtn);
     expect(handleLoad).toHaveBeenCalledTimes(1);
   });
@@ -72,18 +70,17 @@ describe("Navbar Two-Level Header Layout", () => {
     );
 
     // Target entity
-    expect(screen.getByText("src/order.ts:")).toBeInTheDocument();
-    expect(screen.getByText("calculateDiscount")).toBeInTheDocument();
+    expect(screen.getByText("src/order.ts")).toBeInTheDocument();
+    expect(screen.getByText("calculateDiscount()")).toBeInTheDocument();
 
     // Commit comparison
-    expect(screen.getByText(DEMO_SCENARIO_E.baseCommit.shortSha)).toBeInTheDocument();
-    expect(screen.getByText(DEMO_SCENARIO_E.headCommit.shortSha)).toBeInTheDocument();
+    expect(screen.getByText(`${DEMO_SCENARIO_E.baseCommit.shortSha} → ${DEMO_SCENARIO_E.headCommit.shortSha}`)).toBeInTheDocument();
 
     // Status badge
-    expect(screen.getByText(`[${DEMO_SCENARIO_E.status}]`)).toBeInTheDocument();
+    expect(screen.getByText("Complete")).toHaveAttribute("title", DEMO_SCENARIO_E.status);
 
     // Scenario preset selector
-    const select = screen.getByRole("combobox", { name: "Select demonstration scenario" });
+    const select = screen.getByRole("combobox", { name: "Open a sample report" });
     expect(select).toBeInTheDocument();
     expect(select).toHaveValue("E");
 
@@ -104,17 +101,15 @@ describe("Navbar Two-Level Header Layout", () => {
 
     // Primary row still has branding and Import JSON
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Change Archaeologist");
-    const importBtn = screen.getByRole("button", { name: "Import Analysis Report JSON" });
+    const importBtn = screen.getByRole("button", { name: "Open a report" });
     expect(importBtn).toBeInTheDocument();
 
-    // Level 2 shows standby text
-    expect(screen.getByText(/Standby — Ingest a JSON report/i)).toBeInTheDocument();
-
-    // Scenario selector is still accessible
-    expect(screen.getByRole("combobox", { name: "Select demonstration scenario" })).toBeInTheDocument();
+    // Views and samples wait until a report is open
+    expect(screen.queryByRole("tablist")).toBeNull();
+    expect(screen.queryByRole("combobox", { name: "Open a sample report" })).toBeNull();
   });
 
-  it("enforces compact shell height (78px target, <= 84px ceiling) and single Guide control", () => {
+  it("shows a single Guide control and no internal mode names", () => {
     const handleToggleGuide = vi.fn();
 
     render(
@@ -124,32 +119,21 @@ describe("Navbar Two-Level Header Layout", () => {
         onSelectScenario={vi.fn()}
         onToggleGuide={handleToggleGuide}
         activeScenarioId="E"
-        activeTab="structural"
+        activeTab="code"
         onTabChange={vi.fn()}
       />
     );
 
     const banner = screen.getByRole("banner");
     expect(banner).toBeInTheDocument();
-    // Verify compact styling height
-    expect(banner).toHaveStyle({ height: "78px" });
-
     // Verify exactly ONE visible Guide button in the top chrome
     const guideButtons = screen.getAllByRole("button", {
-      name: /How to Read This Report Guide/i,
+      name: /How to read this report/i,
     });
     expect(guideButtons).toHaveLength(1);
 
-    // Verify 3 workspace modes & active mode tag
-    expect(screen.getByText("STRATIGRAPHY")).toBeInTheDocument();
-
-    // Verify compact analysis-state metrics
-    const summaryState = screen.getByLabelText("Analysis summary state");
-    expect(summaryState).toBeInTheDocument();
-    expect(summaryState).toHaveTextContent("mutations");
-    expect(summaryState).toHaveTextContent("tests");
-    expect(summaryState).toHaveTextContent("links");
-    expect(summaryState).toHaveTextContent("findings");
+    // Internal mode names stay out of the header
+    expect(screen.queryByText("STRATIGRAPHY")).toBeNull();
   });
 
   describe("Responsive Viewport Validation", () => {
@@ -178,7 +162,7 @@ describe("Navbar Two-Level Header Layout", () => {
         );
 
         // Import JSON must always exist and be rendered
-        const importBtn = screen.getByRole("button", { name: "Import Analysis Report JSON" });
+        const importBtn = screen.getByRole("button", { name: "Open a report" });
         expect(importBtn).toBeInTheDocument();
         expect(importBtn).not.toHaveClass("hidden");
 
@@ -186,10 +170,10 @@ describe("Navbar Two-Level Header Layout", () => {
         expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Change Archaeologist");
 
         // Scenario selector remains usable
-        expect(screen.getByRole("combobox", { name: "Select demonstration scenario" })).toBeInTheDocument();
+        expect(screen.getByRole("combobox", { name: "Open a sample report" })).toBeInTheDocument();
 
         // Target function is present
-        expect(screen.getByText("calculateDiscount")).toBeInTheDocument();
+        expect(screen.getByText("calculateDiscount()")).toBeInTheDocument();
 
         cleanup();
       });

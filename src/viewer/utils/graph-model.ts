@@ -432,10 +432,16 @@ export function buildCorrelationGraphModel(report: AnalysisReport): CorrelationG
 
   const isEmpty = nodes.length <= 1 && structuralChanges.length === 0 && testChanges.length === 0;
 
+  const drawnEdgeIds = new Set(edges.map((e) => e.id));
+  const unattachedItems = (report.correlationItems ?? []).filter(
+    (item) => !drawnEdgeIds.has(`edge-corr-${item.id}`)
+  );
+
   return {
     nodes,
     edges,
     summary,
+    unattachedItems,
     isIncomplete,
     incompleteReason,
     isEmpty,

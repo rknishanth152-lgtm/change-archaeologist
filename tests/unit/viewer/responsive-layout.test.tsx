@@ -98,23 +98,21 @@ describe("Responsive Viewport Validation Suite", () => {
 
         // Branding
         expect(screen.getByRole("heading", { level: 1, name: "Change Archaeologist" })).toBeInTheDocument();
-        expect(screen.getByText("evidence atlas")).toBeInTheDocument();
 
         // Global actions: Import JSON and Guide
-        const importBtn = screen.getByRole("button", { name: "Import Analysis Report JSON" });
+        const importBtn = screen.getByRole("button", { name: "Open a report" });
         expect(importBtn).toBeInTheDocument();
         fireEvent.click(importBtn);
         expect(handleLoad).toHaveBeenCalledTimes(1);
 
-        const guideBtn = screen.getByRole("button", { name: /Open How to Read This Report Guide/i });
+        const guideBtn = screen.getByRole("button", { name: /How to read this report/i });
         expect(guideBtn).toBeInTheDocument();
         fireEvent.click(guideBtn);
         expect(handleToggleGuide).toHaveBeenCalledTimes(1);
 
         // Subject context & commit bridge
-        expect(screen.getByText("calculateDiscount")).toBeInTheDocument();
-        expect(screen.getByText(DEMO_SCENARIO_E.baseCommit.shortSha)).toBeInTheDocument();
-        expect(screen.getByText(DEMO_SCENARIO_E.headCommit.shortSha)).toBeInTheDocument();
+        expect(screen.getByText("calculateDiscount()")).toBeInTheDocument();
+        expect(screen.getByText(`${DEMO_SCENARIO_E.baseCommit.shortSha} → ${DEMO_SCENARIO_E.headCommit.shortSha}`)).toBeInTheDocument();
       });
     });
   });
@@ -180,8 +178,8 @@ describe("Responsive Viewport Validation Suite", () => {
 
         // Evidence navigation stepper
         expect(screen.getByText("EV-001 (1/2)")).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Navigate to previous evidence item" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Navigate to next evidence item" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Previous evidence" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Next evidence" })).toBeInTheDocument();
       });
     });
   });
@@ -206,37 +204,22 @@ describe("Responsive Viewport Validation Suite", () => {
         );
 
         // Header Title
-        expect(screen.getByText("Production-Test Correlation Graph")).toBeInTheDocument();
+        expect(screen.getByText("How this change reaches the tests")).toBeInTheDocument();
 
         // Mode switch
-        expect(screen.getByRole("button", { name: /Visual Graph/ })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: /Accessible View/ })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "The Dig" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /Table view/ })).toBeInTheDocument();
 
-        // On mobile (< 768px), defaults to Accessible View; on >= 768px defaults to Visual Graph with Fit View & toggles
+        // Under 768px the Accessible View opens with search; otherwise The Dig with its legend filter
         if (width >= 768) {
-          expect(screen.getByRole("button", { name: /Fit view to all nodes/ })).toBeInTheDocument();
-          expect(screen.getByLabelText("Toggle minimap")).toBeInTheDocument();
-          expect(screen.getByLabelText("Toggle graph legend")).toBeInTheDocument();
+          expect(screen.getByRole("button", { name: "The Dig" })).toHaveAttribute("aria-pressed", "true");
+          expect(screen.getByRole("button", { name: /^STRONG: direct/ })).toBeInTheDocument();
+          expect(screen.getByRole("button", { name: /^WEAK: same file/ })).toBeInTheDocument();
+          expect(screen.getByRole("button", { name: /^UNCERTAIN: unclear/ })).toBeInTheDocument();
         } else {
-          expect(screen.getByRole("button", { name: /Accessible View/ })).toHaveAttribute("aria-pressed", "true");
+          expect(screen.getByRole("button", { name: /Table view/ })).toHaveAttribute("aria-pressed", "true");
+          expect(screen.getByPlaceholderText("Search changes and tests")).toBeInTheDocument();
         }
-
-        // Search input
-        const searchInput = screen.getByPlaceholderText("Search nodes or coordinates...");
-        expect(searchInput).toBeInTheDocument();
-
-        // Scope filter pills
-        expect(screen.getByText("Scope:")).toBeInTheDocument();
-        expect(screen.getAllByRole("button", { name: "All" }).length).toBe(2);
-        expect(screen.getByRole("button", { name: "Production" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Tests" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Correlated" })).toBeInTheDocument();
-
-        // Status filter pills
-        expect(screen.getByText("Status:")).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "STRONG" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "WEAK" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "UNCERTAIN" })).toBeInTheDocument();
       });
     });
   });

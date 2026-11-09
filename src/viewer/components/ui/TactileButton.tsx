@@ -6,8 +6,8 @@
  *
  * Adapted for Change Archaeologist Evidence Atlas design tokens:
  * - Precision hairline borders
- * - Subtle tactile feedback (active:scale-[0.98] with motion-safe guard)
- * - Variants: primary (terracotta), secondary (parchment/sandstone), ghost, outline
+ * - Subtle tactile feedback (active:scale-[0.96] with motion-safe guard)
+ * - Variants: primary (accent), secondary (neutral), ghost, outline
  * - Full accessible keyboard focus rings & ARIA semantics
  */
 
@@ -26,9 +26,9 @@ export interface TactileButtonProps
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-terracotta text-paper-white border border-border-hairline shadow-sm hover:opacity-95 focus-visible:ring-border-focus",
+    "bg-action-primary text-on-action font-medium border border-transparent hover:bg-action-hover focus-visible:ring-border-focus",
   secondary:
-    "bg-surface-elevated text-text-primary border border-hairline hover:bg-surface-hover hover:border-border-interactive focus-visible:ring-border-focus shadow-xs",
+    "bg-surface-elevated text-text-primary border border-hairline hover:bg-surface-hover hover:border-border-interactive focus-visible:ring-border-focus",
   ghost:
     "bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-hover border border-transparent focus-visible:ring-border-focus",
   outline:
@@ -36,8 +36,8 @@ const variantClasses: Record<ButtonVariant, string> = {
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  xs: "h-6 px-2 text-[10px] font-mono gap-1 rounded-xs",
-  sm: "h-7 px-2.5 text-xs font-mono gap-1.5 rounded-xs",
+  xs: "h-7 px-2 text-xs font-sans gap-1 rounded-sm",
+  sm: "h-8 px-2.5 text-xs font-sans gap-1.5 rounded-sm",
   md: "h-8 px-3.5 text-xs font-sans font-medium gap-2 rounded-sm",
 };
 
@@ -62,9 +62,9 @@ export const TactileButton = React.forwardRef<HTMLButtonElement, TactileButtonPr
         disabled={disabled}
         className={cn(
           "relative inline-flex items-center justify-center select-none cursor-pointer",
-          "transition-all duration-fast ease-out",
-          "motion-safe:active:scale-[0.98]",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-paper-parchment",
+          "transition-[background-color,border-color,color,transform] duration-fast ease-out",
+          "motion-safe:active:scale-[0.96]",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-ground",
           "disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100",
           variantClasses[variant],
           sizeClasses[size],

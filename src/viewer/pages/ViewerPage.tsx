@@ -1,115 +1,84 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ConsoleLayout } from "../layouts/ConsoleLayout.js";
-import { ChangeTimeline } from "../components/ChangeTimeline.js";
 import { CorrelationGraph } from "../components/CorrelationGraph.js";
 import { StructuralChangeExplorer } from "../components/StructuralChangeExplorer.js";
 import { TestChangesInspector } from "../components/TestChangesInspector.js";
-import { CorrelationMatrixTable } from "../components/CorrelationMatrixTable.js";
 import { FindingsSummary } from "../components/FindingsSummary.js";
 import { ReportLoader } from "../components/ReportLoader.js";
-import { DEMO_FIXTURES, DEMO_SCENARIO_E } from "../data/demo-fixtures.js";
-import type { AnalysisReport, WorkspaceTab, ReportLoadResult, EvidenceItem } from "../types/index.js";
+import { StartScreen } from "../components/StartScreen.js";
+import { DEMO_FIXTURES } from "../data/demo-fixtures.js";
+import type { AnalysisReport, WorkspaceTab, ReportLoadResult } from "../types/index.js";
+import {
+  evidenceForSelection,
+  initialSelection,
+  resolveEvidenceId,
+  type WorkspaceSelection,
+} from "../utils/selection.js";
 
 export const ViewerPage: React.FC = () => {
-  // Default to Scenario E for rich immediate inspection
-  const [report, setReport] = useState<AnalysisReport | null>(DEMO_SCENARIO_E);
-  const [activeScenarioId, setActiveScenarioId] = useState<string | null>("E");
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>("structural");
+  const [report, setReport] = useState<AnalysisReport | null>(null);
+  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("dig");
 
-  const [selectedChangeId, setSelectedChangeId] = useState<string | null>(
-    DEMO_SCENARIO_E.structuralChanges[0]?.id ?? null
-  );
-  const [selectedTestChangeId, setSelectedTestChangeId] = useState<string | null>(
-    DEMO_SCENARIO_E.testChanges[0]?.id ?? null
-  );
-  const [selectedCorrelationId, setSelectedCorrelationId] = useState<string | null>(
-    DEMO_SCENARIO_E.correlationItems?.[0]?.id ?? null
-  );
-  const [selectedFindingId, setSelectedFindingId] = useState<string | null>(
-    DEMO_SCENARIO_E.findings[0]?.id ?? null
-  );
-  const [selectedEvidenceId, setSelectedEvidenceId] = useState<string | null>(
-    DEMO_SCENARIO_E.evidence[0]?.id ?? null
-  );
+  const [selection, setSelection] = useState<WorkspaceSelection | null>(null);
+  const [selectedFindingId, setSelectedFindingId] = useState<string | null>(null);
+  const [preferredEvidenceId, setPreferredEvidenceId] = useState<string | null>(null);
 
   const [isLoaderOpen, setIsLoaderOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
-  // Switch demo scenarios
+  const showReport = (next: AnalysisReport, scenarioId: string | null) => {
+    setReport(next);
+    setActiveScenarioId(scenarioId);
+    setSelection(initialSelection(next));
+    setSelectedFindingId(next.findings[0]?.id ?? null);
+    setPreferredEvidenceId(null);
+  };
+
   const handleSelectScenario = (scenarioId: string) => {
     const fixture = DEMO_FIXTURES.find((f) => f.id === scenarioId);
-    if (fixture) {
-      setReport(fixture.report);
-      setActiveScenarioId(fixture.id);
-      setSelectedChangeId(fixture.report.structuralChanges[0]?.id ?? null);
-      setSelectedTestChangeId(fixture.report.testChanges[0]?.id ?? null);
-      setSelectedCorrelationId(fixture.report.correlationItems?.[0]?.id ?? null);
-      setSelectedFindingId(fixture.report.findings[0]?.id ?? null);
-      setSelectedEvidenceId(fixture.report.evidence[0]?.id ?? null);
-    }
+    if (fixture) showReport(fixture.report, fixture.id);
   };
 
-  // Ingested report callback
-  const handleReportLoaded = (result: ReportLoadResult) => {
-    if (result.success && result.report) {
-      setReport(result.report);
-      setActiveScenarioId(null);
-      setSelectedChangeId(result.report.structuralChanges[0]?.id ?? null);
-      setSelectedTestChangeId(result.report.testChanges[0]?.id ?? null);
-      setSelectedCorrelationId(result.report.correlationItems?.[0]?.id ?? null);
-      setSelectedFindingId(result.report.findings[0]?.id ?? null);
-      setSelectedEvidenceId(result.report.evidence[0]?.id ?? null);
-    }
+  const handleReportOpened = (result: ReportLoadResult, sampleId: string | null) => {
+    if (result.success && result.report) showReport(result.report, sampleId);
   };
 
-  // Selected entities for Detail Inspector
-  const selectedChange = useMemo(() => {
-    if (!report || !selectedChangeId) return null;
-    return report.structuralChanges.find((s) => s.id === selectedChangeId) ?? null;
-  }, [report, selectedChangeId]);
+  const selectChange = (id: string) => setSelection({ kind: "change", id });
+  const selectTestChange = (id: string) => setSelection({ kind: "test", id });
+  const selectCorrelation = (id: string) => setSelection({ kind: "correlation", id });
 
-  const selectedTestChange = useMemo(() => {
-    if (!report || !selectedTestChangeId) return null;
-    return report.testChanges.find((t) => t.id === selectedTestChangeId) ?? null;
-  }, [report, selectedTestChangeId]);
+  const handleSelectFinding = (id: string) => {
+    setSelectedFindingId(id);
+    const finding = report?.findings.find((f) => f.id === id);
+    if (!finding) return;
+    const changeId = finding.structuralChangeIds[0];
+    setSelection(changeId ? { kind: "change", id: changeId } : null);
+    setPreferredEvidenceId(finding.observed[0]?.evidenceIds[0] ?? null);
+  };
 
-  const selectedCorrelation = useMemo(() => {
-    if (!report || !selectedCorrelationId) return null;
-    return report.correlationItems?.find((c) => c.id === selectedCorrelationId) ?? null;
-  }, [report, selectedCorrelationId]);
+  const selectedChangeId = selection?.kind === "change" ? selection.id : null;
+  const selectedTestChangeId = selection?.kind === "test" ? selection.id : null;
+  const selectedCorrelationId = selection?.kind === "correlation" ? selection.id : null;
 
-  // Derive associated evidence items
-  const associatedEvidence = useMemo<readonly EvidenceItem[]>(() => {
-    if (!report) return [];
+  const selectedChange = useMemo(
+    () => report?.structuralChanges.find((s) => s.id === selectedChangeId) ?? null,
+    [report, selectedChangeId]
+  );
+  const selectedTestChange = useMemo(
+    () => report?.testChanges.find((t) => t.id === selectedTestChangeId) ?? null,
+    [report, selectedTestChangeId]
+  );
+  const selectedCorrelation = useMemo(
+    () => report?.correlationItems?.find((c) => c.id === selectedCorrelationId) ?? null,
+    [report, selectedCorrelationId]
+  );
 
-    if (selectedEvidenceId) {
-      const found = report.evidence.find((e) => e.id === selectedEvidenceId);
-      if (found) {
-        return report.evidence;
-      }
-    }
-
-    if (selectedCorrelation?.evidenceIds && selectedCorrelation.evidenceIds.length > 0) {
-      return report.evidence.filter((e) => selectedCorrelation.evidenceIds.includes(e.id));
-    }
-
-    if (selectedChangeId) {
-      const relatedFindings = report.findings.filter((f) => f.structuralChangeIds.includes(selectedChangeId));
-      const evIds = new Set<string>();
-      for (const f of relatedFindings) {
-        for (const obs of f.observed) {
-          for (const evId of obs.evidenceIds) {
-            evIds.add(evId);
-          }
-        }
-      }
-      if (evIds.size > 0) {
-        return report.evidence.filter((e) => evIds.has(e.id));
-      }
-    }
-
-    return report.evidence.slice(0, 3);
-  }, [report, selectedChangeId, selectedCorrelation, selectedEvidenceId]);
+  const associatedEvidence = useMemo(
+    () => (report ? evidenceForSelection(report, selection) : []),
+    [report, selection]
+  );
+  const selectedEvidenceId = resolveEvidenceId(associatedEvidence, preferredEvidenceId);
 
   return (
     <ConsoleLayout
@@ -124,100 +93,56 @@ export const ViewerPage: React.FC = () => {
       selectedCorrelation={selectedCorrelation}
       associatedEvidence={associatedEvidence}
       selectedEvidenceId={selectedEvidenceId}
-      onSelectEvidence={setSelectedEvidenceId}
+      onSelectEvidence={setPreferredEvidenceId}
       isGuideOpen={isGuideOpen}
       onToggleGuide={() => setIsGuideOpen(!isGuideOpen)}
       onCloseGuide={() => setIsGuideOpen(false)}
     >
-      {/* Active Tab Workspace */}
-      {activeTab === "timeline" && report && (
-        <ChangeTimeline
-          report={report}
-          selectedChangeId={selectedChangeId}
-          selectedTestChangeId={selectedTestChangeId}
-          selectedEvidenceId={selectedEvidenceId}
-          onSelectChange={(id) => {
-            setSelectedChangeId(id);
-            setSelectedCorrelationId(null);
-          }}
-          onSelectTestChange={(id) => {
-            setSelectedTestChangeId(id);
-          }}
-          onSelectEvidence={(evidenceId) => {
-            setSelectedEvidenceId(evidenceId);
-          }}
-        />
-      )}
+      {!report && <StartScreen onOpened={handleReportOpened} />}
 
-      {activeTab === "graph" && report && (
+      {report && activeTab === "dig" && (
         <CorrelationGraph
           report={report}
           selectedChangeId={selectedChangeId}
           selectedTestChangeId={selectedTestChangeId}
           selectedEvidenceId={selectedEvidenceId}
           selectedCorrelationId={selectedCorrelationId}
-          onSelectChange={(id) => {
-            setSelectedChangeId(id);
-            setSelectedCorrelationId(null);
-          }}
-          onSelectTestChange={(id) => {
-            setSelectedTestChangeId(id);
-          }}
-          onSelectEvidence={(evidenceId) => {
-            setSelectedEvidenceId(evidenceId);
-          }}
-          onSelectCorrelation={(id) => {
-            setSelectedCorrelationId(id);
-          }}
+          onSelectChange={selectChange}
+          onSelectTestChange={selectTestChange}
+          onSelectEvidence={setPreferredEvidenceId}
+          onSelectCorrelation={selectCorrelation}
         />
       )}
 
-      {activeTab === "structural" && report && (
-        <StructuralChangeExplorer
-          structuralChanges={report.structuralChanges}
-          selectedId={selectedChangeId}
-          onSelectChange={(id) => {
-            setSelectedChangeId(id);
-            setSelectedCorrelationId(null);
-          }}
-        />
+      {report && activeTab === "code" && (
+        <div className="p-4 space-y-6">
+          <StructuralChangeExplorer
+            structuralChanges={report.structuralChanges}
+            selectedId={selectedChangeId}
+            onSelectChange={selectChange}
+          />
+          <TestChangesInspector
+            testChanges={report.testChanges}
+            declarationChanges={report.declarationChanges}
+            selectedId={selectedTestChangeId}
+            onSelectChange={selectTestChange}
+          />
+        </div>
       )}
 
-      {activeTab === "tests" && report && (
-        <TestChangesInspector
-          testChanges={report.testChanges}
-          declarationChanges={report.declarationChanges}
-          selectedId={selectedTestChangeId}
-          onSelectChange={(id) => setSelectedTestChangeId(id)}
-        />
-      )}
-
-      {activeTab === "correlations" && report && (
-        <CorrelationMatrixTable
-          correlationItems={report.correlationItems}
-          selectedId={selectedCorrelationId}
-          onSelectCorrelation={(id) => {
-            setSelectedCorrelationId(id);
-            setSelectedChangeId(null);
-          }}
-        />
-      )}
-
-      {activeTab === "findings" && report && (
+      {report && activeTab === "findings" && (
         <FindingsSummary
           findings={report.findings}
           selectedId={selectedFindingId}
-          onSelectFinding={(id) => setSelectedFindingId(id)}
+          onSelectFinding={handleSelectFinding}
         />
       )}
 
-      {/* Ingestion Dialog */}
       <ReportLoader
         isOpen={isLoaderOpen}
         onClose={() => setIsLoaderOpen(false)}
-        onReportLoaded={handleReportLoaded}
+        onReportLoaded={handleReportOpened}
       />
     </ConsoleLayout>
   );
 };
-

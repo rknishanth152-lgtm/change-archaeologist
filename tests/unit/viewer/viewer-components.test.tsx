@@ -41,11 +41,18 @@ if (typeof window !== "undefined" && !window.matchMedia) {
   });
 }
 
+if (typeof ResizeObserver === "undefined") {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 import { App } from "../../../src/viewer/app/App.js";
 import { ExecutiveSummaryStrip } from "../../../src/viewer/components/ExecutiveSummaryStrip.js";
 import { StructuralChangeExplorer } from "../../../src/viewer/components/StructuralChangeExplorer.js";
 import { TestChangesInspector } from "../../../src/viewer/components/TestChangesInspector.js";
-import { CorrelationMatrixTable } from "../../../src/viewer/components/CorrelationMatrixTable.js";
 import { FindingsSummary } from "../../../src/viewer/components/FindingsSummary.js";
 import { LimitationsBanner } from "../../../src/viewer/components/LimitationsBanner.js";
 import { ReportLoader } from "../../../src/viewer/components/ReportLoader.js";
@@ -65,11 +72,11 @@ describe("Viewer Component Rendering & Console Shell", () => {
     cleanup();
   });
 
-  it("initializes App without crashing and renders Console header", () => {
+  it("starts on the start screen", () => {
     render(<App />);
-    expect(screen.getByText("Change Archaeologist")).toBeInTheDocument();
-    expect(screen.getByText("Console v1.0")).toBeInTheDocument();
-    expect(screen.getByText("TARGET ENTITY")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Change Archaeologist");
+    expect(screen.getByRole("button", { name: /Choose a report file/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /A safety check was removed/ })).toBeInTheDocument();
   });
 
   it("correctly renders ExecutiveSummaryStrip with validated report metrics", () => {
@@ -95,9 +102,8 @@ describe("Viewer Component Rendering & Console Shell", () => {
     );
 
     expect(screen.getByText("SC-001")).toBeInTheDocument();
-    expect(screen.getByText("-REM")).toBeInTheDocument();
-    expect(screen.getByText("GUARD_CLAUSE")).toBeInTheDocument();
-    expect(screen.getByText("RULE_GUARD_REMOVED")).toBeInTheDocument();
+    expect(screen.getByText("Removed: safety check")).toBeInTheDocument();
+    expect(screen.getByText("Lines 2–4")).toBeInTheDocument();
     expect(
       screen.getByText(/Guard clause removed: if \(!payment\.valid\)/)
     ).toBeInTheDocument();
@@ -117,31 +123,9 @@ describe("Viewer Component Rendering & Console Shell", () => {
     expect(
       screen.getByText("order calculation > calculates regular discount")
     ).toBeInTheDocument();
-    expect(screen.getByText("Calls Target Fn")).toBeInTheDocument();
-    expect(screen.getByText("- expect(calculateDiscount(100)).toBe(10)")).toBeInTheDocument();
+    expect(screen.getByText(/calls this function directly/)).toBeInTheDocument();
+    expect(screen.getByText("− expect(calculateDiscount(100)).toBe(10)")).toBeInTheDocument();
     expect(screen.getByText("+ expect(calculateDiscount(100)).toBe(15)")).toBeInTheDocument();
-  });
-
-  it("renders CorrelationMatrixTable with STRONG and WEAK status badges", () => {
-    const onSelect = () => {};
-    render(
-      <CorrelationMatrixTable
-        correlationItems={DEMO_SCENARIO_E.correlationItems}
-        selectedId={null}
-        onSelectCorrelation={onSelect}
-      />
-    );
-
-    expect(screen.getByText("CORR-ITEM-001")).toBeInTheDocument();
-    expect(screen.getByText("[STRONG]")).toBeInTheDocument();
-    expect(screen.getByText("POTENTIALLY_RELATED_ASSERTION_MODIFIED")).toBeInTheDocument();
-
-    expect(screen.getByText("CORR-ITEM-002")).toBeInTheDocument();
-    expect(screen.getByText("[WEAK]")).toBeInTheDocument();
-    expect(screen.getByText("POTENTIALLY_RELATED_TEST_DECLARATION_CHANGED")).toBeInTheDocument();
-
-    expect(screen.getAllByText("Observed Syntactic Fact").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Inferred Conservative Relationship").length).toBeGreaterThan(0);
   });
 
   it("renders FindingsSummary with observed, inferred, and unknown tiers", () => {
@@ -155,22 +139,17 @@ describe("Viewer Component Rendering & Console Shell", () => {
     );
 
     expect(screen.getByText("Return statement modified")).toBeInTheDocument();
-    expect(screen.getByText("INFORMATIONAL")).toBeInTheDocument();
-    expect(screen.getByText("MODERATE ATTENTION")).toBeInTheDocument();
-    expect(screen.getAllByText("[OBSERVED FACTS]").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("[INFERRED HYPOTHESES]").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("[ANALYSIS BOUNDARIES & UNKNOWNS]").length).toBeGreaterThan(0);
+    expect(screen.getByText("For information")).toBeInTheDocument();
+    expect(screen.getByText("Worth a look")).toBeInTheDocument();
+    expect(screen.getAllByText("What we saw").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("What that suggests").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("What we can't tell").length).toBeGreaterThan(0);
   });
 
   it("renders LimitationsBanner in expanded state for incomplete report (Scenario F)", () => {
     render(<LimitationsBanner report={DEMO_SCENARIO_F} />);
 
-    expect(
-      screen.getByText("INCOMPLETE ANALYSIS: INCOMPLETE_FUNCTION_MISSING")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Upstream Lineage & Static Analysis Boundaries")
-    ).toBeInTheDocument();
+    expect(screen.getByText("The function exists in only one of the two versions.")).toBeInTheDocument();
     expect(
       screen.getByText(/Target function 'deprecatedHelper' was not found in HEAD revision/)
     ).toBeInTheDocument();
@@ -187,42 +166,31 @@ describe("Viewer Component Rendering & Console Shell", () => {
     );
 
     expect(
-      screen.getByText("Zero companion test changes detected across the analyzed revision range.")
+      screen.getByText(/No test changes in this report/)
     ).toBeInTheDocument();
   });
 
-  it("supports full workspace tab switching for Scenario E in App", () => {
+  it("switches between the three views for a sample", () => {
     render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /How strong is the link/ }));
 
-    // Default view: Scenario E, Structural Mutations tab
-    expect(screen.getAllByText("calculateDiscount").length).toBeGreaterThan(0);
-    expect(screen.getByText("RULE_RETURN_MODIFIED")).toBeInTheDocument();
+    expect(screen.getByText(/1 code change and 1 test change, with 2 possible links/)).toBeInTheDocument();
+    expect(screen.getByText("Your code, before")).toBeInTheDocument();
 
-    // Switch to Companion Tests tab
-    const testsTab = screen.getByRole("tab", { name: /Companion Tests/ });
-    fireEvent.click(testsTab);
-    expect(screen.getByText("tests/order.test.ts")).toBeInTheDocument();
-    expect(screen.getByText("order calculation > calculates regular discount")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: /Code & tests/ }));
+    expect(screen.getByRole("heading", { name: /Test changes/ })).toBeInTheDocument();
 
-    // Switch to Correlation Matrix tab
-    const corrTab = screen.getByRole("tab", { name: /Correlation Matrix/ });
-    fireEvent.click(corrTab);
-    expect(screen.getByText("CORR-ITEM-001")).toBeInTheDocument();
-    expect(screen.getByText("[STRONG]")).toBeInTheDocument();
-    expect(screen.getByText("POTENTIALLY_RELATED_ASSERTION_MODIFIED")).toBeInTheDocument();
-
-    // Switch to Findings tab
-    const findingsTab = screen.getByRole("tab", { name: /Findings/ });
-    fireEvent.click(findingsTab);
+    fireEvent.click(screen.getByRole("tab", { name: /Findings/ }));
     expect(screen.getByText("Return statement modified")).toBeInTheDocument();
-    expect(screen.getAllByText("[OBSERVED FACTS]").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("What we saw").length).toBeGreaterThan(0);
   });
 
   it("switches to Scenario F via preset selector and displays incomplete analysis status", () => {
     render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /How strong is the link/ }));
 
     // Switch preset to Scenario F
-    const presetSelect = screen.getByLabelText("Select demonstration scenario");
+    const presetSelect = screen.getByLabelText("Open a sample report");
     fireEvent.change(presetSelect, { target: { value: "F" } });
 
     // Target function is deprecatedHelper in src/legacy.ts
@@ -230,10 +198,10 @@ describe("Viewer Component Rendering & Console Shell", () => {
     expect(screen.getAllByText("src/legacy.ts").length).toBeGreaterThan(0);
 
     // Status pill in navbar should show incomplete status
-    expect(screen.getAllByText("[INCOMPLETE_FUNCTION_MISSING]").length).toBeGreaterThan(0);
+    expect(screen.getByText("Incomplete")).toHaveAttribute("title", "INCOMPLETE_FUNCTION_MISSING");
 
     // Limitations banner displays the boundary warning
-    expect(screen.getByText(/Target function 'deprecatedHelper' was not found in HEAD revision/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Target function 'deprecatedHelper' was not found in HEAD revision/).length).toBeGreaterThan(0);
   });
 
   it("renders ReportLoader modal and dismisses on Escape key and backdrop click", () => {
@@ -242,7 +210,7 @@ describe("Viewer Component Rendering & Console Shell", () => {
       <ReportLoader isOpen={true} onClose={() => { closed = true; }} onReportLoaded={() => {}} />
     );
 
-    expect(screen.getByText("Ingest Analysis Report")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Open a report" })).toBeInTheDocument();
 
     // Test Escape key dismissal
     fireEvent.keyDown(window, { key: "Escape" });
@@ -269,47 +237,17 @@ describe("Viewer Component Rendering & Console Shell", () => {
       />
     );
 
-    expect(screen.getByText(/Test Block Declaration Mutations \(1\)/)).toBeInTheDocument();
-    expect(screen.getByText(/TDC-001: order calculation > calculates regular discount/)).toBeInTheDocument();
+    expect(screen.getByText(/Test titles that changed/)).toBeInTheDocument();
+    expect(screen.getByText(/Modified in/)).toBeInTheDocument();
   });
 
-  it("supports keyboard selection in CorrelationMatrixTable", () => {
-    let selectedId: string | null = null;
-    render(
-      <CorrelationMatrixTable
-        correlationItems={DEMO_SCENARIO_E.correlationItems}
-        selectedId={null}
-        onSelectCorrelation={(id) => { selectedId = id; }}
-      />
-    );
-
-    // Epistemic disclaimer banner is visible
-    expect(screen.getByText(/High Syntactic Proximity and Co-occurrence signals prioritize human review/)).toBeInTheDocument();
-
-    // Select row via Enter key
-    const row = screen.getByLabelText(/Correlation item CORR-ITEM-001/);
-    fireEvent.keyDown(row, { key: "Enter" });
-    expect(selectedId).toBe("CORR-ITEM-001");
-
-    // Select row via Space key
-    fireEvent.keyDown(row, { key: " " });
-    expect(selectedId).toBe("CORR-ITEM-001");
-  });
-
-  it("enforces WCAG tablist and tabpanel semantics in ConsoleLayout", () => {
+  it("enforces tablist and tabpanel semantics once a report is open", () => {
     render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /How strong is the link/ }));
 
-    const tablist = screen.getByRole("tablist", { name: "Analysis report workspace views" });
-    expect(tablist).toBeInTheDocument();
-
-    const structuralTab = screen.getByRole("tab", { name: /Structural Mutations/ });
-    expect(structuralTab).toHaveAttribute("aria-selected", "true");
-
-    const testsTab = screen.getByRole("tab", { name: /Companion Tests/ });
-    expect(testsTab).toHaveAttribute("aria-selected", "false");
-
-    const tabpanel = screen.getByRole("tabpanel");
-    expect(tabpanel).toBeInTheDocument();
-    expect(tabpanel).toHaveAttribute("aria-labelledby", "tab-structural");
+    expect(screen.getByRole("tablist", { name: "Report views" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /The Dig/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: /Code & tests/ })).toHaveAttribute("aria-selected", "false");
+    expect(screen.getByRole("tabpanel")).toHaveAttribute("aria-labelledby", "tab-dig");
   });
 });

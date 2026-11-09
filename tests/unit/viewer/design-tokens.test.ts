@@ -18,27 +18,18 @@ describe("Design Token System & Three-Tier Architecture", () => {
     expect(tokensCss.length).toBeGreaterThan(100);
   });
 
-  it("defines all primitive gray neutrals and slate boundary ramp", () => {
+  it("defines the light and dark surface and text ramps", () => {
     const requiredPrimitives = [
-      "--primitive-gray-950",
-      "--primitive-gray-925",
-      "--primitive-gray-900",
-      "--primitive-gray-850",
-      "--primitive-gray-800",
-      "--primitive-gray-750",
-      "--primitive-gray-700",
-      "--primitive-gray-600",
-      "--primitive-gray-500",
-      "--primitive-gray-400",
-      "--primitive-gray-300",
-      "--primitive-gray-200",
-      "--primitive-gray-100",
-      "--primitive-gray-50",
-      "--primitive-white",
-      "--primitive-slate-900",
-      "--primitive-slate-500",
-      "--primitive-slate-400",
-      "--primitive-slate-300",
+      "--primitive-mineral-50",
+      "--primitive-mineral-200",
+      "--primitive-mineral-500",
+      "--primitive-basalt-950",
+      "--primitive-basalt-850",
+      "--primitive-basalt-700",
+      "--primitive-ink-900",
+      "--primitive-ink-600",
+      "--primitive-frost-100",
+      "--primitive-frost-400",
     ];
 
     for (const token of requiredPrimitives) {
@@ -46,13 +37,18 @@ describe("Design Token System & Three-Tier Architecture", () => {
     }
   });
 
-  it("defines the canonical technical indigo accent and status primitives", () => {
+  it("defines the accent and status primitives for both themes", () => {
     const requiredAccents = [
-      "--primitive-indigo-500",
-      "--primitive-emerald-500",
-      "--primitive-coral-500",
-      "--primitive-amber-500",
-      "--primitive-violet-500",
+      "--primitive-verdigris-700",
+      "--primitive-verdigris-300",
+      "--primitive-green-700",
+      "--primitive-green-300",
+      "--primitive-red-700",
+      "--primitive-red-300",
+      "--primitive-amber-700",
+      "--primitive-amber-300",
+      "--primitive-violet-700",
+      "--primitive-violet-300",
     ];
 
     for (const token of requiredAccents) {

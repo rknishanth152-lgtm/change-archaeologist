@@ -88,14 +88,14 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
 
       const header = screen.getByRole("banner");
       expect(header).toBeInTheDocument();
-      expect(header).toHaveAttribute("aria-label", "Change Archaeologist Application Header");
+      expect(header).toHaveAttribute("aria-label", "Change Archaeologist");
     });
 
     it("renders proper main and complementary landmarks in ConsoleLayout", () => {
       render(
         <ConsoleLayout
           report={DEMO_SCENARIO_E}
-          activeTab="timeline"
+          activeTab="dig"
           onTabChange={vi.fn()}
           onLoadClick={vi.fn()}
           onSelectScenario={vi.fn()}
@@ -112,7 +112,7 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
       expect(mainPanel).toHaveAttribute("id", "panel-workspace");
       expect(mainPanel).toHaveAttribute("tabIndex", "0");
 
-      const aside = screen.getByRole("complementary", { name: /Entity and Evidence Detail Inspector/i });
+      const aside = screen.getByRole("complementary", { name: /Details of the selected item/i });
       expect(aside).toBeInTheDocument();
     });
 
@@ -120,7 +120,7 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
       render(
         <ConsoleLayout
           report={DEMO_SCENARIO_E}
-          activeTab="graph"
+          activeTab="dig"
           onTabChange={vi.fn()}
           onLoadClick={vi.fn()}
           onSelectScenario={vi.fn()}
@@ -135,7 +135,7 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
       const liveRegion = screen.getByRole("status");
       expect(liveRegion).toBeInTheDocument();
       expect(liveRegion).toHaveAttribute("aria-live", "polite");
-      expect(liveRegion.textContent).toContain("Correlation Graph view");
+      expect(liveRegion.textContent).toContain("The Dig");
       expect(liveRegion.textContent).toContain("calculateDiscount");
     });
   });
@@ -147,7 +147,7 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
       render(
         <ConsoleLayout
           report={DEMO_SCENARIO_E}
-          activeTab="timeline"
+          activeTab="dig"
           onTabChange={handleTabChange}
           onLoadClick={vi.fn()}
           onSelectScenario={vi.fn()}
@@ -159,19 +159,19 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
         </ConsoleLayout>
       );
 
-      const tablist = screen.getByRole("tablist", { name: "Analysis report workspace views" });
+      const tablist = screen.getByRole("tablist", { name: "Report views" });
 
-      // ArrowRight: timeline -> graph
+      // ArrowRight: The Dig -> Code & tests
       fireEvent.keyDown(tablist, { key: "ArrowRight" });
-      expect(handleTabChange).toHaveBeenCalledWith("graph");
+      expect(handleTabChange).toHaveBeenCalledWith("code");
 
       // End: jumps to last tab (findings)
       fireEvent.keyDown(tablist, { key: "End" });
       expect(handleTabChange).toHaveBeenCalledWith("findings");
 
-      // Home: jumps to first tab (timeline)
+      // Home: jumps to first tab
       fireEvent.keyDown(tablist, { key: "Home" });
-      expect(handleTabChange).toHaveBeenCalledWith("timeline");
+      expect(handleTabChange).toHaveBeenCalledWith("dig");
     });
 
     it("supports keyboard selection and accessible labels in StructuralChangeExplorer", () => {
@@ -185,16 +185,11 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
         />
       );
 
-      const mutationBtn = screen.getByRole("button", { name: /Structural mutation SC-001/i });
-      expect(mutationBtn).toBeInTheDocument();
-      expect(mutationBtn).toHaveAttribute("tabIndex", "0");
+      const changeBtn = screen.getByRole("button", { name: /SC-001/ });
+      expect(changeBtn.tagName).toBe("BUTTON");
+      expect(changeBtn).toHaveAttribute("aria-pressed", "false");
 
-      // Enter key triggers selection
-      fireEvent.keyDown(mutationBtn, { key: "Enter" });
-      expect(handleSelectChange).toHaveBeenCalledWith("SC-001");
-
-      // Space key triggers selection
-      fireEvent.keyDown(mutationBtn, { key: " " });
+      fireEvent.click(changeBtn);
       expect(handleSelectChange).toHaveBeenCalledWith("SC-001");
     });
 
@@ -208,14 +203,14 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
         />
       );
 
-      const modeBtn = screen.getByRole("button", { name: /Switch to Text View/i });
+      const modeBtn = screen.getByRole("button", { name: /Show as text/i });
       expect(modeBtn).toBeInTheDocument();
       fireEvent.click(modeBtn);
 
-      const baseCopyBtn = screen.getByRole("button", { name: /Copy BASE snippet to clipboard/i });
+      const baseCopyBtn = screen.getByRole("button", { name: /Copy: Before/i });
       expect(baseCopyBtn).toBeInTheDocument();
 
-      const headCopyBtn = screen.getByRole("button", { name: /Copy HEAD snippet to clipboard/i });
+      const headCopyBtn = screen.getByRole("button", { name: /Copy: After/i });
       expect(headCopyBtn).toBeInTheDocument();
     });
   });
@@ -238,7 +233,7 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
       expect(dialog).toHaveAttribute("aria-labelledby", "loader-title");
 
       // Close button is focused
-      const closeBtn = screen.getByRole("button", { name: "Close dialog" });
+      const closeBtn = screen.getByRole("button", { name: "Close" });
       expect(closeBtn).toBeInTheDocument();
 
       // Escape key closes modal
@@ -255,7 +250,7 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
         />
       );
 
-      const dropzone = screen.getByRole("button", { name: /Upload report JSON file: browse or drag and drop/i });
+      const dropzone = screen.getByRole("button", { name: /Choose a report file/i });
       expect(dropzone).toBeInTheDocument();
       expect(dropzone).toHaveAttribute("tabIndex", "0");
 
@@ -286,7 +281,7 @@ describe("Milestone 13.8: Accessibility and Semantic Structure", () => {
       );
 
       // On narrow viewport, Accessible Linear View should be active automatically
-      expect(screen.getByText(/Accessible Linear Representation/)).toBeInTheDocument();
+      expect(screen.getByText(/Everything in The Dig as a list/)).toBeInTheDocument();
 
       // Restore window width
       window.innerWidth = originalInnerWidth;

@@ -56,39 +56,39 @@ export interface ReportReadingGuideData {
  */
 export const CONCEPT_EXPLANATIONS = {
   astMutation: {
-    term: "Code Change (AST Mutation)",
+    term: "Code change",
     plain: "A structural modification in the code syntax tree (like deleting a guard check or changing a return value), ignoring harmless formatting or whitespace differences.",
   },
   companionTest: {
-    term: "Related Test (Companion Test)",
+    term: "Related test",
     plain: "A test file that was edited in the same Git commit range as the production code change.",
   },
   correlationLink: {
-    term: "Code–Test Relationship (Correlation)",
+    term: "Link",
     plain: "A detected analytical link showing whether test changes reference or correspond to the changed production code.",
   },
   evidenceAnchor: {
-    term: "Traceable Evidence Anchor",
+    term: "Evidence",
     plain: "A verified proof record linking every observation directly to a Git commit, file path, line number, and code snippet.",
   },
   epistemicFindings: {
-    term: "What We Know (Epistemic Findings)",
+    term: "Finding",
     plain: "Facts observed directly in the code, rule-based hypotheses inferred from those facts, and explicit boundaries showing what static analysis cannot prove.",
   },
   strongStatus: {
-    term: "STRONG Correlation",
+    term: "STRONG",
     plain: "A test assertion directly calls or names the modified production function in the same commit.",
   },
   weakStatus: {
-    term: "WEAK Correlation",
+    term: "WEAK",
     plain: "A test block or test suite was modified in the same commit, but without a direct assertion targeting the specific changed function.",
   },
   uncertainStatus: {
-    term: "UNCERTAIN Correlation",
+    term: "UNCERTAIN",
     plain: "Changes were detected in both production code and tests, but relationships are ambiguous or incomplete.",
   },
   noneStatus: {
-    term: "NONE (Uncorrelated)",
+    term: "NONE",
     plain: "No related test changes were found for this production code change in the analyzed commit range.",
   },
   analysisBoundaries: {
@@ -152,7 +152,7 @@ export function explainStructuralChange(
   return {
     entityType: "Production Code Change",
     plainTitle,
-    whatChanged: `${whatChanged} (${sc.ruleId})`,
+    whatChanged,
     evidenceSummary: `Change ID: ${sc.id} | Location: ${spanStr}`,
     establishes: "The syntax tree of this function was structurally altered between the two Git commits.",
     doesNotEstablish: "Whether this change caused a bug, altered runtime behavior for callers, or passed code review.",
@@ -172,7 +172,7 @@ export function explainTestChange(
   const callsTarget = tc.mentionsTargetFunction || tc.assertionChanges.some((a) => a.callsTargetFunctionInBlock);
 
   let plainTitle = "Related Test File Changed";
-  let whatChanged = `Test file '${tc.posixTestFilePath}' was updated with ${assertionCount} assertion change(s).`;
+  let whatChanged = `'${tc.posixTestFilePath}' changed, with ${assertionCount} ${assertionCount === 1 ? "assertion" : "assertions"} updated.`;
 
   if (callsTarget) {
     plainTitle = "Test Calling Changed Function";
@@ -403,68 +403,67 @@ export function buildReportReadingGuideData(report: AnalysisReport): ReportReadi
   const weakCount = report.correlationItems?.filter((c) => c.status === "WEAK").length ?? 0;
 
   // 1. What changed?
-  let scSummary = `We compared function '${targetName}' across Git commits ${commitRange} and found ${scCount} structural code change(s).`;
+  let scSummary = `We compared '${targetName}' between ${commitRange} and found ${scCount} structural ${scCount === 1 ? "change" : "changes"}.`;
   if (scCount === 0) {
-    scSummary = `No structural code changes were detected in '${targetName}' across Git commits ${commitRange}.`;
+    scSummary = `No structural changes were found in '${targetName}' between ${commitRange}.`;
   }
 
   const scDetails: string[] = [];
-  if (addedCount > 0) scDetails.push(`${addedCount} syntax element(s) added (+ADD)`);
-  if (modifiedCount > 0) scDetails.push(`${modifiedCount} syntax element(s) modified (ΔMOD)`);
-  if (removedCount > 0) scDetails.push(`${removedCount} syntax element(s) removed (-REM)`);
+  if (addedCount > 0) scDetails.push(`${addedCount} ${addedCount === 1 ? "part" : "parts"} added`);
+  if (modifiedCount > 0) scDetails.push(`${modifiedCount} ${modifiedCount === 1 ? "part" : "parts"} changed`);
+  if (removedCount > 0) scDetails.push(`${removedCount} ${removedCount === 1 ? "part" : "parts"} removed`);
 
   if (report.structuralChanges.length > 0) {
     const firstSc = report.structuralChanges[0];
-    scDetails.push(`Primary change: ${firstSc.category.replace(/_/g, " ")} (${firstSc.summary})`);
+    scDetails.push(`Main change: ${firstSc.summary}`);
   }
 
   // 2. What do the tests tell us?
-  let testSummary = `We searched for test changes committed in the same revision range and found ${tcCount} companion test file(s).`;
+  let testSummary = `We looked for test changes in the same range and found ${tcCount} ${tcCount === 1 ? "test change" : "test changes"}.`;
   const testDetails: string[] = [];
   if (tcCount === 0) {
-    testSummary = `Zero companion test files were touched in the same commit range. The production changes have no corresponding test edits in this commit.`;
-    testDetails.push("No test files were committed alongside this production change.");
-    testDetails.push("Existing tests might still cover this function, but they were not edited in this commit.");
+    testSummary = `No test files changed in this range.`;
+        testDetails.push("Existing tests might still cover this function. They just weren't edited here.");
   } else {
     const totalAssertions = report.testChanges.reduce((acc, t) => acc + t.assertionChanges.length, 0);
-    testDetails.push(`${totalAssertions} assertion change(s) detected across ${tcCount} test file(s).`);
+    testDetails.push(`${totalAssertions} ${totalAssertions === 1 ? "assertion" : "assertions"} changed.`);
     const callingTests = report.testChanges.filter(
       (t) => t.mentionsTargetFunction || t.assertionChanges.some((a) => a.callsTargetFunctionInBlock)
     );
     if (callingTests.length > 0) {
-      testDetails.push(`${callingTests.length} test file(s) directly invoke '${targetName}'.`);
+      testDetails.push(`Calls '${targetName}' directly: ${callingTests.length} of ${tcCount}.`);
     } else {
-      testDetails.push(`None of the touched test files directly call '${targetName}'.`);
+      testDetails.push(`None of them call '${targetName}' directly.`);
     }
   }
 
   // 3. What can we conclude?
-  let concludeSummary = `Based on static analysis of syntax and Git history:`;
+  let concludeSummary = `From reading the code and its Git history:`;
   const concludeDetails: string[] = [];
 
   if (strongCount > 0) {
     concludeDetails.push(
-      `Found ${strongCount} STRONG correlation(s): tests were committed that directly test '${targetName}' and updated their assertions.`
+      `${strongCount} STRONG ${strongCount === 1 ? "link" : "links"}: a changed test directly calls '${targetName}'.`
     );
   } else if (weakCount > 0) {
     concludeDetails.push(
-      `Found ${weakCount} WEAK correlation(s): test files were modified in the same commit, but without direct assertion updates on '${targetName}'.`
+      `${weakCount} WEAK ${weakCount === 1 ? "link" : "links"}: a test file changed, but nothing points at '${targetName}' directly.`
     );
   } else if (scCount > 0 && tcCount === 0) {
     concludeDetails.push(
-      `Unaccompanied production change: code was modified without any companion test updates in the same commit.`
+      `The code changed with no test changes in the same range.`
     );
   } else {
     concludeDetails.push(
-      `Analytical correlation count: ${corrCount} link(s) detected.`
+      `${corrCount} ${corrCount === 1 ? "link" : "links"} recorded.`
     );
   }
 
   concludeDetails.push(
-    "Observed Fact: Static analysis inspects code structure in Git; it does NOT run the tests."
+    "This tool read the code. It did not run the tests."
   );
   concludeDetails.push(
-    "Boundary: Correlation does not prove the test passed, nor that it caught or prevented bugs."
+    "A link doesn't prove a test passed, or that it caught or prevented a bug."
   );
 
   return {

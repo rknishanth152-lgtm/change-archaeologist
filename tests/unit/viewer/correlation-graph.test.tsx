@@ -1,18 +1,16 @@
 // @vitest-environment jsdom
 /**
- * Change Archaeologist - Correlation Graph Component Tests
+ * Change Archaeologist - Correlation View Component Tests
  *
- * Verifies interactive Production-Test Correlation Graph rendering,
- * visual vs accessible mode switching, legend, Scenario A through F,
- * and keyboard/selection navigation.
+ * Verifies The Dig renders real report entities, selection reports through
+ * the shared callbacks, and the Accessible View exposes the same relationships.
  */
 
 import React from "react";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 
-// Polyfill ResizeObserver for JSDOM
 if (typeof ResizeObserver === "undefined") {
   global.ResizeObserver = class ResizeObserver {
     observe() {}
@@ -21,420 +19,199 @@ if (typeof ResizeObserver === "undefined") {
   };
 }
 
-// Polyfill matchMedia for JSDOM
-if (typeof window !== "undefined" && !window.matchMedia) {
-  Object.defineProperty(window, "matchMedia", {
-    writable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  });
-}
-
 import { CorrelationGraph } from "../../../src/viewer/components/CorrelationGraph.js";
 import {
   DEMO_SCENARIO_A,
   DEMO_SCENARIO_E,
   DEMO_SCENARIO_F,
 } from "../../../src/viewer/data/demo-fixtures.js";
+import type { AnalysisReport } from "../../../src/viewer/types/index.js";
+import { CROWDED_REPORT } from "../../helpers/crowded-report.js";
 
-describe("CorrelationGraph Component", () => {
-  beforeEach(() => {
-    cleanup();
+function renderGraph(report: AnalysisReport) {
+  const handlers = {
+    onSelectChange: vi.fn(),
+    onSelectTestChange: vi.fn(),
+    onSelectEvidence: vi.fn(),
+    onSelectCorrelation: vi.fn(),
+  };
+  render(
+    <CorrelationGraph
+      report={report}
+      selectedChangeId={null}
+      selectedTestChangeId={null}
+      selectedEvidenceId={null}
+      selectedCorrelationId={null}
+      {...handlers}
+    />
+  );
+  return handlers;
+}
+
+const openAccessibleView = () => fireEvent.click(screen.getByRole("button", { name: /Table view/ }));
+const strongShaft = () => screen.getByRole("button", { name: /STRONG link from SC-001 to TC-001/ });
+
+describe("The Dig", () => {
+  afterEach(cleanup);
+
+  it("opens on The Dig with its layers and the real function source", () => {
+    renderGraph(DEMO_SCENARIO_E);
+
+    expect(screen.getByRole("button", { name: "The Dig" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Your code, before")).toBeInTheDocument();
+    expect(screen.getByText("Tests changed in this range")).toBeInTheDocument();
+    expect(screen.getByText(/Never dug:/)).toBeInTheDocument();
+    expect(screen.getByText("return price * 0.15;")).toBeInTheDocument();
   });
 
-  afterEach(() => {
-    cleanup();
+  it("draws the file-level WEAK link alongside the STRONG one", () => {
+    renderGraph(DEMO_SCENARIO_E);
+
+    expect(strongShaft()).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /WEAK link from SC-001 to tests\/order\.test\.ts/ })).toBeInTheDocument();
   });
 
-  it("renders graph toolbar, title, and summary metrics", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
+  it("selects a correlation, shows the three-part explanation, and flags a verdict conflict", () => {
+    const handlers = renderGraph(DEMO_SCENARIO_E);
+    fireEvent.click(strongShaft());
 
-    expect(screen.getByText("Production-Test Correlation Graph")).toBeInTheDocument();
-    expect(screen.getByText("Visual Graph")).toBeInTheDocument();
-    expect(screen.getByText("Accessible View")).toBeInTheDocument();
-
-    // Summary metric text: "2 Prod / 3 Test / 1 Corr"
-    expect(screen.getByText(/Prod \/.*Test \/.*Corr/)).toBeInTheDocument();
+    expect(handlers.onSelectCorrelation).toHaveBeenCalledWith("CORR-ITEM-001");
+    expect(handlers.onSelectEvidence).toHaveBeenCalledWith("EV-001");
+    expect(strongShaft()).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("heading", { name: "STRONG link" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "What we can't tell" })).toBeInTheDocument();
+    expect(screen.getByText(/overall verdict for SC-001 is WEAK/)).toBeInTheDocument();
   });
 
-  it("switches to accessible view when Accessible View button is clicked", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    const accessibleBtn = screen.getByRole("button", { name: /Accessible View/ });
-    fireEvent.click(accessibleBtn);
-
-    expect(screen.getByText(/Accessible Linear Representation/)).toBeInTheDocument();
-    expect(screen.getByText(/1. Production Function & Structural Mutations/)).toBeInTheDocument();
-    expect(screen.getByText(/2. Companion Test Files & Changes/)).toBeInTheDocument();
-    expect(screen.getByText(/3. Analytical Correlation Links/)).toBeInTheDocument();
+  it("opens evidence from the detail panel", () => {
+    const handlers = renderGraph(DEMO_SCENARIO_E);
+    fireEvent.click(strongShaft());
+    fireEvent.click(screen.getByRole("button", { name: "EV-002" }));
+    expect(handlers.onSelectEvidence).toHaveBeenLastCalledWith("EV-002");
   });
 
-  it("renders Scenario A with 1 production mutation and empty test notice in accessible view", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_A}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    const accessibleBtn = screen.getByRole("button", { name: /Accessible View/ });
-    fireEvent.click(accessibleBtn);
-
-    // Target function and SC-001 should be present
-    expect(screen.getByText("processPayment()")).toBeInTheDocument();
-    expect(screen.getByText("SC-001")).toBeInTheDocument();
-
-    // Notice that test side is empty
-    expect(
-      screen.getByText(/No companion test files or test assertion changes recorded in this report/)
-    ).toBeInTheDocument();
+  it("selects a code change from its fault", () => {
+    const handlers = renderGraph(DEMO_SCENARIO_E);
+    fireEvent.click(screen.getByRole("button", { name: /^Changed: Return statement modified/ }));
+    expect(handlers.onSelectChange).toHaveBeenCalledWith("SC-001");
   });
 
-  it("renders Scenario E correlation links with STRONG status in accessible view", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
+  it("selects a test and says the code was not run", () => {
+    const handlers = renderGraph(DEMO_SCENARIO_E);
+    fireEvent.click(screen.getByRole("button", { name: /^Test change: order calculation/ }));
 
-    const accessibleBtn = screen.getByRole("button", { name: /Accessible View/ });
-    fireEvent.click(accessibleBtn);
-
-    // Structural change SC-001
-    expect(screen.getByText("SC-001")).toBeInTheDocument();
-    // Test change TC-001
-    expect(screen.getByText("TC-001")).toBeInTheDocument();
-    // Declaration change TDC-001
-    expect(screen.getByText("TDC-001")).toBeInTheDocument();
-
-    // Correlation edge badge
-    expect(screen.getByText("STRONG CORRELATION")).toBeInTheDocument();
+    expect(handlers.onSelectTestChange).toHaveBeenCalledWith("TC-001");
+    expect(screen.getByText(/did not run it/)).toBeInTheDocument();
   });
 
-  it("renders Scenario F incomplete analysis boundary banner", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_F}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
+  it("supports the keyboard and clears focus with Escape or a second click", () => {
+    renderGraph(DEMO_SCENARIO_E);
 
-    expect(screen.getByText("Comparative Analysis Incomplete:")).toBeInTheDocument();
+    fireEvent.keyDown(strongShaft(), { key: "Enter" });
+    expect(strongShaft()).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.keyDown(strongShaft(), { key: "Escape" });
+    expect(strongShaft()).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(strongShaft());
+    fireEvent.click(strongShaft());
+    expect(strongShaft()).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("triggers onSelectChange and onSelectEvidence when a mutation card is clicked", () => {
-    const handleSelectChange = vi.fn();
-    const handleSelectEvidence = vi.fn();
+  it("uses the legend as a status filter and disables statuses with no links", () => {
+    renderGraph(DEMO_SCENARIO_E);
 
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_A}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={handleSelectChange}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={handleSelectEvidence}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    const accessibleBtn = screen.getByRole("button", { name: /Accessible View/ });
-    fireEvent.click(accessibleBtn);
-
-    const scCard = screen.getByText("SC-001").closest('[role="listitem"]');
-    expect(scCard).not.toBeNull();
-    if (scCard) {
-      fireEvent.click(scCard);
-      expect(handleSelectChange).toHaveBeenCalledWith("SC-001");
-      expect(handleSelectEvidence).toHaveBeenCalledWith("EV-001");
-    }
+    const weak = screen.getByRole("button", { name: /^WEAK: same file/ });
+    fireEvent.click(weak);
+    expect(weak).toHaveAttribute("aria-pressed", "true");
+    expect(strongShaft().getAttribute("class")).toContain("dig-dimmed");
+    expect(screen.getByRole("button", { name: /^UNCERTAIN: unclear/ })).toBeDisabled();
   });
 
-  it("triggers onSelectCorrelation when a correlation link card is clicked", () => {
-    const handleSelectCorrelation = vi.fn();
-    const handleSelectEvidence = vi.fn();
-
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={handleSelectEvidence}
-        onSelectCorrelation={handleSelectCorrelation}
-      />
-    );
-
-    const accessibleBtn = screen.getByRole("button", { name: /Accessible View/ });
-    fireEvent.click(accessibleBtn);
-
-    const corrCard = screen.getByText("STRONG CORRELATION").closest('[role="listitem"]');
-    expect(corrCard).not.toBeNull();
-    if (corrCard) {
-      fireEvent.click(corrCard);
-      expect(handleSelectCorrelation).toHaveBeenCalled();
-    }
+  it("keeps absence honest when a report has no test changes", () => {
+    renderGraph(DEMO_SCENARIO_A);
+    expect(screen.getByText(/does not mean the code is untested/)).toBeInTheDocument();
   });
 
-  it("displays Graph Legend with calibration statuses and non-causality principle", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
+  it("shows a missing function as a broken layer", () => {
+    renderGraph(DEMO_SCENARIO_F);
+    expect(screen.getByText("Function not found in this version")).toBeInTheDocument();
+      });
 
-    expect(screen.getByText("Graph Legend & Calibration")).toBeInTheDocument();
-    expect(screen.getByText("Node Categories")).toBeInTheDocument();
-    expect(screen.getByText("Correlation Edge Statuses")).toBeInTheDocument();
-    expect(screen.getByText(/Non-Causality Principle:/)).toBeInTheDocument();
-  });
+  it("compresses long functions on demand and notes unanchored links", () => {
+    renderGraph(CROWDED_REPORT);
 
-  it("renders the Fit View button and domain guide overlay in visual graph mode", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
+    expect(screen.getAllByText(/lines hidden/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/1 recorded link isn't tied/)).toBeInTheDocument();
 
-    // Fit View button
-    const fitViewBtn = screen.getByRole("button", { name: /Fit view to all nodes/ });
-    expect(fitViewBtn).toBeInTheDocument();
-    fireEvent.click(fitViewBtn); // Should not throw
-
-    // Domain guide overlay banner
-    expect(screen.getByText("Production Domain")).toBeInTheDocument();
-    expect(screen.getByText("Test Domain")).toBeInTheDocument();
-  });
-
-  it("toggles Focus Mode and displays active 1-hop network banner for selected mutation", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId="SC-001"
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    const focusBtn = screen.getByRole("button", { name: /Focus Mode/ });
-    expect(focusBtn).toBeInTheDocument();
-    expect(focusBtn).toHaveAttribute("aria-pressed", "false");
-
-    // Click to activate focus mode
-    fireEvent.click(focusBtn);
-    expect(focusBtn).toHaveAttribute("aria-pressed", "true");
-
-    // Focus mode banner should be visible with target SC-001
-    expect(screen.getByText(/Focus Mode:/)).toBeInTheDocument();
-    expect(screen.getAllByText("SC-001").length).toBeGreaterThanOrEqual(1);
-
-    // Click Exit Focus
-    const exitBtn = screen.getByText("Exit Focus");
-    fireEvent.click(exitBtn);
-    expect(focusBtn).toHaveAttribute("aria-pressed", "false");
-  });
-
-  it("renders search filter input, category filter pills, and status filter pills in sub-toolbar", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    // Search input
-    const searchInput = screen.getByPlaceholderText("Search nodes or coordinates...");
-    expect(searchInput).toBeInTheDocument();
-
-    // Category filter pills
-    expect(screen.getByText("Scope:")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Production" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Tests" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Correlated" })).toBeInTheDocument();
-
-    // Status filter pills
-    expect(screen.getByText("Status:")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "STRONG" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "WEAK" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "UNCERTAIN" })).toBeInTheDocument();
-  });
-
-  it("filters nodes in accessible view when search query is entered", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    // Switch to accessible view
-    const accessibleBtn = screen.getByRole("button", { name: /Accessible View/ });
-    fireEvent.click(accessibleBtn);
-
-    // Both SC-001 and TC-001 initially present
-    expect(screen.getByText("SC-001")).toBeInTheDocument();
-    expect(screen.getByText("TC-001")).toBeInTheDocument();
-
-    // Type "calculate" into search input
-    const searchInput = screen.getByPlaceholderText("Search nodes or coordinates...");
-    fireEvent.change(searchInput, { target: { value: "calculate" } });
-
-    // Target function / SC-001 matching "calculate" is present
-    expect(screen.getByText(/calculateDiscount/)).toBeInTheDocument();
-
-    // Clear search
-    const clearBtn = screen.getByTitle("Clear search");
-    fireEvent.click(clearBtn);
-    expect(searchInput).toHaveValue("");
-  });
-
-  it("displays dedicated correlation edge inspection card when selectedCorrelationId is set", () => {
-    const handleSelectEvidence = vi.fn();
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId="CORR-ITEM-001"
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={handleSelectEvidence}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    // Correlation card header
-    expect(screen.getByText("STRONG Correlation")).toBeInTheDocument();
-    expect(screen.getAllByText("SC-001").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("TC-001").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Does not establish:/)).toBeInTheDocument();
-
-    // Evidence button in card
-    const evBtn = screen.getByRole("button", { name: "EV-001" });
-    expect(evBtn).toBeInTheDocument();
-    fireEvent.click(evBtn);
-    expect(handleSelectEvidence).toHaveBeenCalledWith("EV-001");
-  });
-
-  it("toggles minimap and graph legend visibility buttons", () => {
-    render(
-      <CorrelationGraph
-        report={DEMO_SCENARIO_E}
-        selectedChangeId={null}
-        selectedTestChangeId={null}
-        selectedEvidenceId={null}
-        selectedCorrelationId={null}
-        onSelectChange={vi.fn()}
-        onSelectTestChange={vi.fn()}
-        onSelectEvidence={vi.fn()}
-        onSelectCorrelation={vi.fn()}
-      />
-    );
-
-    const legendTitle = () => screen.queryByText("Graph Legend & Calibration");
-    expect(legendTitle()).toBeInTheDocument();
-
-    const toggleLegendBtn = screen.getByRole("button", { name: "Toggle graph legend" });
-    fireEvent.click(toggleLegendBtn);
-    expect(legendTitle()).toBeNull();
-
-    fireEvent.click(toggleLegendBtn);
-    expect(legendTitle()).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Show all lines" }));
+    expect(screen.queryByText(/lines hidden/)).toBeNull();
+    expect(screen.getByRole("button", { name: "Hide unchanged lines" })).toBeInTheDocument();
   });
 });
 
+describe("Accessible View", () => {
+  afterEach(cleanup);
+
+  it("lists production entities, tests, and correlation links", () => {
+    renderGraph(DEMO_SCENARIO_E);
+    openAccessibleView();
+
+    expect(screen.getByText(/Everything in The Dig as a list/)).toBeInTheDocument();
+    expect(screen.getByText("SC-001")).toBeInTheDocument();
+    expect(screen.getByText("TC-001")).toBeInTheDocument();
+    expect(screen.getByText("TDC-001")).toBeInTheDocument();
+    expect(screen.getByText("STRONG")).toBeInTheDocument();
+  });
+
+  it("includes the file-level link and reports its selection", () => {
+    const handlers = renderGraph(DEMO_SCENARIO_E);
+    openAccessibleView();
+
+    expect(screen.getByText(/^Links \(2\)/)).toBeInTheDocument();
+    const row = screen.getByText("WEAK").closest('[role="listitem"]');
+    fireEvent.click(row as Element);
+    expect(handlers.onSelectCorrelation).toHaveBeenCalledWith("CORR-ITEM-002");
+  });
+
+  it("shows an empty-test notice for Scenario A", () => {
+    renderGraph(DEMO_SCENARIO_A);
+    openAccessibleView();
+
+    expect(screen.getByText("processPayment()")).toBeInTheDocument();
+    expect(
+      screen.getByText(/No test changes in this report/)
+    ).toBeInTheDocument();
+  });
+
+  it("selects a mutation and its evidence", () => {
+    const handlers = renderGraph(DEMO_SCENARIO_A);
+    openAccessibleView();
+
+    fireEvent.click(screen.getByText("SC-001").closest('[role="listitem"]') as Element);
+    expect(handlers.onSelectChange).toHaveBeenCalledWith("SC-001");
+    expect(handlers.onSelectEvidence).toHaveBeenCalledWith("EV-001");
+  });
+
+  it("selects a drawn correlation link", () => {
+    const handlers = renderGraph(DEMO_SCENARIO_E);
+    openAccessibleView();
+
+    fireEvent.click(screen.getByText("STRONG").closest('[role="listitem"]') as Element);
+    expect(handlers.onSelectCorrelation).toHaveBeenCalledWith("CORR-ITEM-001");
+  });
+
+  it("filters by search and clears", () => {
+    renderGraph(DEMO_SCENARIO_E);
+    openAccessibleView();
+
+    const input = screen.getByPlaceholderText("Search changes and tests");
+    fireEvent.change(input, { target: { value: "calculate" } });
+    expect(screen.getByText(/calculateDiscount/)).toBeInTheDocument();
+    expect(screen.queryByText("TC-001")).toBeNull();
+
+    fireEvent.click(screen.getByTitle("Clear search"));
+    expect(input).toHaveValue("");
+    expect(screen.getByText("TC-001")).toBeInTheDocument();
+  });
+});

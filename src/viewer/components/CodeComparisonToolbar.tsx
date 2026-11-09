@@ -80,13 +80,13 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
     currentEvidenceIndex !== -1 ? evidenceList[currentEvidenceIndex] : null;
 
   return (
-    <div className="border-b border-hairline bg-panel select-none font-mono text-xs">
+    <div className="border-b border-hairline bg-panel select-none font-sans text-xs">
       {/* Primary Toolbar Row: Diff Modes & Evidence Navigation */}
       <div className="min-h-[38px] px-3 py-1 flex items-center justify-between gap-2 shrink-0">
         {/* Group 1: Diff Mode Layout Toggle */}
         <div
           role="group"
-          aria-label="Diff comparison layout mode"
+          aria-label="Diff layout"
           className="flex items-center rounded-xs bg-ground border border-hairline p-0.5 shrink-0"
         >
           <button
@@ -96,13 +96,13 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
             aria-label="Side by side diff layout"
             className={`px-2 py-0.5 flex items-center space-x-1.5 rounded-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer ${
               diffMode === "side-by-side"
-                ? "bg-surface-elevated text-text-primary font-semibold shadow-xs"
+                ? "bg-surface-elevated text-text-primary font-semibold"
                 : "text-text-muted hover:text-text-secondary"
             }`}
-            title="Side-by-side diff comparison"
+            title="Before and after in two columns"
           >
             <Columns2 size={12} strokeWidth={1.5} />
-            <span className="text-[11px] whitespace-nowrap">Side-by-Side</span>
+            <span className="text-xs whitespace-nowrap">Side-by-Side</span>
           </button>
 
           <button
@@ -112,13 +112,13 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
             aria-label="Unified diff layout"
             className={`px-2 py-0.5 flex items-center space-x-1.5 rounded-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer ${
               diffMode === "unified"
-                ? "bg-surface-elevated text-text-primary font-semibold shadow-xs"
+                ? "bg-surface-elevated text-text-primary font-semibold"
                 : "text-text-muted hover:text-text-secondary"
             }`}
-            title="Unified diff comparison"
+            title="Before and after in one column"
           >
             <Rows size={12} strokeWidth={1.5} />
-            <span className="text-[11px] whitespace-nowrap">Unified</span>
+            <span className="text-xs whitespace-nowrap">Unified</span>
           </button>
         </div>
 
@@ -127,16 +127,14 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
           {hasEvidence && (
             <div className="flex items-center space-x-1 bg-ground border border-hairline px-2 py-0.5 rounded-xs">
               <GlyphEvidencePin size={11} className="text-text-accent shrink-0" />
-              <span className="text-[10px] text-text-muted uppercase hidden xs:inline">
-                Evidence:
-              </span>
+              <span className="text-xs text-text-secondary hidden sm:inline">Evidence</span>
               {currentEvidence ? (
-                <span className="text-[10px] font-semibold text-text-accent whitespace-nowrap">
+                <span className="font-mono text-xs font-semibold text-text-accent whitespace-nowrap">
                   {currentEvidence.id} ({currentEvidenceIndex + 1}/
                   {evidenceList.length})
                 </span>
               ) : (
-                <span className="text-[10px] text-text-muted whitespace-nowrap">
+                <span className="text-xs text-text-muted whitespace-nowrap">
                   {evidenceList.length} items
                 </span>
               )}
@@ -146,13 +144,13 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
                   type="button"
                   onClick={handlePrevEvidence}
                   disabled={isFirst}
-                  aria-label="Navigate to previous evidence item"
+                  aria-label="Previous evidence"
                   className={`p-1 rounded-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus ${
                     isFirst
                       ? "text-border opacity-40 cursor-not-allowed"
                       : "hover:text-text-primary text-text-muted hover:bg-surface-hover cursor-pointer"
                   }`}
-                  title="Previous evidence item"
+                  title="Previous evidence"
                 >
                   <ChevronLeft size={12} strokeWidth={1.5} />
                 </button>
@@ -160,13 +158,13 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
                   type="button"
                   onClick={handleNextEvidence}
                   disabled={isLast}
-                  aria-label="Navigate to next evidence item"
+                  aria-label="Next evidence"
                   className={`p-1 rounded-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus ${
                     isLast
                       ? "text-border opacity-40 cursor-not-allowed"
                       : "hover:text-text-primary text-text-muted hover:bg-surface-hover cursor-pointer"
                   }`}
-                  title="Next evidence item"
+                  title="Next evidence"
                 >
                   <ChevronRight size={12} strokeWidth={1.5} />
                 </button>
@@ -179,9 +177,9 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
             <button
               type="button"
               onClick={onCopySource}
-              aria-label="Copy active comparison source"
+              aria-label="Copy this code"
               className="p-1 text-text-muted hover:text-text-primary hover:bg-surface-hover rounded-xs border border-hairline transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-border-focus cursor-pointer shrink-0"
-              title="Copy active comparison code"
+              title="Copy this code"
             >
               {isCopied ? (
                 <Check
@@ -198,15 +196,15 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
       </div>
 
       {/* Group 2: Revision Context & Coordinate Sub-strip */}
-      <div className="h-6 px-3 bg-surface-elevated/60 border-t border-hairline flex items-center justify-between text-[10px] text-text-muted font-mono overflow-hidden">
+      <div className="h-6 px-3 bg-surface-elevated/60 border-t border-hairline flex items-center justify-between text-xs text-text-muted font-sans overflow-hidden">
         {/* Revision Identifiers */}
         <div className="flex items-center space-x-1.5 min-w-0 truncate">
           <GitCommit size={11} strokeWidth={1.5} className="shrink-0 text-text-accent" />
-          <span className="text-status-removed font-medium truncate" title={baseRevisionLabel}>
+          <span className="font-mono text-status-removed font-medium truncate" title={baseRevisionLabel}>
             {baseRevisionLabel}
           </span>
           <span className="text-text-muted shrink-0">→</span>
-          <span className="text-status-added font-medium truncate" title={headRevisionLabel}>
+          <span className="font-mono text-status-added font-medium truncate" title={headRevisionLabel}>
             {headRevisionLabel}
           </span>
         </div>
@@ -214,14 +212,14 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
         {/* Active Line Span Coordinates */}
         {activeSpan ? (
           <span
-            className="text-[10px] text-text-secondary font-semibold px-1.5 py-0.2 bg-ground border border-hairline rounded-xs shrink-0 ml-2"
-            title={`Active inspection coordinates: ${formatSpanCoordinates(activeSpan)}`}
+            className="font-mono text-xs text-text-secondary font-semibold px-1.5 py-0.5 bg-ground border border-hairline rounded-xs shrink-0 ml-2"
+            title="Line and column of the highlighted code"
           >
             {formatSpanCoordinates(activeSpan)}
           </span>
         ) : (
           targetFunctionName && (
-            <span className="text-[9px] text-text-muted truncate ml-2">
+            <span className="text-xs text-text-muted truncate ml-2">
               {targetFunctionName}()
             </span>
           )
