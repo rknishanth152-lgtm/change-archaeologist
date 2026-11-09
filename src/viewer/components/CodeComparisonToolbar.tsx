@@ -127,7 +127,6 @@ export const CodeComparisonToolbar: React.FC<CodeComparisonToolbarProps> = ({
           {hasEvidence && (
             <div className="flex items-center space-x-1 bg-ground border border-hairline px-2 py-0.5 rounded-xs">
               <GlyphEvidencePin size={11} className="text-text-accent shrink-0" />
-              <span className="text-xs text-text-secondary hidden sm:inline">Evidence</span>
               {currentEvidence ? (
                 <span className="font-mono text-xs font-semibold text-text-accent whitespace-nowrap">
                   {currentEvidence.id} ({currentEvidenceIndex + 1}/

@@ -22,7 +22,7 @@ export interface DigLegendProps {
 }
 
 export const DigLegend: React.FC<DigLegendProps> = ({ active, counts, onToggle }) => (
-  <div role="group" aria-label="Link strength. Select one to show only those links." className="flex flex-wrap gap-2">
+  <div role="group" aria-label="Link strength. Select one to show only those links." className="flex flex-wrap gap-x-2 gap-y-1 -ml-2">
     {ENTRIES.map(({ status, gloss }) => {
       const style = SHAFT_STYLE[status];
       const isActive = active === status;

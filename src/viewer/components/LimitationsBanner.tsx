@@ -66,12 +66,12 @@ export const LimitationsBanner: React.FC<LimitationsBannerProps> = ({ report }) 
         <DisclosureContent>
           <div className="px-4 py-3 border-t border-hairline max-h-48 overflow-y-auto overscroll-contain space-y-2 text-sm text-text-secondary">
             {report.errors.map((error, index) => (
-              <p key={index} className="m-0 text-status-removed">
+              <p key={index} className="text-status-removed">
                 {error.message} <span className="font-mono text-xs">{error.code}</span>
               </p>
             ))}
             {report.limitations.map((limitation, index) => (
-              <p key={index} className="m-0">{limitation}</p>
+              <p key={index}>{limitation}</p>
             ))}
           </div>
         </DisclosureContent>

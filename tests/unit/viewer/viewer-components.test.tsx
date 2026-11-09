@@ -50,7 +50,6 @@ if (typeof ResizeObserver === "undefined") {
 }
 
 import { App } from "../../../src/viewer/app/App.js";
-import { ExecutiveSummaryStrip } from "../../../src/viewer/components/ExecutiveSummaryStrip.js";
 import { StructuralChangeExplorer } from "../../../src/viewer/components/StructuralChangeExplorer.js";
 import { TestChangesInspector } from "../../../src/viewer/components/TestChangesInspector.js";
 import { FindingsSummary } from "../../../src/viewer/components/FindingsSummary.js";
@@ -77,18 +76,6 @@ describe("Viewer Component Rendering & Console Shell", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Change Archaeologist");
     expect(screen.getByRole("button", { name: /Choose a report file/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /A safety check was removed/ })).toBeInTheDocument();
-  });
-
-  it("correctly renders ExecutiveSummaryStrip with validated report metrics", () => {
-    render(<ExecutiveSummaryStrip report={DEMO_SCENARIO_E} />);
-
-    expect(screen.getByText("calculateDiscount")).toBeInTheDocument();
-    expect(screen.getByText("src/order.ts")).toBeInTheDocument();
-    expect(screen.getByText("STRUCTURAL MUTATIONS")).toBeInTheDocument();
-    expect(screen.getByText("COMPANION TEST FILES")).toBeInTheDocument();
-    expect(screen.getByText("CORRELATION LINKS")).toBeInTheDocument();
-    expect(screen.getByText(/Epistemic Invariant:/)).toBeInTheDocument();
-    expect(screen.getByText(/Unverified Runtime Causality/)).toBeInTheDocument();
   });
 
   it("renders StructuralChangeExplorer with mutation badges and summaries", () => {

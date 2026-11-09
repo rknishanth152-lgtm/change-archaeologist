@@ -1,5 +1,7 @@
 import React from "react";
 import type { TestChange, TestDeclarationChange } from "../types/index.js";
+import { SectionHeading } from "./ui/Headings.js";
+import { GlyphFlask, GlyphTitle } from "./icons/HeadingGlyphs.js";
 import { ASSERTION_CHANGE_LABEL, formatLines, humanizeEnum } from "../utils/labels.js";
 
 interface TestChangesInspectorProps {
@@ -15,13 +17,13 @@ export const TestChangesInspector: React.FC<TestChangesInspectorProps> = ({
   selectedId,
   onSelectChange,
 }) => (
-  <section aria-labelledby="test-changes-heading" className="space-y-2">
-    <h2 id="test-changes-heading" className="m-0 text-base font-semibold text-text-primary">
-      Test changes <span className="font-normal text-text-secondary tabular-nums">{testChanges.length}</span>
-    </h2>
+  <section aria-labelledby="test-changes-heading" className="flex flex-col gap-3">
+    <SectionHeading id="test-changes-heading" icon={<GlyphFlask />} count={testChanges.length}>
+      Test changes
+    </SectionHeading>
 
     {testChanges.length === 0 && (
-      <p className="m-0 text-sm text-text-secondary">
+      <p className="text-sm text-text-secondary">
         No test changes in this report. That does not mean the code is untested.
       </p>
     )}
@@ -69,8 +71,8 @@ export const TestChangesInspector: React.FC<TestChangesInspectorProps> = ({
     })}
 
     {declarationChanges.length > 0 && (
-      <div className="pt-2 space-y-1.5">
-        <h3 className="m-0 text-sm font-semibold text-text-primary">Test titles that changed</h3>
+      <div className="flex flex-col gap-3 pt-3">
+        <SectionHeading icon={<GlyphTitle />}>Test titles that changed</SectionHeading>
         {declarationChanges.map((declaration) => (
           <div key={declaration.id} className="p-2.5 rounded-md border border-hairline text-sm text-text-secondary">
             <span className="font-medium text-text-primary">{declaration.fullTitle}</span>

@@ -27,11 +27,11 @@ import {
 import { AnimatedGroup } from "./ui/AnimatedGroup.js";
 import { TactileButton } from "./ui/TactileButton.js";
 import {
-  GlyphMark,
-  GlyphDeltaModified,
-  GlyphCorrStrong,
-  GlyphEpistemicTier,
-} from "./icons/ArchaeologistGlyphs.js";
+  GlyphFault,
+  GlyphFlask,
+  GlyphLoupe,
+} from "./icons/HeadingGlyphs.js";
+import { LogoMark } from "./icons/LogoMark.js";
 
 export interface ReportReadingGuideProps {
   readonly report: AnalysisReport;
@@ -121,7 +121,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
               style={{ background: "var(--surface-ground)", border: "1px solid var(--border-hairline)" }}
               aria-hidden="true"
             >
-              <GlyphMark size={18} />
+              <LogoMark size={20} />
             </div>
             <div className="min-w-0">
               <div className="flex items-center space-x-2">
@@ -184,7 +184,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-hairline">
                   <div className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
-                    <GlyphDeltaModified size={15} className="text-status-modified" />
+                    <GlyphFault size={16} className="text-text-accent" />
                     <span>1. What changed?</span>
                   </div>
                   
@@ -241,7 +241,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-hairline">
                   <div className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
-                    <GlyphCorrStrong size={15} className="text-status-strong" />
+                    <GlyphFlask size={16} className="text-text-accent" />
                     <span>2. What do the tests tell us?</span>
                   </div>
                   
@@ -298,7 +298,7 @@ export const ReportReadingGuide: React.FC<ReportReadingGuideProps> = ({
               <div>
                 <div className="flex items-center justify-between pb-2 border-b border-hairline">
                   <div className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
-                    <GlyphEpistemicTier size={15} className="text-text-secondary" />
+                    <GlyphLoupe size={16} className="text-text-accent" />
                     <span>3. What can we conclude?</span>
                   </div>
                   

@@ -21,12 +21,6 @@ import {
   DisclosureTrigger,
   DisclosureContent,
 } from "../../../src/viewer/components/ui/Disclosure.js";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "../../../src/viewer/components/ui/Accordion.js";
 import { AnimatedGroup } from "../../../src/viewer/components/ui/AnimatedGroup.js";
 
 describe("Retrieved & Adapted UI Components", () => {
@@ -158,26 +152,6 @@ describe("Retrieved & Adapted UI Components", () => {
 
       fireEvent.keyDown(trigger, { key: " " });
       expect(trigger).toHaveAttribute("aria-expanded", "false");
-    });
-  });
-
-  describe("Accordion (ui.shadcn.com + motion-primitives.com)", () => {
-    it("renders accessible accordion structure", () => {
-      render(
-        <Accordion>
-          <AccordionItem>
-            <AccordionTrigger>Section 1: AST Changes</AccordionTrigger>
-            <AccordionContent>Details of AST shifts</AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      );
-
-      const trigger = screen.getByRole("button", { name: /Section 1: AST Changes/i });
-      expect(trigger).toBeInTheDocument();
-      expect(screen.queryByText("Details of AST shifts")).not.toBeInTheDocument();
-
-      fireEvent.click(trigger);
-      expect(screen.getByText("Details of AST shifts")).toBeInTheDocument();
     });
   });
 

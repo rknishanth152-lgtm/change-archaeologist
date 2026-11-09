@@ -6,12 +6,14 @@
  */
 
 import React, { useRef, useState } from "react";
-import { AlertTriangle, FileText } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { loadReportFromFile, loadReportFromJsonString } from "../utils/report-loader.js";
 import { DEMO_FIXTURES } from "../data/demo-fixtures.js";
 import { SAMPLE_LABELS, sampleName } from "../utils/labels.js";
 import type { ReportLoadResult } from "../types/index.js";
 import { TactileButton } from "./ui/TactileButton.js";
+import { SectionHeading } from "./ui/Headings.js";
+import { GlyphDrop, GlyphSpecimens, SampleArt } from "./icons/HeadingGlyphs.js";
 
 export interface ReportIntakeProps {
   readonly onOpened: (result: ReportLoadResult, sampleId: string | null) => void;
@@ -40,7 +42,7 @@ export const ReportIntake: React.FC<ReportIntakeProps> = ({ onOpened }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-6">
       {errorMessage && (
         <div
           role="alert"
@@ -84,7 +86,7 @@ export const ReportIntake: React.FC<ReportIntakeProps> = ({ onOpened }) => {
           void openFile(event.dataTransfer.files?.[0]);
         }}
         onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+        className={`border-2 border-dashed rounded-lg px-6 py-8 flex flex-col items-center gap-2 text-center transition-colors duration-fast focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
           isDragging ? "border-border-focus bg-surface-elevated" : "border-border-interactive hover:bg-surface-elevated"
         }`}
       >
@@ -97,16 +99,16 @@ export const ReportIntake: React.FC<ReportIntakeProps> = ({ onOpened }) => {
           tabIndex={-1}
           aria-hidden="true"
         />
-        <FileText size={26} strokeWidth={1.5} className="mx-auto text-text-secondary" aria-hidden="true" />
-        <p className="m-0 mt-2 text-sm font-medium text-text-primary">Drop a report here, or click to choose a file</p>
-        <p className="m-0 mt-1 text-xs text-text-secondary">
+        <GlyphDrop size={28} className="text-text-accent" />
+        <p className="text-sm font-medium text-text-primary">Drop a report here, or click to choose a file</p>
+        <p className="text-xs text-text-secondary">
           Accepts the <span className="font-mono">.json</span> report from the command-line tool
         </p>
       </div>
 
-      <section aria-label="Sample reports" className="space-y-2">
-        <h3 className="m-0 text-sm font-semibold text-text-primary">Or try a sample</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <section aria-label="Sample reports" className="flex flex-col gap-3">
+        <SectionHeading icon={<GlyphSpecimens />}>Or try a sample</SectionHeading>
+        <div className="grid grid-cols-1 sm:grid-cols-2 auto-rows-fr gap-2">
           {DEMO_FIXTURES.map((fixture) => (
             <button
               key={fixture.id}
@@ -114,10 +116,13 @@ export const ReportIntake: React.FC<ReportIntakeProps> = ({ onOpened }) => {
               onClick={() =>
                 onOpened({ success: true, fileName: `sample-${fixture.id.toLowerCase()}.json`, report: fixture.report }, fixture.id)
               }
-              className="p-3 rounded-md border border-hairline bg-transparent text-left transition-colors duration-fast hover:bg-surface-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+              className="p-3 flex items-center gap-3 rounded-md border border-hairline bg-transparent text-left transition-colors duration-fast hover:bg-surface-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
-              <span className="block text-sm font-medium text-text-primary">{sampleName(fixture.id)}</span>
-              <span className="block mt-0.5 text-xs text-text-secondary">{SAMPLE_LABELS[fixture.id]?.teaches}</span>
+              <SampleArt id={fixture.id} />
+              <span className="min-w-0 flex flex-col gap-0.5">
+                <span className="text-sm font-medium text-text-primary">{sampleName(fixture.id)}</span>
+                <span className="text-xs text-text-secondary">{SAMPLE_LABELS[fixture.id]?.teaches}</span>
+              </span>
             </button>
           ))}
         </div>

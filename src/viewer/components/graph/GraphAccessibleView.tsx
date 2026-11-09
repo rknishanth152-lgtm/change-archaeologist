@@ -11,7 +11,6 @@ import {
   FileCode2,
   FileCheck,
   Tag,
-  Network,
   Info,
   Layers,
 } from "lucide-react";
@@ -39,6 +38,7 @@ import type {
 import { formatSpanCoordinates } from "../../utils/source-location.js";
 import { Badge } from "../ui/Badge.js";
 import { humanizeEnum } from "../../utils/labels.js";
+import { GlyphDig, GlyphFault, GlyphFlask } from "../icons/HeadingGlyphs.js";
 
 interface GraphAccessibleViewProps {
   readonly model: CorrelationGraphModel;
@@ -165,7 +165,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
       {/* 1. Production Entities */}
       <div className="space-y-2">
         <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
-          <GlyphMark size={14} className="text-text-accent" />
+          <GlyphFault size={16} className="text-text-accent" />
           <span>Code ({productionNodes.length})</span>
         </div>
 
@@ -240,7 +240,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
       {/* 2. Test Entities */}
       <div className="space-y-2">
         <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
-          <FileCheck size={14} className="text-status-strong" />
+          <GlyphFlask size={16} className="text-text-accent" />
           <span>Tests ({testNodes.length})</span>
         </div>
 
@@ -323,7 +323,7 @@ export const GraphAccessibleView: React.FC<GraphAccessibleViewProps> = ({
       {/* 3. Correlation Links */}
       <div className="space-y-2">
         <div className="flex items-center space-x-2 text-text-secondary font-semibold text-xs border-b border-hairline pb-1.5">
-          <Network size={14} className="text-text-accent" />
+          <GlyphDig size={16} className="text-text-accent" />
           <span>Links ({correlationEdges.length + unattachedItems.length})</span>
         </div>
 

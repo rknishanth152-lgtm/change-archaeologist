@@ -11,6 +11,8 @@ import type { DigFault, DigFocus, DigModel, DigShaft, DigTestCard } from "../../
 import { explainStructuralChange } from "../../utils/explanation-helpers.js";
 import { plainFindingTitle } from "../../utils/labels.js";
 import { STATUS_MEANING } from "./DigCanvas.js";
+import { PartHeading } from "../ui/Headings.js";
+import { GlyphBranch, GlyphEye, GlyphUndug } from "../icons/HeadingGlyphs.js";
 
 const ATTENTION_ORDER: Record<ReviewAttentionLevel, number> = {
   HIGH_ATTENTION: 0,
@@ -18,14 +20,14 @@ const ATTENTION_ORDER: Record<ReviewAttentionLevel, number> = {
   INFORMATIONAL: 2,
 };
 
-const Statements: React.FC<{ readonly heading: string; readonly items: readonly string[] }> = ({ heading, items }) => (
-  <div className="min-w-0 space-y-1 [overflow-wrap:anywhere]">
-    <h4 className="font-sans text-xs font-semibold text-text-primary m-0">{heading}</h4>
+const Statements: React.FC<{ readonly heading: string; readonly icon: React.ReactNode; readonly items: readonly string[] }> = ({ heading, icon, items }) => (
+  <div className="min-w-0 flex flex-col gap-1.5 [overflow-wrap:anywhere]">
+    <h4><PartHeading icon={icon}>{heading}</PartHeading></h4>
     {items.length === 0 ? (
-      <p className="m-0 text-sm text-text-secondary">Nothing recorded.</p>
+      <p className="text-sm text-text-secondary">Nothing recorded.</p>
     ) : (
       items.map((item, index) => (
-        <p key={index} className="m-0 text-sm leading-relaxed text-text-secondary">
+        <p key={index} className="text-sm leading-relaxed text-text-secondary">
           {item}
         </p>
       ))
@@ -38,10 +40,10 @@ const ThreeParts: React.FC<{
   readonly suggests: readonly string[];
   readonly unknown: readonly string[];
 }> = ({ saw, suggests, unknown }) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <Statements heading="What we saw" items={saw} />
-    <Statements heading="What that suggests" items={suggests} />
-    <Statements heading="What we can't tell" items={unknown} />
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+    <Statements heading="What we saw" icon={<GlyphEye size={14} />} items={saw} />
+    <Statements heading="What that suggests" icon={<GlyphBranch size={14} />} items={suggests} />
+    <Statements heading="What we can't tell" icon={<GlyphUndug size={14} />} items={unknown} />
   </div>
 );
 
@@ -67,7 +69,7 @@ const Evidence: React.FC<{
 
 const Heading: React.FC<{ readonly title: string; readonly tag?: string }> = ({ title, tag }) => (
   <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-    <h3 className="font-sans text-base font-semibold text-text-primary m-0">{title}</h3>
+    <h3 className="font-sans text-base font-semibold text-text-primary">{title}</h3>
     {tag && <span className="font-mono text-xs text-text-secondary">{tag}</span>}
   </header>
 );
@@ -89,10 +91,10 @@ const ShaftDetail: React.FC<{ readonly shaft: DigShaft; readonly onSelectEvidenc
       title={`${shaft.status} link`}
       tag={`${shaft.faultId} → ${shaft.testChangeId ?? shaft.testFilePath ?? "no test"}`}
     />
-    <p className="m-0 text-sm text-text-secondary">{STATUS_MEANING[shaft.status]}</p>
+    <p className="text-sm text-text-secondary">{STATUS_MEANING[shaft.status]}</p>
     <ThreeParts saw={[shaft.observed]} suggests={shaft.inferred ? [shaft.inferred] : []} unknown={shaft.unknowns} />
     {shaft.conflictingResult && (
-      <p className="m-0 text-sm text-text-primary">
+      <p className="text-sm text-text-primary">
         The report's overall verdict for {shaft.faultId} is {shaft.conflictingResult.status} (
         <span className="font-mono text-xs">{shaft.conflictingResult.id}</span>), while this individual link is{" "}
         {shaft.status}.
@@ -118,7 +120,7 @@ const FaultDetail: React.FC<{
   return (
     <>
       <Heading title={explanation.plainTitle} tag={fault.id} />
-      <p className="m-0 text-sm text-text-secondary">{fault.change.summary}</p>
+      <p className="text-sm text-text-secondary">{fault.change.summary}</p>
       {fault.findings.length > 0 && <ThreeParts {...findingParts(fault.findings)} />}
       <Evidence ids={evidence} onSelect={onSelectEvidence} />
     </>
@@ -137,7 +139,7 @@ const TestDetail: React.FC<{ readonly card: DigTestCard; readonly onSelectEviden
     {card.testChange.assertionChanges.map((assertion, index) => (
       <div key={index} className="min-w-0 space-y-1">
         {card.testChange.assertionChanges.length > 1 && (
-          <h4 className="font-sans text-xs font-semibold text-text-primary m-0">
+          <h4 className="font-sans text-xs font-semibold text-text-primary">
             {assertion.enclosingTestBlock ?? "Top-level assertion"}
           </h4>
         )}
@@ -147,14 +149,14 @@ const TestDetail: React.FC<{ readonly card: DigTestCard; readonly onSelectEviden
         {assertion.afterAssertionText && (
           <code className="block font-mono text-xs text-status-added break-words">+ {assertion.afterAssertionText}</code>
         )}
-        <p className="m-0 text-sm text-text-secondary">
+        <p className="text-sm text-text-secondary">
           {assertion.callsTargetFunctionInBlock
             ? "This test block calls the function directly."
             : "This test block doesn't call the function directly."}
         </p>
       </div>
     ))}
-    <p className="m-0 text-sm text-text-secondary">
+    <p className="text-sm text-text-secondary">
       The analysis read this code but did not run it, so it can't say whether this test passes.
     </p>
     <Evidence ids={card.evidenceIds} onSelect={onSelectEvidence} />
@@ -210,7 +212,7 @@ export const DigDetail: React.FC<DigDetailProps> = ({ model, report, focus, onSe
   }
 
   return (
-    <div aria-live="polite" className="border-t border-hairline pt-4 space-y-3">
+    <div aria-live="polite" className="px-4 pb-4 flex flex-col gap-3">
       {content}
     </div>
   );

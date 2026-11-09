@@ -16,6 +16,8 @@ import {
 } from "../utils/explanation-helpers.js";
 import { EVIDENCE_KIND_LABEL, formatLines } from "../utils/labels.js";
 import { TactileButton } from "./ui/TactileButton.js";
+import { PartHeading, SectionHeading, VIEW_HEADER_CLASS } from "./ui/Headings.js";
+import { GlyphEye, GlyphEyeOff, GlyphMarker } from "./icons/HeadingGlyphs.js";
 
 interface DetailInspectorProps {
   readonly report: AnalysisReport;
@@ -54,7 +56,7 @@ const SnippetPanel: React.FC<{
           </button>
         )}
       </div>
-      <pre className="m-0 p-3 font-mono text-xs text-text-primary overflow-x-auto bg-surface-code leading-relaxed">
+      <pre className="p-3 font-mono text-xs text-text-primary overflow-x-auto bg-surface-code leading-relaxed">
         <code>{code ?? absentText}</code>
       </pre>
     </div>
@@ -90,7 +92,7 @@ export const DetailInspector: React.FC<DetailInspectorProps> = ({
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center text-text-secondary">
         <MousePointerClick size={28} strokeWidth={1.5} className="mb-3" aria-hidden="true" />
-        <p className="m-0 text-sm">Select a change, test or link to see its details and code here.</p>
+        <p className="text-sm">Select a change, test or link to see its details and code here.</p>
       </div>
     );
   }
@@ -100,9 +102,9 @@ export const DetailInspector: React.FC<DetailInspectorProps> = ({
 
   return (
     <div className="flex flex-col h-full overflow-y-auto overscroll-contain">
-      <div className="min-h-12 px-4 py-2 border-b border-hairline flex items-center justify-between gap-3 shrink-0">
+      <div className={`${VIEW_HEADER_CLASS} sticky top-0 z-10`}>
         <div className="flex items-baseline gap-2 min-w-0">
-          <h2 className="m-0 text-sm font-semibold text-text-primary truncate">{heading}</h2>
+          <h2 className="text-[15px] font-semibold text-text-primary truncate">{heading}</h2>
           <span className="font-mono text-xs text-text-secondary shrink-0">{tag}</span>
         </div>
         <TactileButton
@@ -115,18 +117,18 @@ export const DetailInspector: React.FC<DetailInspectorProps> = ({
         </TactileButton>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 flex flex-col gap-5">
         {explanation && (
-          <div role="region" aria-label="What this means" className="space-y-3">
-            <p className="m-0 text-sm leading-relaxed text-text-secondary">{explanation.whatChanged}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <div className="min-w-0 space-y-1">
-                <h3 className="m-0 text-xs font-semibold text-text-primary">What this shows</h3>
-                <p className="m-0 leading-relaxed text-text-secondary">{explanation.establishes}</p>
+          <div role="region" aria-label="What this means" className="flex flex-col gap-4">
+            <p className="text-sm leading-relaxed text-text-secondary">{explanation.whatChanged}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+              <div className="min-w-0 flex flex-col gap-1.5">
+                <h3><PartHeading icon={<GlyphEye size={14} />}>What this shows</PartHeading></h3>
+                <p className="leading-relaxed text-text-secondary">{explanation.establishes}</p>
               </div>
-              <div className="min-w-0 space-y-1">
-                <h3 className="m-0 text-xs font-semibold text-text-primary">What this doesn't show</h3>
-                <p className="m-0 leading-relaxed text-text-secondary">{explanation.doesNotEstablish}</p>
+              <div className="min-w-0 flex flex-col gap-1.5">
+                <h3><PartHeading icon={<GlyphEyeOff size={14} />}>What this doesn't show</PartHeading></h3>
+                <p className="leading-relaxed text-text-secondary">{explanation.doesNotEstablish}</p>
               </div>
             </div>
           </div>
@@ -162,13 +164,11 @@ export const DetailInspector: React.FC<DetailInspectorProps> = ({
           )
         )}
 
-        <section aria-label="Evidence" className="space-y-2">
-          <h3 className="m-0 text-sm font-semibold text-text-primary">
-            Evidence <span className="font-normal text-text-secondary tabular-nums">{associatedEvidence.length}</span>
-          </h3>
+        <section aria-label="Evidence" className="flex flex-col gap-3">
+          <SectionHeading icon={<GlyphMarker />} count={associatedEvidence.length}>Evidence</SectionHeading>
 
           {associatedEvidence.length === 0 ? (
-            <p className="m-0 text-sm text-text-secondary">No evidence is linked to this item.</p>
+            <p className="text-sm text-text-secondary">No evidence is linked to this item.</p>
           ) : (
             associatedEvidence.map((item) => {
               const isSelected = selectedEvidenceId === item.id;

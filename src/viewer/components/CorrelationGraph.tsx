@@ -17,6 +17,8 @@ import { DigCanvas } from "./dig/DigCanvas.js";
 import { DigDetail } from "./dig/DigDetail.js";
 import { DigLegend } from "./dig/DigLegend.js";
 import { GraphAccessibleView } from "./graph/GraphAccessibleView.js";
+import { ViewHeader } from "./ui/Headings.js";
+import { GlyphDig } from "./icons/HeadingGlyphs.js";
 
 interface CorrelationGraphProps {
   readonly report: AnalysisReport;
@@ -28,10 +30,12 @@ interface CorrelationGraphProps {
   readonly onSelectTestChange: (testChangeId: string) => void;
   readonly onSelectEvidence: (evidenceId: string) => void;
   readonly onSelectCorrelation: (correlationId: string) => void;
+  /** Set when someone already chose an item in another view. */
+  readonly initialFocus?: DigFocus | null;
 }
 
 const toggleClass = (active: boolean) =>
-  `min-h-8 px-3 py-1 text-sm rounded-sm transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+  `h-8 px-3 text-sm rounded-sm transition-colors duration-fast cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
     active ? "bg-surface-elevated text-text-primary font-semibold" : "text-text-secondary hover:text-text-primary"
   }`;
 
@@ -44,9 +48,10 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
   onSelectTestChange,
   onSelectEvidence,
   onSelectCorrelation,
+  initialFocus = null,
 }) => {
   const [viewMode, setViewMode] = useState<"dig" | "accessible">("dig");
-  const [focus, setFocus] = useState<DigFocus | null>(null);
+  const [focus, setFocus] = useState<DigFocus | null>(initialFocus);
   const [statusFilter, setStatusFilter] = useState<CorrelationStatus | null>(null);
   const [showAllLines, setShowAllLines] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
@@ -67,7 +72,10 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
     return counts;
   }, [digModel]);
 
+  const previousReport = useRef(report);
   useEffect(() => {
+    if (previousReport.current === report) return;
+    previousReport.current = report;
     setFocus(null);
     setStatusFilter(null);
     setShowAllLines(false);
@@ -122,11 +130,8 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
 
   return (
     <div className="flex flex-col min-h-full text-text-primary" style={{ background: "var(--surface-ground)" }}>
-      <div className="px-4 py-3 border-b border-hairline flex flex-wrap items-center justify-between gap-3" style={{ background: "var(--surface-panel)" }}>
-        <h2 className="m-0 font-sans text-base font-semibold text-text-primary">
-          How this change reaches the tests
-        </h2>
-        <div className="flex items-center p-0.5 rounded-sm border border-hairline" style={{ background: "var(--surface-ground)" }}>
+      <ViewHeader icon={<GlyphDig />} title="How this change reaches the tests">
+        <div className="flex items-center p-0.5 rounded-md border border-hairline shrink-0" style={{ background: "var(--surface-ground)" }}>
           <button type="button" onClick={() => setViewMode("dig")} aria-pressed={viewMode === "dig"} className={toggleClass(viewMode === "dig")}>
             The Dig
           </button>
@@ -134,7 +139,7 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
             Table view
           </button>
         </div>
-      </div>
+      </ViewHeader>
 
       {viewMode === "accessible" ? (
         <div className="flex-1 min-w-0">
@@ -191,13 +196,13 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
         </div>
       ) : (
         <div
-          className="flex-1 min-w-0 p-4 space-y-3"
+          className="flex-1 min-w-0 flex flex-col"
           onKeyDown={(event) => {
             if (event.key === "Escape") setFocus(null);
           }}
         >
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="m-0 text-sm text-text-secondary min-h-5">{hint ?? "Select a fault, shaft or test to see what's known about it."}</p>
+          <div className="min-h-12 px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-text-secondary min-h-5">{hint ?? "Select a fault, shaft or test to see what's known about it."}</p>
             {(digModel.hiddenLineCount > 0 || showAllLines) && (
               <button
                 type="button"
@@ -214,7 +219,7 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
             ref={stageRef}
             tabIndex={0}
             aria-label="Excavation diagram. Scrolls sideways when it is wider than the window."
-            className="overflow-x-auto rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            className="overflow-x-auto border-y border-hairline focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             style={{ background: "var(--dig-canvas)" }}
           >
             <DigCanvas
@@ -229,14 +234,16 @@ export const CorrelationGraph: React.FC<CorrelationGraphProps> = ({
             />
           </div>
 
+          <div className="px-4 py-3">
           <DigLegend
             active={statusFilter}
             counts={statusCounts}
             onToggle={(status) => setStatusFilter(statusFilter === status ? null : status)}
           />
+          </div>
 
           {digModel.unanchoredLinkCount > 0 && (
-            <p className="m-0 text-sm text-text-secondary">
+            <p className="px-4 pb-3 text-sm text-text-secondary">
               {digModel.unanchoredLinkCount} recorded link{digModel.unanchoredLinkCount === 1 ? " isn't" : "s aren't"} tied to a specific code change, so {digModel.unanchoredLinkCount === 1 ? "it's" : "they're"} listed in the table view.
             </p>
           )}

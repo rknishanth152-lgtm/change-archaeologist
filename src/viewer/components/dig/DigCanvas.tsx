@@ -12,6 +12,7 @@ import type { DigLitSet } from "../../utils/dig-model.js";
 import type { DigLayout, LaidOutColumn, LaidOutShaft } from "../../utils/dig-layout.js";
 import { truncate } from "../../utils/dig-layout.js";
 import { CONCEPT_EXPLANATIONS } from "../../utils/explanation-helpers.js";
+import { GlyphAfter, GlyphBefore, GlyphFlask } from "../icons/HeadingGlyphs.js";
 
 export const STATUS_MEANING: Record<CorrelationStatus, string> = {
   STRONG: CONCEPT_EXPLANATIONS.strongStatus.plain,
@@ -199,10 +200,12 @@ export const DigCanvas: React.FC<DigCanvasProps> = ({
         </pattern>
       </defs>
 
-      <text x={layout.base.x} y={20} className="dig-layer">Your code, before</text>
-      <text x={layout.base.x} y={40} className="dig-small">{layout.base.column.shortSha}</text>
-      <text x={layout.head.x} y={20} className="dig-layer">Your code, after</text>
-      <text x={layout.head.x} y={40} className="dig-small">{layout.head.column.shortSha}</text>
+      <GlyphBefore x={layout.base.x} y={18} size={16} className="dig-glyph" />
+      <text x={layout.base.x + 22} y={31} className="dig-layer">Your code, before</text>
+      <text x={layout.base.x + layout.base.width} y={31} textAnchor="end" className="dig-small">{layout.base.column.shortSha}</text>
+      <GlyphAfter x={layout.head.x} y={18} size={16} className="dig-glyph" />
+      <text x={layout.head.x + 22} y={31} className="dig-layer">Your code, after</text>
+      <text x={layout.head.x + layout.head.width} y={31} textAnchor="end" className="dig-small">{layout.head.column.shortSha}</text>
 
       <ColumnStrata column={layout.base} codeTop={layout.codeTop} codeHeight={layout.codeHeight} />
       <ColumnStrata column={layout.head} codeTop={layout.codeTop} codeHeight={layout.codeHeight} />
@@ -227,15 +230,16 @@ export const DigCanvas: React.FC<DigCanvasProps> = ({
         </Pick>
       ))}
 
-      <line x1={20} x2={layout.width - 20} y1={layout.datumY} y2={layout.datumY} className="dig-rule" />
-      <text x={20} y={layout.datumY - 9} className="dig-layer">Tests changed in this range</text>
+      <line x1={layout.margin} x2={layout.width - layout.margin} y1={layout.datumY} y2={layout.datumY} className="dig-rule" />
+      <GlyphFlask x={layout.margin} y={layout.datumY - 22} size={16} className="dig-glyph" />
+      <text x={layout.margin + 22} y={layout.datumY - 9} className="dig-layer">Tests changed in this range</text>
 
       {layout.files.length === 0 && (
         <g>
           <rect
-            x={20}
+            x={layout.margin}
             y={layout.testTop}
-            width={layout.width - 40}
+            width={layout.width - layout.margin * 2}
             height={layout.testEmptyHeight}
             rx={4}
             strokeDasharray="5 5"
@@ -297,7 +301,7 @@ export const DigCanvas: React.FC<DigCanvasProps> = ({
         </g>
       ))}
 
-      <rect x={20} y={layout.unknownTop} width={layout.width - 40} height={layout.unknownHeight} rx={4} fill="url(#dig-hatch)" />
+      <rect x={layout.margin} y={layout.unknownTop} width={layout.width - layout.margin * 2} height={layout.unknownHeight} rx={4} fill="url(#dig-hatch)" />
       <rect x={layout.width / 2 - 300} y={layout.unknownTop + 14} width={600} height={34} rx={4} className="dig-canvas-fill" />
       <text x={layout.width / 2} y={layout.unknownTop + 36} textAnchor="middle" className="dig-note">
         Never dug: whether these tests ran, passed, or actually reach this code.

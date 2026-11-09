@@ -12,7 +12,6 @@ import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 
 import { ReportReadingGuide } from "../../../src/viewer/components/ReportReadingGuide.js";
-import { ExecutiveSummaryStrip } from "../../../src/viewer/components/ExecutiveSummaryStrip.js";
 import { DetailInspector } from "../../../src/viewer/components/DetailInspector.js";
 import {
   DEMO_SCENARIO_A,
@@ -111,23 +110,6 @@ describe("ReportReadingGuide & Newcomer Comprehension", () => {
 
     fireEvent.click(glossaryBtn);
     expect(screen.getByText(/^STRONG:/)).toBeInTheDocument();
-  });
-
-  it("renders the 'How to Read This Report' trigger button in ExecutiveSummaryStrip and fires onToggleGuide", () => {
-    const handleToggle = vi.fn();
-
-    render(
-      <ExecutiveSummaryStrip
-        report={DEMO_SCENARIO_E}
-        isGuideOpen={false}
-        onToggleGuide={handleToggle}
-      />
-    );
-
-    const guideBtn = screen.getByRole("button", { name: /How to read this report/i });
-    expect(guideBtn).toBeInTheDocument();
-    fireEvent.click(guideBtn);
-    expect(handleToggle).toHaveBeenCalledTimes(1);
   });
 
   it("renders plain-English explanation card with 'Establishes' and 'Does NOT Establish' in DetailInspector", () => {

@@ -68,7 +68,7 @@ export const ReportLoader: React.FC<ReportLoaderProps> = ({ isOpen, onClose, onR
         onClick={(event) => event.stopPropagation()}
       >
         <div className="h-12 px-4 border-b border-hairline flex items-center justify-between">
-          <h2 id="loader-title" className="m-0 text-base font-semibold text-text-primary">
+          <h2 id="loader-title" className="text-base font-semibold text-text-primary">
             Open a report
           </h2>
           <button
@@ -91,7 +91,7 @@ export const ReportLoader: React.FC<ReportLoaderProps> = ({ isOpen, onClose, onR
           />
         </div>
 
-        <p className="m-0 px-4 py-2.5 border-t border-hairline text-xs text-text-secondary">
+        <p className="px-4 py-2.5 border-t border-hairline text-xs text-text-secondary">
           Reports are read in your browser and never leave this computer.
         </p>
       </div>

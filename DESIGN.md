@@ -28,6 +28,16 @@ Change Archaeologist is a local-first, deterministic static analysis tool. Its v
 
 ---
 
+## Identity
+
+The mark is a stone cut into strata with one artifact at its core, symmetrical on both axes and drawn in one colour on a 256 grid (`components/icons/LogoMark.tsx`, `public/favicon.svg`). It is tested from 16px up, in both themes.
+
+Heading icons in `components/icons/HeadingGlyphs.tsx` share a 20-unit grid and one 1.5 stroke, and reuse the mark's strata, cuts and diamond.
+
+**Layout grid:** every panel uses a 16px gutter. View headers are 56px tall and share the same lines across the split.
+
+---
+
 ## 3. Typography
 
 - **IBM Plex Sans** for all interface text, self-hosted with `@fontsource`.

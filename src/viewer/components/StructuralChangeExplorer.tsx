@@ -5,6 +5,8 @@ import {
   GlyphDeltaModified,
   GlyphDeltaRemoved,
 } from "./icons/ArchaeologistGlyphs.js";
+import { SectionHeading } from "./ui/Headings.js";
+import { GlyphFault } from "./icons/HeadingGlyphs.js";
 import { CHANGE_CATEGORY_LABEL, CHANGE_TYPE_LABEL, formatLines } from "../utils/labels.js";
 
 interface StructuralChangeExplorerProps {
@@ -37,11 +39,11 @@ export const StructuralChangeExplorer: React.FC<StructuralChangeExplorerProps> =
   );
 
   return (
-    <section aria-labelledby="code-changes-heading" className="space-y-2">
+    <section aria-labelledby="code-changes-heading" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="code-changes-heading" className="m-0 text-base font-semibold text-text-primary">
-          Code changes <span className="font-normal text-text-secondary tabular-nums">{structuralChanges.length}</span>
-        </h2>
+        <SectionHeading id="code-changes-heading" icon={<GlyphFault />} count={structuralChanges.length}>
+          Code changes
+        </SectionHeading>
         {structuralChanges.length > 1 && (
           <div className="flex flex-wrap gap-2">
             <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} aria-label="Filter by kind of change" className={selectClass}>
@@ -61,9 +63,9 @@ export const StructuralChangeExplorer: React.FC<StructuralChangeExplorerProps> =
       </div>
 
       {structuralChanges.length === 0 ? (
-        <p className="m-0 text-sm text-text-secondary">No structural changes were found in this function.</p>
+        <p className="text-sm text-text-secondary">No structural changes were found in this function.</p>
       ) : filtered.length === 0 ? (
-        <p className="m-0 text-sm text-text-secondary">No changes match these filters.</p>
+        <p className="text-sm text-text-secondary">No changes match these filters.</p>
       ) : (
         filtered.map((change) => {
           const isSelected = selectedId === change.id;

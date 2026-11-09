@@ -8,13 +8,14 @@
 import React from "react";
 import { Upload, CheckCircle2, AlertCircle, HelpCircle, Moon, Sun } from "lucide-react";
 import type { AnalysisReport, WorkspaceTab } from "../types/index.js";
+import { GlyphCodeTests, GlyphDig, GlyphLoupe } from "./icons/HeadingGlyphs.js";
 import { DEMO_FIXTURES } from "../data/demo-fixtures.js";
 import { analysisStatusLabel, isCompleteStatus, sampleName } from "../utils/labels.js";
 import { buildVerdict } from "../utils/verdict.js";
 import { setTheme, useTheme } from "../utils/theme.js";
 import { TactileButton } from "./ui/TactileButton.js";
 import { Badge } from "./ui/Badge.js";
-import { GlyphMark } from "./icons/ArchaeologistGlyphs.js";
+import { LogoMark } from "./icons/LogoMark.js";
 
 export interface NavbarProps {
   readonly report: AnalysisReport | null;
@@ -34,6 +35,12 @@ export const TAB_LABELS: Record<WorkspaceTab, string> = {
   dig: "The Dig",
   code: "Code & tests",
   findings: "Findings",
+};
+
+const TAB_GLYPHS: Record<WorkspaceTab, React.ReactNode> = {
+  dig: <GlyphDig />,
+  code: <GlyphCodeTests />,
+  findings: <GlyphLoupe />,
 };
 
 function tabCount(report: AnalysisReport, tab: WorkspaceTab): number {
@@ -64,10 +71,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header role="banner" aria-label="Change Archaeologist" className="border-b border-hairline bg-panel z-20 shrink-0">
-      <div className="min-h-[52px] px-4 py-2 flex items-center gap-x-4 gap-y-2">
+      <div className="min-h-14 px-4 py-2 flex items-center gap-x-4 gap-y-2">
         <div className="flex items-center gap-2 shrink-0">
-          <GlyphMark size={18} className="text-text-accent" aria-hidden="true" />
-          <h1 className="m-0 text-sm font-semibold text-text-primary whitespace-nowrap">Change Archaeologist</h1>
+          <LogoMark size={24} className="text-text-accent" />
+          <h1 className="text-[15px] font-semibold tracking-tight text-text-primary whitespace-nowrap">Change Archaeologist</h1>
         </div>
 
         {report && (
@@ -154,8 +161,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {report && (
-        <div className="px-4 py-2 border-t border-hairline flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
-          <p className="m-0 min-w-0 flex-1 basis-80 text-[15px] leading-snug font-medium text-text-primary text-pretty">
+        <div className="min-h-14 px-4 py-2 border-t border-hairline flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
+          <p className="min-w-0 flex-1 basis-80 text-[15px] leading-snug font-medium text-text-primary text-pretty">
             {buildVerdict(report)}
           </p>
 
@@ -183,6 +190,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : "text-text-secondary hover:text-text-primary hover:bg-surface-hover"
                   }`}
                 >
+                  <span className={isActive ? "text-text-accent" : ""}>{TAB_GLYPHS[tab]}</span>
                   <span>{TAB_LABELS[tab]}</span>
                   <span className="text-xs tabular-nums text-text-secondary">{tabCount(report, tab)}</span>
                 </button>

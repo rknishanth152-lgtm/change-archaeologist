@@ -8,10 +8,10 @@
 import type { DigCard, DigColumn, DigFault, DigModel, DigRow, DigShaft } from "../types/dig.js";
 
 export const DIG_MIN_WIDTH = 760;
-const MARGIN = 20;
+const MARGIN = 16;
 const CHANNEL = 160;
 const ROW_HEIGHT = 25;
-const CODE_TOP = 62;
+const CODE_TOP = 48;
 const DATUM_GAP = 34;
 const LANE_GAP = 20;
 const BAND_HEIGHT = 25;
@@ -86,6 +86,7 @@ export interface DigLayout {
   readonly height: number;
   readonly codeHeight: number;
   readonly codeTop: number;
+  readonly margin: number;
   readonly base: LaidOutColumn;
   readonly head: LaidOutColumn;
   readonly faults: readonly LaidOutFault[];
@@ -299,6 +300,7 @@ export function layoutDig(model: DigModel, availableWidth: number): DigLayout {
     height: unknownTop + UNKNOWN_HEIGHT + 6,
     codeHeight: rowCount * ROW_HEIGHT,
     codeTop: CODE_TOP,
+    margin: MARGIN,
     base,
     head,
     faults,
