@@ -1,0 +1,257 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="matBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0F11" />
+      <stop offset="50%" stop-color="#101719" />
+      <stop offset="100%" stop-color="#141E21" />
+    </linearGradient>
+
+    <!-- Card Backgrounds -->
+    <linearGradient id="cellBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#141E21" />
+      <stop offset="100%" stop-color="#0E1618" />
+    </linearGradient>
+    <linearGradient id="cellHazardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E1911" />
+      <stop offset="100%" stop-color="#0E1618" />
+    </linearGradient>
+
+    <!-- Cartographic Grid Pattern -->
+    <pattern id="matGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#162225" stroke-width="0.5" stroke-opacity="0.6" />
+    </pattern>
+
+    <!-- Radar Sweep Gradient -->
+    <linearGradient id="sweepGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4EBEAD" stop-opacity="0" />
+      <stop offset="85%" stop-color="#4EBEAD" stop-opacity="0.04" />
+      <stop offset="100%" stop-color="#4EBEAD" stop-opacity="0.25" />
+    </linearGradient>
+
+    <style>
+      /* Radar Sweep Line Animation across the 6 Scenarios */
+      .anim-radar-sweep {
+        animation: radarSweep 6s linear infinite;
+      }
+      @keyframes radarSweep {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(900px); }
+      }
+
+      /* Staggered Telemetry LED Pulses */
+      .anim-led-coral { animation: ledPulseCoral 2s ease-in-out infinite; }
+      .anim-led-amber { animation: ledPulseAmber 1.8s ease-in-out infinite; }
+      .anim-led-teal  { animation: ledPulseTeal 2.6s ease-in-out infinite; }
+      .anim-led-green { animation: ledPulseGreen 2.4s ease-in-out infinite; }
+      .anim-led-blue  { animation: ledPulseBlue 3s ease-in-out infinite; }
+
+      @keyframes ledPulseCoral {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #F58D84); }
+        50% { opacity: 1; filter: drop-shadow(0 0 5px #F58D84); }
+      }
+      @keyframes ledPulseAmber {
+        0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 1px #F59E0B); }
+        50% { opacity: 1; filter: drop-shadow(0 0 6px #F59E0B); }
+      }
+      @keyframes ledPulseTeal {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #5CCFBE); }
+        50% { opacity: 1; filter: drop-shadow(0 0 5px #5CCFBE); }
+      }
+      @keyframes ledPulseGreen {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #34D399); }
+        50% { opacity: 1; filter: drop-shadow(0 0 6px #34D399); }
+      }
+      @keyframes ledPulseBlue {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #38BDF8); }
+        50% { opacity: 1; filter: drop-shadow(0 0 5px #38BDF8); }
+      }
+
+      /* Hazard Border Pulse for Scenario E */
+      .anim-hazard-card {
+        animation: hazardGlow 2.4s ease-in-out infinite;
+      }
+      @keyframes hazardGlow {
+        0%, 100% { stroke-opacity: 0.5; }
+        50% { stroke-opacity: 1; }
+      }
+
+      /* Accessibility Reduced Motion */
+      @media (prefers-reduced-motion: reduce) {
+        .anim-radar-sweep, .anim-led-coral, .anim-led-amber, .anim-led-teal, .anim-led-green, .anim-led-blue, .anim-hazard-card {
+          animation: none !important;
+        }
+      }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="900" height="320" rx="12" fill="url(#matBg)" />
+  <rect width="900" height="320" rx="12" fill="url(#matGrid)" />
+  <rect width="898" height="318" x="1" y="1" rx="11" fill="none" stroke="#253539" stroke-width="1" stroke-opacity="0.6" />
+
+  <!-- Radar Scanning Beam (subtle sweep) -->
+  <g clip-path="url(#matClip)" opacity="0.6">
+    <clipPath id="matClip">
+      <rect width="898" height="318" x="1" y="1" rx="11" />
+    </clipPath>
+    <rect x="-80" y="0" width="80" height="320" fill="url(#sweepGrad)" class="anim-radar-sweep" />
+  </g>
+
+  <!-- Header Strip -->
+  <g transform="translate(24, 26)">
+    <circle cx="6" cy="6" r="3" fill="#4EBEAD" />
+    <text x="18" y="10" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#86DDCF" letter-spacing="1.2">FORENSIC DEMONSTRATION SUITE // 6 CANONICAL EVOLUTION PATTERNS</text>
+    
+    <g transform="translate(630, -2)">
+      <rect width="222" height="18" rx="4" fill="#111B1E" stroke="#1D2A2E" stroke-width="0.8" />
+      <circle cx="10" cy="9" r="2.5" fill="#34D399" class="anim-led-green" />
+      <text x="18" y="12.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#94A3B8" letter-spacing="0.5">VERIFIED CORPUS • 6/6 PASSING (100%)</text>
+    </g>
+  </g>
+
+  <!-- Datum Divider -->
+  <line x1="24" y1="42" x2="876" y2="42" stroke="#1E2C30" stroke-width="0.8" />
+
+  <!-- ==================== ROW 1 (SCENARIOS A, B, C) ==================== -->
+
+  <!-- SCENARIO A: GUARD CLAUSE REMOVAL -->
+  <g transform="translate(24, 52)">
+    <rect width="270" height="110" rx="8" fill="url(#cellBg)" stroke="#F58D84" stroke-width="1.2" stroke-opacity="0.7" />
+    <!-- Title Bar -->
+    <rect width="270" height="26" rx="8" fill="#221719" />
+    <rect x="0" y="18" width="270" height="8" fill="#221719" />
+    <circle cx="12" cy="13" r="3" fill="#F58D84" class="anim-led-coral" />
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#FCA5A5">SCENARIO A • GUARD REMOVAL</text>
+    <!-- Badge -->
+    <rect x="190" y="5" width="72" height="16" rx="3" fill="#381E21" stroke="#5C252B" stroke-width="0.8" />
+    <text x="226" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#F87171" text-anchor="middle">REVIEW FIRST</text>
+    
+    <!-- Content Body -->
+    <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">processPayment <tspan fill="#64748B">in auth.ts</tspan></text>
+      <text x="0" y="24" fill="#94A3B8">Mutation: <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">if (!user) throw Error()</tspan> dropped</text>
+      <text x="0" y="38" fill="#94A3B8">Companion: Assertion modified in test</text>
+      
+      <!-- Footer Metric -->
+      <line x1="0" y1="46" x2="246" y2="46" stroke="#1D282B" stroke-width="0.8" />
+      <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">STRONG (SYNTACTIC BIND)</text>
+    </g>
+  </g>
+
+  <!-- SCENARIO B: OPERATOR MUTATION -->
+  <g transform="translate(314, 52)">
+    <rect width="270" height="110" rx="8" fill="url(#cellBg)" stroke="#F58D84" stroke-width="1.2" stroke-opacity="0.7" />
+    <rect width="270" height="26" rx="8" fill="#221719" />
+    <rect x="0" y="18" width="270" height="8" fill="#221719" />
+    <circle cx="12" cy="13" r="3" fill="#F58D84" class="anim-led-coral" />
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#FCA5A5">SCENARIO B • OPERATOR MUTATION</text>
+    <rect x="190" y="5" width="72" height="16" rx="3" fill="#381E21" stroke="#5C252B" stroke-width="0.8" />
+    <text x="226" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#F87171" text-anchor="middle">REVIEW FIRST</text>
+    
+    <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">authorizeUser <tspan fill="#64748B">in access.ts</tspan></text>
+      <text x="0" y="24" fill="#94A3B8">Mutation: <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">&amp;&amp;</tspan> replaced by <tspan fill="#FCA5A5" font-family="ui-monospace, monospace">||</tspan> in auth check</text>
+      <text x="0" y="38" fill="#94A3B8">Companion: Assertion updated to match</text>
+      
+      <line x1="0" y1="46" x2="246" y2="46" stroke="#1D282B" stroke-width="0.8" />
+      <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">STRONG (BOOLEAN DELTA)</text>
+    </g>
+  </g>
+
+  <!-- SCENARIO C: THROW TO RETURN -->
+  <g transform="translate(604, 52)">
+    <rect width="272" height="110" rx="8" fill="url(#cellBg)" stroke="#5CCFBE" stroke-width="1.2" stroke-opacity="0.7" />
+    <rect width="272" height="26" rx="8" fill="#132425" />
+    <rect x="0" y="18" width="272" height="8" fill="#132425" />
+    <circle cx="12" cy="13" r="3" fill="#5CCFBE" class="anim-led-teal" />
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#A7F3D0">SCENARIO C • THROW TO RETURN</text>
+    <rect x="182" y="5" width="82" height="16" rx="3" fill="#0E2829" stroke="#1E4748" stroke-width="0.8" />
+    <text x="223" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#5CCFBE" text-anchor="middle">WORTH A LOOK</text>
+    
+    <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">loadConfig <tspan fill="#64748B">in config.ts</tspan></text>
+      <text x="0" y="24" fill="#94A3B8">Mutation: <tspan fill="#5CCFBE" font-family="ui-monospace, monospace">throw</tspan> converted to <tspan fill="#5CCFBE" font-family="ui-monospace, monospace">return null</tspan></text>
+      <text x="0" y="38" fill="#94A3B8">Companion: Error assertion rewrote to null check</text>
+      
+      <line x1="0" y1="46" x2="248" y2="46" stroke="#1D282B" stroke-width="0.8" />
+      <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#4EBEAD">STRONG (CONTROL FLOW)</text>
+    </g>
+  </g>
+
+  <!-- ==================== ROW 2 (SCENARIOS D, E, F) ==================== -->
+
+  <!-- SCENARIO D: COMPANION TEST ADDITION -->
+  <g transform="translate(24, 172)">
+    <rect width="270" height="110" rx="8" fill="url(#cellBg)" stroke="#34D399" stroke-width="1.2" stroke-opacity="0.7" />
+    <rect width="270" height="26" rx="8" fill="#12251D" />
+    <rect x="0" y="18" width="270" height="8" fill="#12251D" />
+    <circle cx="12" cy="13" r="3" fill="#34D399" class="anim-led-green" />
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#BBF7D0">SCENARIO D • TEST ADDITION</text>
+    <rect x="180" y="5" width="82" height="16" rx="3" fill="#0D2E1F" stroke="#1A5338" stroke-width="0.8" />
+    <text x="221" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#34D399" text-anchor="middle">INFORMATIONAL</text>
+    
+    <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">calculateDiscount <tspan fill="#64748B">in order.ts</tspan></text>
+      <text x="0" y="24" fill="#94A3B8">Mutation: Added VIP tier discount computation</text>
+      <text x="0" y="38" fill="#94A3B8">Companion: New test block &amp; assertion added</text>
+      
+      <line x1="0" y1="46" x2="246" y2="46" stroke="#1D282B" stroke-width="0.8" />
+      <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#34D399">STRONG (POSITIVE BIND)</text>
+    </g>
+  </g>
+
+  <!-- SCENARIO E: UNTOUCHED COMPANION TEST (CRITICAL HAZARD) -->
+  <g transform="translate(314, 172)">
+    <rect width="270" height="110" rx="8" fill="url(#cellHazardBg)" stroke="#F59E0B" stroke-width="1.4" class="anim-hazard-card" />
+    <rect width="270" height="26" rx="8" fill="#2B210F" />
+    <rect x="0" y="18" width="270" height="8" fill="#2B210F" />
+    <circle cx="12" cy="13" r="3" fill="#F59E0B" class="anim-led-amber" />
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#FDE68A">SCENARIO E • UNTOUCHED TEST</text>
+    <rect x="182" y="5" width="80" height="16" rx="3" fill="#3D2908" stroke="#784C0F" stroke-width="0.8" />
+    <text x="222" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#F59E0B" text-anchor="middle">REGRESSION !</text>
+    
+    <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">calculateDiscount <tspan fill="#64748B">in order.ts</tspan></text>
+      <text x="0" y="24" fill="#FDE68A">Mutation: Production rates altered</text>
+      <text x="0" y="38" fill="#EF4444" font-weight="600">Companion: Test file left COMPLETELY UNTOUCHED</text>
+      
+      <line x1="0" y1="46" x2="246" y2="46" stroke="#2B210F" stroke-width="0.8" />
+      <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CORRELATION:</text>
+      <text x="74" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#EF4444">NONE (ZERO TEST UPDATE)</text>
+    </g>
+  </g>
+
+  <!-- SCENARIO F: MISSING FUNCTION (EPISTEMIC BOUNDARY) -->
+  <g transform="translate(604, 172)">
+    <rect width="272" height="110" rx="8" fill="url(#cellBg)" stroke="#38BDF8" stroke-width="1.2" stroke-opacity="0.7" />
+    <rect width="272" height="26" rx="8" fill="#11222D" />
+    <rect x="0" y="18" width="272" height="8" fill="#11222D" />
+    <circle cx="12" cy="13" r="3" fill="#38BDF8" class="anim-led-blue" />
+    <text x="22" y="17" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#BAE6FD">SCENARIO F • MISSING TARGET</text>
+    <rect x="176" y="5" width="88" height="16" rx="3" fill="#0C2538" stroke="#164E63" stroke-width="0.8" />
+    <text x="220" y="16.5" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#38BDF8" text-anchor="middle">EPISTEMIC LIMIT</text>
+    
+    <g transform="translate(12, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#E2E8F0">deprecatedHelper <tspan fill="#64748B">in legacy.ts</tspan></text>
+      <text x="0" y="24" fill="#94A3B8">Mutation: Function removed/renamed in HEAD</text>
+      <text x="0" y="38" fill="#38BDF8">Boundary: Emits INCOMPLETE report (No guessing)</text>
+      
+      <line x1="0" y1="46" x2="248" y2="46" stroke="#1D282B" stroke-width="0.8" />
+      <text x="0" y="58" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CLASSIFICATION:</text>
+      <text x="86" y="58" font-family="ui-monospace, monospace" font-size="7.5" font-weight="700" fill="#38BDF8">INCOMPLETE (EXIT CODE 1)</text>
+    </g>
+  </g>
+
+  <!-- Bottom Global Footnote Bar -->
+  <g transform="translate(24, 292)">
+    <line x1="0" y1="0" x2="852" y2="0" stroke="#1E2C30" stroke-width="0.8" />
+    <text x="6" y="16" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" fill="#64748B">
+      <tspan fill="#4EBEAD" font-weight="700">DEMO COMMAND:</tspan> <tspan fill="#E2E8F0">npm run demo</tspan> — EXECUTES ALL 6 SCENARIOS AGAINST SYNTHETIC GIT REPOS WITH ZERO EXTERNAL DEPENDENCIES
+    </text>
+  </g>
+</svg>

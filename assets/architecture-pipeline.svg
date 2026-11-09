@@ -1,0 +1,332 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="pipeBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0F11" />
+      <stop offset="50%" stop-color="#101719" />
+      <stop offset="100%" stop-color="#141E21" />
+    </linearGradient>
+
+    <!-- Card Background Gradient -->
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#152023" />
+      <stop offset="100%" stop-color="#0E1618" />
+    </linearGradient>
+
+    <!-- Bus Line Gradients -->
+    <linearGradient id="busGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#4EBEAD" />
+    </linearGradient>
+    <linearGradient id="busGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4EBEAD" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="busGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#5CCFBE" />
+    </linearGradient>
+
+    <!-- Cartographic Grid Pattern -->
+    <pattern id="pipeGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#162225" stroke-width="0.5" stroke-opacity="0.6" />
+    </pattern>
+
+    <!-- Glow Filter -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="b1" />
+      <feMerge>
+        <feMergeNode in="b1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="beaconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="b1" />
+      <feMerge>
+        <feMergeNode in="b1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <style>
+      /* Flowing Data Stream along Conduits */
+      .anim-bus-packet {
+        stroke-dasharray: 8 16;
+        animation: busFlow 2s linear infinite;
+      }
+      .anim-bus-packet-slow {
+        stroke-dasharray: 8 16;
+        animation: busFlow 2.6s linear infinite;
+      }
+      .anim-bus-packet-fast {
+        stroke-dasharray: 6 12;
+        animation: busFlow 1.6s linear infinite;
+      }
+      @keyframes busFlow {
+        from { stroke-dashoffset: 24; }
+        to { stroke-dashoffset: 0; }
+      }
+
+      /* Glowing Telemetry Beacons */
+      .anim-beacon-cyan {
+        animation: beaconCyan 2.4s ease-in-out infinite;
+      }
+      .anim-beacon-verdigris {
+        animation: beaconVerdigris 2.8s ease-in-out infinite;
+      }
+      .anim-beacon-amber {
+        animation: beaconAmber 2.2s ease-in-out infinite;
+      }
+      .anim-beacon-teal {
+        animation: beaconTeal 3s ease-in-out infinite;
+      }
+      @keyframes beaconCyan {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #38BDF8); }
+        50% { opacity: 1; filter: drop-shadow(0 0 5px #38BDF8); }
+      }
+      @keyframes beaconVerdigris {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #4EBEAD); }
+        50% { opacity: 1; filter: drop-shadow(0 0 6px #4EBEAD); }
+      }
+      @keyframes beaconAmber {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #F59E0B); }
+        50% { opacity: 1; filter: drop-shadow(0 0 6px #F59E0B); }
+      }
+      @keyframes beaconTeal {
+        0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 1px #5CCFBE); }
+        50% { opacity: 1; filter: drop-shadow(0 0 7px #5CCFBE); }
+      }
+
+      /* Node Card Subtle Hover Effect */
+      .pipe-node {
+        transition: transform 0.2s ease;
+      }
+
+      /* Accessibility Reduced Motion */
+      @media (prefers-reduced-motion: reduce) {
+        .anim-bus-packet, .anim-bus-packet-slow, .anim-bus-packet-fast,
+        .anim-beacon-cyan, .anim-beacon-verdigris, .anim-beacon-amber, .anim-beacon-teal {
+          animation: none !important;
+        }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="900" height="320" rx="12" fill="url(#pipeBg)" />
+  <rect width="900" height="320" rx="12" fill="url(#pipeGrid)" />
+  <rect width="898" height="318" x="1" y="1" rx="11" fill="none" stroke="#253539" stroke-width="1" stroke-opacity="0.6" />
+
+  <!-- Top Telemetry Header -->
+  <g transform="translate(24, 26)">
+    <!-- Terminal glyph -->
+    <circle cx="6" cy="6" r="3" fill="#4EBEAD" />
+    <text x="18" y="10" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="10.5" font-weight="700" fill="#86DDCF" letter-spacing="1.2">PIPELINE ARCHITECTURE // DETERMINISTIC UNIDIRECTIONAL DATAFLOW</text>
+    
+    <g transform="translate(620, -2)">
+      <rect width="232" height="18" rx="4" fill="#111B1E" stroke="#1D2A2E" stroke-width="0.8" />
+      <circle cx="10" cy="9" r="2.5" fill="#38BDF8" class="anim-beacon-cyan" />
+      <text x="18" y="12.5" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#94A3B8" letter-spacing="0.5">SUBPROCESS ISOLATION • 100% OFFLINE</text>
+    </g>
+  </g>
+
+  <!-- Horizontal Datum Line -->
+  <line x1="24" y1="42" x2="876" y2="42" stroke="#1E2C30" stroke-width="0.8" />
+
+  <!-- ==================== CONDUITS & BUS LINES (BACKGROUND) ==================== -->
+  <g fill="none">
+    <!-- Conduit 0: Input -> Stage 1 -->
+    <path d="M 120 160 L 150 160" stroke="#2A3B40" stroke-width="2" />
+    <path d="M 120 160 L 150 160" stroke="#38BDF8" stroke-width="2" class="anim-bus-packet-fast" />
+
+    <!-- Conduit 1 -> 2 (AST Engine, top branch) -->
+    <path d="M 285 130 L 305 130 Q 315 130 315 115 L 315 105 Q 315 95 325 95 L 340 95" stroke="#2A3B40" stroke-width="2" />
+    <path d="M 285 130 L 305 130 Q 315 130 315 115 L 315 105 Q 315 95 325 95 L 340 95" stroke="url(#busGrad1)" stroke-width="2" class="anim-bus-packet" />
+
+    <!-- Conduit 1 -> 3 (Test Excavator, bottom branch) -->
+    <path d="M 285 190 L 305 190 Q 315 190 315 205 L 315 215 Q 315 225 325 225 L 340 225" stroke="#2A3B40" stroke-width="2" />
+    <path d="M 285 190 L 305 190 Q 315 190 315 205 L 315 215 Q 315 225 325 225 L 340 225" stroke="url(#busGrad1)" stroke-width="2" class="anim-bus-packet" />
+
+    <!-- Conduit 2 -> 4 (AST -> Correlator) -->
+    <path d="M 480 95 L 495 95 Q 505 95 505 115 L 505 135 Q 505 145 515 145 L 530 145" stroke="#2A3B40" stroke-width="2" />
+    <path d="M 480 95 L 495 95 Q 505 95 505 115 L 505 135 Q 505 145 515 145 L 530 145" stroke="url(#busGrad2)" stroke-width="2" class="anim-bus-packet" />
+
+    <!-- Conduit 3 -> 4 (Tests -> Correlator) -->
+    <path d="M 480 225 L 495 225 Q 505 225 505 205 L 505 185 Q 505 175 515 175 L 530 175" stroke="#2A3B40" stroke-width="2" />
+    <path d="M 480 225 L 495 225 Q 505 225 505 205 L 505 185 Q 505 175 515 175 L 530 175" stroke="url(#busGrad2)" stroke-width="2" class="anim-bus-packet" />
+
+    <!-- Conduit 4 -> 5 (Correlator -> Assembler) -->
+    <path d="M 670 160 L 700 160" stroke="#2A3B40" stroke-width="2" />
+    <path d="M 670 160 L 700 160" stroke="url(#busGrad3)" stroke-width="2" class="anim-bus-packet-slow" />
+  </g>
+
+  <!-- ==================== PIPELINE STAGE NODES ==================== -->
+
+  <!-- INPUT BADGE (Left) -->
+  <g transform="translate(24, 115)">
+    <rect width="96" height="90" rx="8" fill="#10181A" stroke="#1F2D30" stroke-width="1" />
+    <text x="48" y="24" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" font-weight="700" fill="#64748B" text-anchor="middle" letter-spacing="0.8">USER INPUT</text>
+    <rect x="14" y="32" width="68" height="18" rx="3" fill="#162326" stroke="#253538" stroke-width="0.8" />
+    <text x="48" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" fill="#4EBEAD" text-anchor="middle">CLI / API</text>
+    <text x="48" y="62" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" fill="#64748B" text-anchor="middle">--repo, --file</text>
+    <text x="48" y="74" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" fill="#64748B" text-anchor="middle">--base, --head</text>
+    <!-- Junction Dot -->
+    <circle cx="96" cy="45" r="3.5" fill="#38BDF8" />
+  </g>
+
+  <!-- STAGE 01: GIT ADAPTER -->
+  <g transform="translate(150, 60)" class="pipe-node">
+    <rect width="135" height="200" rx="8" fill="url(#cardBg)" stroke="#38BDF8" stroke-width="1.2" stroke-opacity="0.8" />
+    <!-- Header -->
+    <rect width="135" height="30" rx="8" fill="#132125" />
+    <rect x="0" y="22" width="135" height="8" fill="#132125" />
+    <circle cx="14" cy="15" r="3.5" fill="#38BDF8" class="anim-beacon-cyan" />
+    <text x="25" y="19" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#F0FDFA">01. Git Runner</text>
+    
+    <rect x="10" y="38" width="115" height="16" rx="3" fill="#0C1518" stroke="#1E2E32" stroke-width="0.7" />
+    <text x="67" y="49" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" font-weight="600" fill="#38BDF8" text-anchor="middle">SUBPROCESS SANDBOX</text>
+
+    <!-- Details -->
+    <g transform="translate(12, 68)" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94A3B8">
+      <circle cx="3" cy="5" r="1.5" fill="#38BDF8" />
+      <text x="10" y="8" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">execFile (shell:0)</text>
+      
+      <circle cx="3" cy="24" r="1.5" fill="#38BDF8" />
+      <text x="10" y="27" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">Path Sanitizer</text>
+
+      <circle cx="3" cy="43" r="1.5" fill="#38BDF8" />
+      <text x="10" y="46">Read-only snapshots</text>
+
+      <circle cx="3" cy="62" r="1.5" fill="#38BDF8" />
+      <text x="10" y="65">BASE &amp; HEAD blobs</text>
+
+      <circle cx="3" cy="81" r="1.5" fill="#38BDF8" />
+      <text x="10" y="84" fill="#5CCFBE">Zero working tree edits</text>
+    </g>
+
+    <!-- Bottom Status -->
+    <rect x="10" y="168" width="115" height="20" rx="4" fill="#0E171A" stroke="#1C2B2E" stroke-width="0.8" />
+    <text x="67" y="181" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" fill="#38BDF8" text-anchor="middle">STATUS: ISOLATED</text>
+
+    <!-- Branching Junction Dots -->
+    <circle cx="135" cy="70" r="3.5" fill="#4EBEAD" />
+    <circle cx="135" cy="130" r="3.5" fill="#4EBEAD" />
+  </g>
+
+  <!-- STAGE 02: AST ENGINE (Top Right of Git) -->
+  <g transform="translate(340, 50)" class="pipe-node">
+    <rect width="140" height="92" rx="8" fill="url(#cardBg)" stroke="#4EBEAD" stroke-width="1.2" stroke-opacity="0.8" />
+    <rect width="140" height="26" rx="8" fill="#132427" />
+    <rect x="0" y="18" width="140" height="8" fill="#132427" />
+    <circle cx="12" cy="13" r="3.5" fill="#4EBEAD" class="anim-beacon-verdigris" />
+    <text x="22" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#F0FDFA">02. AST Engine</text>
+
+    <!-- Details -->
+    <g transform="translate(10, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5" fill="#94A3B8">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#86DDCF">• ts-morph Tree Diffing</text>
+      <text x="0" y="24" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">• Guard Clauses &amp; Throws</text>
+      <text x="0" y="38" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">• Return &amp; Conditional logic</text>
+    </g>
+    <!-- Output Junction -->
+    <circle cx="140" cy="45" r="3.5" fill="#4EBEAD" />
+  </g>
+
+  <!-- STAGE 03: TEST EXCAVATOR (Bottom Right of Git) -->
+  <g transform="translate(340, 178)" class="pipe-node">
+    <rect width="140" height="92" rx="8" fill="url(#cardBg)" stroke="#818CF8" stroke-width="1.2" stroke-opacity="0.8" />
+    <rect width="140" height="26" rx="8" fill="#1A1C2E" />
+    <rect x="0" y="18" width="140" height="8" fill="#1A1C2E" />
+    <circle cx="12" cy="13" r="3.5" fill="#818CF8" />
+    <text x="22" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#F0FDFA">03. Companion Tests</text>
+
+    <!-- Details -->
+    <g transform="translate(10, 36)" font-family="system-ui, -apple-system, sans-serif" font-size="8.5" fill="#94A3B8">
+      <text x="0" y="10" font-family="ui-monospace, monospace" font-size="8" fill="#C7D2FE">• Test File Auto-Locator</text>
+      <text x="0" y="24" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">• expect() / assert() Extractor</text>
+      <text x="0" y="38" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">• Assertion Delta Classifier</text>
+    </g>
+    <!-- Output Junction -->
+    <circle cx="140" cy="47" r="3.5" fill="#818CF8" />
+  </g>
+
+  <!-- STAGE 04: CONSERVATIVE CORRELATOR -->
+  <g transform="translate(530, 60)" class="pipe-node">
+    <rect width="140" height="200" rx="8" fill="url(#cardBg)" stroke="#F59E0B" stroke-width="1.2" stroke-opacity="0.8" />
+    <!-- Header -->
+    <rect width="140" height="30" rx="8" fill="#241E13" />
+    <rect x="0" y="22" width="140" height="8" fill="#241E13" />
+    <circle cx="14" cy="15" r="3.5" fill="#F59E0B" class="anim-beacon-amber" />
+    <text x="25" y="19" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#F0FDFA">04. Correlator</text>
+
+    <rect x="10" y="38" width="120" height="16" rx="3" fill="#17140B" stroke="#2B2412" stroke-width="0.7" />
+    <text x="70" y="49" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" font-weight="600" fill="#F59E0B" text-anchor="middle">CONSERVATIVE HEURISTICS</text>
+
+    <!-- Details -->
+    <g transform="translate(12, 68)" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94A3B8">
+      <circle cx="3" cy="5" r="1.5" fill="#F59E0B" />
+      <text x="10" y="8" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">Syntactic Alignment</text>
+      
+      <circle cx="3" cy="24" r="1.5" fill="#F59E0B" />
+      <text x="10" y="27" font-family="ui-monospace, monospace" font-size="8" fill="#CBD5E1">Temporal Co-occurrence</text>
+
+      <circle cx="3" cy="43" r="1.5" fill="#F59E0B" />
+      <text x="10" y="46">Calibration Matrix:</text>
+
+      <rect x="8" y="52" width="112" height="36" rx="3" fill="#121719" stroke="#1D2A2E" stroke-width="0.6" />
+      <text x="14" y="64" font-family="ui-monospace, monospace" font-size="7" fill="#4EBEAD">STRONG  • Direct Bind</text>
+      <text x="14" y="74" font-family="ui-monospace, monospace" font-size="7" fill="#94A3B8">WEAK    • Same Commit</text>
+      <text x="14" y="84" font-family="ui-monospace, monospace" font-size="7" fill="#F59E0B">NONE    • Zero Test Chg</text>
+    </g>
+
+    <!-- Bottom Status -->
+    <rect x="10" y="168" width="120" height="20" rx="4" fill="#1A150D" stroke="#2B2211" stroke-width="0.8" />
+    <text x="70" y="181" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" fill="#F59E0B" text-anchor="middle">STATUS: CALIBRATED</text>
+
+    <!-- Output Junction -->
+    <circle cx="140" cy="100" r="3.5" fill="#5CCFBE" />
+  </g>
+
+  <!-- STAGE 05: REPORT ASSEMBLER & EVIDENCE ATLAS -->
+  <g transform="translate(700, 60)" class="pipe-node">
+    <rect width="176" height="200" rx="8" fill="url(#cardBg)" stroke="#5CCFBE" stroke-width="1.2" stroke-opacity="0.8" />
+    <!-- Header -->
+    <rect width="176" height="30" rx="8" fill="#122425" />
+    <rect x="0" y="22" width="176" height="8" fill="#122425" />
+    <circle cx="14" cy="15" r="3.5" fill="#5CCFBE" class="anim-beacon-teal" />
+    <text x="25" y="19" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#F0FDFA">05. Report Assembler</text>
+
+    <rect x="10" y="38" width="156" height="16" rx="3" fill="#0A1819" stroke="#162E30" stroke-width="0.7" />
+    <text x="88" y="49" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" font-weight="600" fill="#5CCFBE" text-anchor="middle">ZOD SCHEMA VALIDATION</text>
+
+    <!-- Output Formats List -->
+    <g transform="translate(12, 68)" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94A3B8">
+      <rect x="0" y="0" width="152" height="24" rx="3" fill="#111B1E" stroke="#1E2C30" stroke-width="0.8" />
+      <text x="10" y="15" font-family="ui-monospace, monospace" font-size="8" font-weight="700" fill="#E2E8F0">JSON Report</text>
+      <text x="80" y="15" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">Spec v1.1</text>
+
+      <rect x="0" y="30" width="152" height="24" rx="3" fill="#111B1E" stroke="#1E2C30" stroke-width="0.8" />
+      <text x="10" y="45" font-family="ui-monospace, monospace" font-size="8" font-weight="700" fill="#E2E8F0">Markdown</text>
+      <text x="80" y="45" font-family="ui-monospace, monospace" font-size="7.5" fill="#64748B">CI Console</text>
+
+      <rect x="0" y="60" width="152" height="28" rx="3" fill="#132326" stroke="#254246" stroke-width="0.8" />
+      <circle cx="10" cy="74" r="3" fill="#4EBEAD" />
+      <text x="18" y="77" font-family="ui-monospace, monospace" font-size="8" font-weight="700" fill="#86DDCF">Evidence Atlas</text>
+      <text x="104" y="77" font-family="ui-monospace, monospace" font-size="7.5" fill="#4EBEAD">Web Viewer</text>
+    </g>
+
+    <!-- Bottom Status -->
+    <rect x="10" y="168" width="156" height="20" rx="4" fill="#0E1E20" stroke="#1C383C" stroke-width="0.8" />
+    <text x="88" y="181" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" fill="#5CCFBE" text-anchor="middle">STATUS: EVIDENTIARY</text>
+  </g>
+
+  <!-- Bottom Global Footnote Bar -->
+  <g transform="translate(24, 280)">
+    <line x1="0" y1="0" x2="852" y2="0" stroke="#1E2C30" stroke-width="0.8" />
+    <text x="6" y="18" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8.5" fill="#64748B">
+      <tspan fill="#4EBEAD" font-weight="700">CORE INVARIANT:</tspan> EVIDENCE PRECEDES INFERENCE // NO CAUSALITY ASSUMED // DETERMINISTIC &amp; 100% REPRODUCIBLE
+    </text>
+    <text x="846" y="18" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="8" fill="#475569" text-anchor="end">
+      EVIDENCE ATLAN v1.1.0-RELEASE
+    </text>
+  </g>
+</svg>

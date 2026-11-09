@@ -153,6 +153,13 @@ Click **Demo Preset** to explore preloaded scenarios, or drop in any report gene
 
 Change Archaeologist executes as a deterministic, unidirectional data pipeline:
 
+<p align="center">
+  <img src="assets/architecture-pipeline.svg" alt="Change Archaeologist Architecture &amp; Pipeline — Subprocess Isolation, AST Engine, Companion Tests, Correlator, and Evidence Assembler" width="100%" />
+</p>
+
+<details>
+<summary><b>View Subsystem Dataflow Details</b></summary>
+
 ```mermaid
 flowchart TD
     subgraph Input["Input Specification"]
@@ -208,11 +215,17 @@ flowchart TD
     style ReportingSubsystem fill:#0f172a,stroke:#06b6d4,color:#e2e8f0
 ```
 
+</details>
+
 ---
 
 ## The 6 Forensic Demonstration Scenarios
 
 Change Archaeologist is calibrated against 6 canonical software evolution patterns:
+
+<p align="center">
+  <img src="assets/forensic-matrix.svg" alt="The 6 Forensic Demonstration Scenarios — Calibration Matrix across Scenarios A through F" width="100%" />
+</p>
 
 ```
 ┌──────────┬────────────────────────────────────────────┬─────────────────────────────┬───────────────────────────┐
