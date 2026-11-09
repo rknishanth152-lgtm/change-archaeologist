@@ -60,20 +60,9 @@ Modern software development relies heavily on Git for version tracking and CI pi
 
 Every analysis produced by Change Archaeologist strictly segregates findings into three epistemic tiers:
 
-```mermaid
-graph TD
-    subgraph Stratum["The Epistemic Hierarchy"]
-        OBS["OBSERVED (Empirical Facts)<br/>• AST syntax mutations<br/>• Exact line/column spans (EV-xxx)<br/>• Git commit metadata & hashes"]
-        INF["INFERRED (Rule-Based Deductions)<br/>• Proximity heuristics<br/>• Calibrated correlation (STRONG, WEAK, UNCERTAIN, NONE)<br/>• Potential companion relationship"]
-        UNK["UNKNOWN (Epistemic Boundaries)<br/>• Runtime test execution & passage<br/>• Real code coverage & branch traversal<br/>• External caller impact & defect causation"]
-    end
-    OBS -->|Grounds| INF
-    INF -->|Bounded By| UNK
-
-    style OBS fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#e2e8f0
-    style INF fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#e2e8f0
-    style UNK fill:#1e293b,stroke:#f59e0b,stroke-width:2px,color:#e2e8f0
-```
+<p align="center">
+  <img src="assets/epistemic-bridge.svg" alt="The Epistemic Bridge — Three-Tier Truth Segregation" width="100%" />
+</p>
 
 ### Correlation Calibration
 
@@ -92,30 +81,9 @@ When correlating a production AST change with companion test changes, the relati
 
 Change Archaeologist includes a local-first, interactive forensic analysis viewer called **Evidence Atlas**. Built with React 19, Vite, Tailwind CSS v4, Monaco Editor, and `@xyflow/react`.
 
-```
-======================================================================================
-  CHANGE ARCHAEOLOGIST  [Scenario E] ▾  [Guide]  [Import JSON]  [Theme: Dark]
-  calculateDiscount  •  src/order.ts  •  9a8bf4e → a8265d8  •  [COMPLETED_WITH_FINDINGS]
-======================================================================================
-  [ THE DIG ]             [ CODE & TESTS ]             [ FINDINGS ]
---------------------------------------------------------------------------------------
-  EXCAVATION CROSS-SECTION (THE DIG)              RESIZABLE DETAIL INSPECTOR
-  +--------------------------------------------+  +----------------------------------+
-  |  BASE (9a8bf4e)            HEAD (a8265d8)  |  | MONACO CODE COMPARISON           |
-  |  ----------------------------------------  |  | [Side-by-Side] [Unified]         |
-  |  L1: export function       L1: export ...  |  | L14:C3-L16:C20 (EV-001)          |
-  |  ... (compressed runs) ...                 |  | -------------------------------- |
-  |  L14: if (!user)           L14: // check   |  | - if (!user) throw Error();      |
-  |  ========================================  |  | + // safety check removed        |
-  |  FAULT: Safety check removed (EV-001)      |  | -------------------------------- |
-  |     \                                      |  | EVIDENCE CORRELATION             |
-  |      \ SHAFT: NONE (No test assertion)     |  | • Status: NONE                   |
-  |       \                                    |  | • Attention: REVIEW FIRST        |
-  |        v [Open Ground]                     |  | • Question: Was test updated?    |
-  |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  |  |                                  |
-  |  BEDROCK: WHAT STATIC ANALYSIS CANNOT SEE  |  |                                  |
-  +--------------------------------------------+  +----------------------------------+
-```
+<p align="center">
+  <img src="assets/the-dig-diagram.svg" alt="The Dig — Interactive Excavation Cross-Section Diagram" width="100%" />
+</p>
 
 ### Key Viewer Features
 
